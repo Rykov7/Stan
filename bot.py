@@ -2,7 +2,8 @@ import telebot
 from me import get_me
 from flask import Flask, request, abort
 from query_log import logging
-
+from datetime import datetime as dt
+from os.path import exists
 # https://core.telegram.org/bots/api Telegram Bot API
 
 
@@ -15,10 +16,10 @@ bot = telebot.TeleBot(LUTZPYBOT)
 print("LutzPyBot is working!")
 
 
-@bot.message_handler(commands=['rules'])
+@bot.message_handler(commands=['rules', 'faq'])
 def send_lutz_command(message):
     bot.send_message(message.chat.id,
-                     '<b>⁉️ <u><a href="https://telegra.ph/Pravila-chata-07-06-11">Правила чата</a></u></b>',
+                     '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                      parse_mode='HTML',
                      disable_notification=True,
                      )
@@ -48,26 +49,41 @@ def send_start_notify_admin(message):
 def send_log_file(message):
     """Get log.csv"""
     if message.from_user.id == 280887861:
-        logfile = open("logs/logs.csv", "r")
-        bot.send_document(message.chat.id, logfile)
-        logfile.close()
+        file_path = f"logs/log_{dt.now().strftime('%Y-%m')}.csv"
+        if exists(file_path):
+            with open(file_path, "r", encoding='utf-8') as f:
+                bot.send_document(message.chat.id, f)
+
 
 
 @bot.inline_handler(lambda query: len(query.query) == 0)
 def default_query(inline_query):
 
     """Inline Aricles"""
-    # lutz = telebot.types.InlineQueryResultCachedDocument(
-    #     id='1', title='M. Lutz "Learning Python"',
-    #     document_file_id='BQACAgIAAxkBAAMdYsS6lL00w2d7pTERHuDHHUT8qF0AAq0ZAALazClKDVkklqaS0FQpBA',
-    #     description='5th Edition (2013), 14.7 MB',
-    #     caption='M. Lutz "Learning Python"',
-    #     )
+    lutz_rus = telebot.types.InlineQueryResultCachedDocument(
+        id='44', title='📕 Изучаем Python 🇷🇺',
+        document_file_id='BQACAgIAAxkBAAIBcGLHE2ryQewEP1ddXOd_jF3OOHUfAAISIAACaOk4SissgGKstQbqKQQ',
+        description='Марк Лутц, 5-е издание, Том 1',
+        caption="""<i><b>Изучаем Python</b>, 5-е издание</i>
+        ├ Автор: Марк Лутц
+        └ Год: 2019""",
+        parse_mode='HTML',
+        )
+
+    matthes_rus = telebot.types.InlineQueryResultCachedDocument(
+        id='45', title='📕 Изучаем Python 🇷🇺',
+        document_file_id='BQACAgIAAxkBAAIBdmLHF0InnLNlQuKzi1fZOYWOdu7eAAIrIAACaOk4StPj0vlMzwe2KQQ',
+        description='Эрик Мэтиз , 3-е издание',
+        caption="""<i><b>Изучаем Python</b>, 3-е издание</i>
+        ├ Автор: Эрик Мэтиз
+        └ Год: 2020""",
+        parse_mode='HTML',
+        )
 
     lutz = telebot.types.InlineQueryResultDocument(
-        id='1', title='⭐️ Learning Python',
+        id='1', title='📕 Learning Python ⭐️',
         document_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.pdf',
-        description='by Mark Lutz, 5th Edition',
+        description='Mark Lutz, 5th Edition',
         caption="""<i><b>Learning Python</b>, 5th Edition</i>
     ├ by Mark Lutz
     └ Released June 2013""",
@@ -78,7 +94,7 @@ def default_query(inline_query):
     matthes = telebot.types.InlineQueryResultDocument(
         id='2', title='📕 Python Crash Course',
         document_url='https://fk7.ru/books/PythonCrashCourse.pdf',
-        description='by Eric Matthes, 2th Edition',
+        description='Eric Matthes, 2th Edition',
         caption="""<i><b>Python Crash Course</b>, 2th Edition</i>
     ├ by Eric Matthes
     └ Released 2019""",
@@ -89,7 +105,7 @@ def default_query(inline_query):
     vincent = telebot.types.InlineQueryResultDocument(
         id='3', title='📕 Django for Beginners',
         document_url='https://fk7.ru/books/django_for_beginners_4_0.pdf',
-        description='by William S. Vincent, 4.0',
+        description='William S. Vincent, 4.0',
         caption="""<i><b>Django for Beginners</b>, 4.0</i>
     ├ by William S. Vincent
     └ Released March 2022""",
@@ -98,7 +114,7 @@ def default_query(inline_query):
         thumb_url='https://fk7.ru/books/django_for_beginners_4_0.jpg',)
 
     bot.answer_inline_query(
-        inline_query.id, [lutz, vincent, matthes],
+        inline_query.id, [lutz,  matthes, lutz_rus, matthes_rus],
         cache_time=10)
 
 
