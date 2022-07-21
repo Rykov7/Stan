@@ -55,7 +55,6 @@ def send_log_file(message):
                 bot.send_document(message.chat.id, f)
 
 
-
 @bot.inline_handler(lambda query: len(query.query) == 0)
 def default_query(inline_query):
 
