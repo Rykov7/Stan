@@ -6,10 +6,7 @@ from datetime import datetime as dt
 from os.path import exists
 # https://core.telegram.org/bots/api Telegram Bot API
 
-
 LUTZPYBOT = "5598132169:AAFBpUn4Us8m7StkY4yHUIcEnnJg3adPvsQ"
-
-
 app = Flask(__name__)
 bot = telebot.TeleBot(LUTZPYBOT)
 
@@ -57,7 +54,6 @@ def send_log_file(message):
 
 @bot.inline_handler(lambda query: len(query.query) == 0)
 def default_query(inline_query):
-
     """Inline Aricles"""
     lutz_rus = telebot.types.InlineQueryResultCachedDocument(
         id='44', title='📕 Изучаем Python 🇷🇺',
