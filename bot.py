@@ -4,13 +4,17 @@ from flask import Flask, request, abort
 from query_log import logging
 from datetime import datetime as dt
 from os.path import exists
+import os
+
+from config import bot, ADMIN_ID
+import reminder
+
 # https://core.telegram.org/bots/api Telegram Bot API
 
-LUTZPYBOT = "5598132169:AAFBpUn4Us8m7StkY4yHUIcEnnJg3adPvsQ"
-app = Flask(__name__)
-bot = telebot.TeleBot(LUTZPYBOT)
 
-print("LutzPyBot is working!")
+app = Flask(__name__)
+
+print("LutzBot is running!")
 
 
 @bot.message_handler(commands=['rules', 'faq'])
@@ -38,14 +42,14 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['start'])
 def send_start_notify_admin(message):
     bot.send_message(
-        280887861, get_me(message), parse_mode='HTML')
+        ADMIN_ID, get_me(message), parse_mode='HTML')
     logging(message)
 
 
 @bot.message_handler(commands=['log'])
 def send_log_file(message):
     """Get log.csv"""
-    if message.from_user.id == 280887861:
+    if message.from_user.id == ADMIN_ID:
         file_path = f"logs/log_{dt.now().strftime('%Y-%m')}.csv"
         if exists(file_path):
             with open(file_path, "r", encoding='utf-8') as f:
@@ -63,7 +67,7 @@ def default_query(inline_query):
         ├ Автор: Марк Лутц
         └ Год: 2019""",
         parse_mode='HTML',
-        )
+    )
 
     matthes_rus = telebot.types.InlineQueryResultCachedDocument(
         id='45', title='📕 Изучаем Python 🇷🇺',
@@ -73,7 +77,7 @@ def default_query(inline_query):
         ├ Автор: Эрик Мэтиз
         └ Год: 2020""",
         parse_mode='HTML',
-        )
+    )
 
     lutz = telebot.types.InlineQueryResultDocument(
         id='1', title='📕 Learning Python ⭐️',
@@ -84,7 +88,7 @@ def default_query(inline_query):
     └ Released June 2013""",
         parse_mode='HTML',
         mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.jpg',)
+        thumb_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.jpg', )
 
     matthes = telebot.types.InlineQueryResultDocument(
         id='2', title='📕 Python Crash Course',
@@ -95,7 +99,7 @@ def default_query(inline_query):
     └ Released 2019""",
         parse_mode='HTML',
         mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/PythonCrashCourse.jpg',)
+        thumb_url='https://fk7.ru/books/PythonCrashCourse.jpg', )
 
     vincent = telebot.types.InlineQueryResultDocument(
         id='3', title='📕 Django for Beginners',
@@ -106,17 +110,17 @@ def default_query(inline_query):
     └ Released March 2022""",
         parse_mode='HTML',
         mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/django_for_beginners_4_0.jpg',)
+        thumb_url='https://fk7.ru/books/django_for_beginners_4_0.jpg', )
 
     bot.answer_inline_query(
-        inline_query.id, [lutz,  matthes, lutz_rus, matthes_rus],
+        inline_query.id, [lutz, matthes, lutz_rus, matthes_rus],
         cache_time=10)
 
 
 @bot.message_handler(content_types=['document'])
 def command_me(message):
-    """GetMe Informer"""
-    if message.chat.id == 280887861:
+    """ GetMe Informer. """
+    if message.chat.id == ADMIN_ID:
         bot.send_message(message.chat.id, message.document)
 
 
@@ -127,7 +131,13 @@ def command_me(message):
     logging(message)
 
 
-@app.route(f'/bot{LUTZPYBOT}/', methods=['POST'])
+@bot.message_handler(commands=['remind'])
+def remind_manually():
+    """Remind manually"""
+    reminder.remind()
+
+
+@app.route(f"/bot{os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')}/", methods=['POST'])
 def webhook():
     """Parse POST requests from Telegram"""
     if request.headers.get('content-type') == 'application/json':

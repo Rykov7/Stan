@@ -3,3 +3,5 @@
 /testbot.py
 /.venv/
 /.idea/
+/config.py
+/.env
