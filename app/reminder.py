@@ -2,16 +2,12 @@ import schedule
 import time
 from threading import Thread
 from datetime import datetime as dt
-from config import bot
 import csv
-from dotenv import load_dotenv
 
-from config import PYTHONCHATRU
+from .config import PYTHONCHATRU, bot
+
 
 # https://core.telegram.org/bots/api Telegram Bot API
-
-dotenv_path = '.env'
-load_dotenv(dotenv_path)
 
 
 def scheduler():
@@ -28,7 +24,7 @@ def remind():
     for entry in holidays[1:]:
         date, holiday, description = entry
         if today.month == dt.strptime(date, "%Y-%m-%d").month and today.day == dt.strptime(date, "%Y-%m-%d").day:
-            notification = f'🎉💻 Сегодня {dt.strptime(date, "%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>!\
+            notification = f'🎉💻 Сегодня {dt.strptime(date, "%Y-%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>!\
                                     \n\n{description}.'
             if dt.strptime(date, "%Y-%m-%d").year != 1:
                 age = today.year - dt.strptime(date, "%Y-%m-%d").year
@@ -36,5 +32,13 @@ def remind():
             bot.send_message(PYTHONCHATRU, notification, parse_mode='HTML')  # PYTHONCHATRU
 
 
-schedule.every().day.at('07:00').do(remind)
+def get_jobs():
+    all_jobs = schedule.get_jobs()
+    text = f"├ <b>Jobs:</b> {str(len(all_jobs))}\
+\n├ {dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+    text += '<i>' + str(all_jobs) + '</i>'
+    return text
+
+
+schedule.every().day.at('06:00').do(remind)
 Thread(target=scheduler).start()

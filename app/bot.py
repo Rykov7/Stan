@@ -1,21 +1,21 @@
 import telebot
-from me import get_me
+from telebot import util
 from flask import Flask, request, abort
-from query_log import logging
 from datetime import datetime as dt
 from os.path import exists
-import os
 import csv
 
-from config import bot, ADMIN_ID
-import reminder
+from .query_log import logging
+from .me import get_me
+from .config import bot, ADMIN_ID, TOKEN
+from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
 
 
 app = Flask(__name__)
 
-print("LutzBot is running!")
+print(">>> LutzBot is running! <<<")
 
 
 @bot.message_handler(commands=['rules', 'faq'])
@@ -106,17 +106,6 @@ def default_query(inline_query):
         mime_type='application/pdf',
         thumb_url='https://fk7.ru/books/PythonCrashCourse.jpg', )
 
-    vincent = telebot.types.InlineQueryResultDocument(
-        id='3', title='📕 Django for Beginners',
-        document_url='https://fk7.ru/books/django_for_beginners_4_0.pdf',
-        description='William S. Vincent, 4.0',
-        caption="""<i><b>Django for Beginners</b>, 4.0</i>
-    ├ by William S. Vincent
-    └ Released March 2022""",
-        parse_mode='HTML',
-        mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/django_for_beginners_4_0.jpg', )
-
     bot.answer_inline_query(
         inline_query.id, [lutz, matthes, lutz_rus, matthes_rus],
         cache_time=10)
@@ -142,9 +131,19 @@ def remind_manually():
     reminder.remind()
 
 
-@app.route(f"/bot{os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')}/", methods=['POST'])
+@bot.message_handler(commands=['jobs'])
+def list_jobs(message):
+    """List all jobs"""
+    if message.chat.id == ADMIN_ID:
+        text = reminder.get_jobs()
+        bot.send_message(message.chat.id, text, parse_mode='HTML')
+
+
+@app.route(f"/bot{TOKEN}/", methods=['POST'])
 def webhook():
-    """Parse POST requests from Telegram"""
+    """ Set webhook. """
+    bot.set_webhook(f'https://fk7.ru/bot{TOKEN}/', allowed_updates=util.update_types)
+    """ Parse POST requests from Telegram. """
     if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
         update = telebot.types.Update.de_json(json_string)
