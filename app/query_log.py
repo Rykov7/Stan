@@ -14,6 +14,6 @@ def logging(message):
     with open(log_file_csv, 'a') as f:
         logs = csv.writer(f)
         logs.writerow(
-            [dt.datetime.now().strftime('%Y-%m-%d %H:%H'), message.from_user.id,
+            [dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), message.from_user.id,
              message.from_user.first_name, message.from_user.username,
              message.chat.id, message.from_user.language_code, message.from_user.is_premium, message.text])
