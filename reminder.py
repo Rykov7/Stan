@@ -28,7 +28,7 @@ def remind():
     for entry in holidays[1:]:
         date, holiday, description = entry
         if today.month == dt.strptime(date, "%Y-%m-%d").month and today.day == dt.strptime(date, "%Y-%m-%d").day:
-            notification = f'🎉💻 Сегодня {dt.strptime(date, "%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>! \
+            notification = f'🎉💻 Сегодня {dt.strptime(date, "%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>!\
                                     \n\n{description}.'
             if dt.strptime(date, "%Y-%m-%d").year != 1:
                 age = today.year - dt.strptime(date, "%Y-%m-%d").year
