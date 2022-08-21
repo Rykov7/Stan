@@ -28,13 +28,11 @@ def remind():
     for entry in holidays[1:]:
         date, holiday, description = entry
         if today.month == dt.strptime(date, "%Y-%m-%d").month and today.day == dt.strptime(date, "%Y-%m-%d").day:
-            if dt.strptime(date, "%Y-%m-%d").year == 1:
-                notification = f'🎉💻 Сегодня {dt.strptime(date, "%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>! \
-                                        \n\n{description}.'
-            else:
+            notification = f'🎉💻 Сегодня {dt.strptime(date, "%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>! \
+                                    \n\n{description}.'
+            if dt.strptime(date, "%Y-%m-%d").year != 1:
                 age = today.year - dt.strptime(date, "%Y-%m-%d").year
-                notification = f'🎉💻 Сегодня {dt.strptime(date, "%Y-%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>! \
-                                                         \n\n{description}.\n<i>{age} годовщина</i>'
+                notification += f'\n<i>{age} годовщина</i>'
             bot.send_message(PYTHONCHATRU, notification, parse_mode='HTML')  # PYTHONCHATRU
 
 

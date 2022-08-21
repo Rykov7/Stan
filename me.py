@@ -2,7 +2,7 @@
 
 
 def get_me(message):
-    # Fields: https://core.telegram.org/bots/api#user
+    # Fields tip: https://core.telegram.org/bots/api#user
     msg = f"<b>Telegram ID:</b> <code>{message.from_user.id}</code>\n\
     ├ <b>Is bot:</b> {message.from_user.is_bot}\n\
     ├ <b>First name:</b> {message.from_user.first_name}\n"

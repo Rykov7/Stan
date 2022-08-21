@@ -5,6 +5,7 @@ from query_log import logging
 from datetime import datetime as dt
 from os.path import exists
 import os
+import csv
 
 from config import bot, ADMIN_ID
 import reminder
@@ -47,13 +48,17 @@ def send_start_notify_admin(message):
 
 
 @bot.message_handler(commands=['log'])
-def send_log_file(message):
-    """Get log.csv"""
+def send_log(message):
+    """Send log from log.csv"""
     if message.from_user.id == ADMIN_ID:
         file_path = f"logs/log_{dt.now().strftime('%Y-%m')}.csv"
         if exists(file_path):
-            with open(file_path, "r", encoding='utf-8') as f:
-                bot.send_document(message.chat.id, f)
+            with open(file_path, "r", newline='', encoding='utf-8') as f:
+                all_rows = list(csv.reader(f))
+            text = ''
+            for row in all_rows[-min(len(all_rows), 5):]:
+                text += str(row) + '\n'
+            bot.send_message(ADMIN_ID, f'<code>{text}</code>', parse_mode='html')
 
 
 @bot.inline_handler(lambda query: len(query.query) == 0)
