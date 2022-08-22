@@ -13,7 +13,7 @@ from .config import PYTHONCHATRU, bot
 def scheduler():
     while True:
         run_pending()
-        time.sleep(120)
+        time.sleep(300)
 
 
 @repeat(every().day.at('06:00'))
