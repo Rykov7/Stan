@@ -23,6 +23,8 @@ def remind(chat_to_repeat=PYTHONCHATRU, today=dt.today()):
         holidays = tuple(csv.reader(holidays_file))[1:]
     for entry in holidays:
         date, holiday, description = entry
+        if holiday == 'День программиста' and today.year % 4 == 0:
+            date = '09-12-1000'  # instead of 09-13-1000 in non-leap-year
         date = dt.strptime(date, "%m-%d-%Y")
         if today.month == date.month and today.day == date.day:
             notification = f'🎉💻 Сегодня <b><u>{holiday.upper()}</u></b>!\
