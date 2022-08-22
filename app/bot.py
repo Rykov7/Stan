@@ -126,16 +126,26 @@ def command_me(message):
 
 
 @bot.message_handler(commands=['remind'])
-def remind_manually():
+def remind_manually(message):
     """Remind manually"""
-    reminder.remind()
+    args = message.text.split()
+    if len(args) > 1:
+        try:
+            today = dt.strptime(args[1], "%m-%d-%Y")
+        except ValueError as ve:
+            bot.send_message(message.chat.id, f"Не удалось распарсить дату!\n{ve}", parse_mode='HTML')
+        else:
+            reminder.remind(message.chat.id, today)
+    else:
+        bot.send_message(message.chat.id, f"<b>Справка</b>\nФормат даты: MM-DD-YYYY\n"
+                                          f"Пример: /remind 02-14-2022", parse_mode='HTML')
 
 
 @bot.message_handler(commands=['jobs'])
 def list_jobs(message):
     """List all jobs"""
     if message.chat.id == ADMIN_ID:
-        text = reminder.get_jobs()
+        text = reminder.print_get_jobs()
         bot.send_message(message.chat.id, text, parse_mode='HTML')
 
 
