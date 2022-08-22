@@ -133,12 +133,14 @@ def remind_manually(message):
         try:
             today = dt.strptime(args[1], "%m-%d-%Y")
         except ValueError as ve:
-            bot.send_message(message.chat.id, f"Не удалось распарсить дату!\n{ve}", parse_mode='HTML')
+            bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}", parse_mode='HTML')
         else:
             reminder.remind(message.chat.id, today)
     else:
-        bot.send_message(message.chat.id, f"<b>Справка</b>\nФормат даты: MM-DD-YYYY\n"
-                                          f"Пример: /remind 02-14-2022", parse_mode='HTML')
+        bot.send_message(message.chat.id, f"<b>Формат даты: MM-DD-YYYY</b>\n\n"
+                                          f"Примеры:\n"
+                                          f"/remind 02-14-2022\n"
+                                          f"/remind 09-13-1985", parse_mode='HTML')
 
 
 @bot.message_handler(commands=['jobs'])
