@@ -13,7 +13,7 @@ from .config import PYTHONCHATRU, bot
 def scheduler():
     while True:
         schedule.run_pending()
-        time.sleep(20)
+        time.sleep(120)
 
 
 def remind():
@@ -23,11 +23,12 @@ def remind():
     today = dt.today()
     for entry in holidays[1:]:
         date, holiday, description = entry
-        if today.month == dt.strptime(date, "%Y-%m-%d").month and today.day == dt.strptime(date, "%Y-%m-%d").day:
-            notification = f'🎉💻 Сегодня {dt.strptime(date, "%Y-%m-%d"):%d.%m}, <b><u>{holiday.upper()}</u></b>!\
+        date = dt.strptime(date, "%m-%d-%Y")
+        if today.month == date.month and today.day == date.day:
+            notification = f'🎉💻 Сегодня {date:%d.%m}, <b><u>{holiday.upper()}</u></b>!\
                                     \n\n{description}.'
-            if dt.strptime(date, "%Y-%m-%d").year != 1:
-                age = today.year - dt.strptime(date, "%Y-%m-%d").year
+            if date.year != 1000:
+                age = today.year - date.year
                 notification += f'\n<i>{age} годовщина</i>'
             bot.send_message(PYTHONCHATRU, notification, parse_mode='HTML')  # PYTHONCHATRU
 
