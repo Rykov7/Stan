@@ -69,8 +69,8 @@ def default_query(inline_query):
         document_file_id='BQACAgIAAxkBAAIBcGLHE2ryQewEP1ddXOd_jF3OOHUfAAISIAACaOk4SissgGKstQbqKQQ',
         description='Марк Лутц, 5-е издание, Том 1',
         caption="""<i><b>Изучаем Python</b>, 5-е издание</i>
-        ├ Автор: Марк Лутц
-        └ Год: 2019""",
+    ├ Автор: Марк Лутц
+    └ Год: 2019""",
         parse_mode='HTML',
     )
 
@@ -79,8 +79,8 @@ def default_query(inline_query):
         document_file_id='BQACAgIAAxkBAAIBdmLHF0InnLNlQuKzi1fZOYWOdu7eAAIrIAACaOk4StPj0vlMzwe2KQQ',
         description='Эрик Мэтиз , 3-е издание',
         caption="""<i><b>Изучаем Python</b>, 3-е издание</i>
-        ├ Автор: Эрик Мэтиз
-        └ Год: 2020""",
+    ├ Автор: Эрик Мэтиз
+    └ Год: 2020""",
         parse_mode='HTML',
     )
 
@@ -139,8 +139,8 @@ def remind_manually(message):
     else:
         bot.send_message(message.chat.id, f"<b>Формат даты: MM-DD-YYYY</b>\n\n"
                                           f"Примеры:\n"
-                                          f"/remind 02-14-2022\n"
-                                          f"/remind 09-13-1985", parse_mode='HTML')
+                                          f"/remind 09-12-2024\n"
+                                          f"/remind 09-13-2022", parse_mode='HTML')
 
 
 @bot.message_handler(commands=['jobs'])
