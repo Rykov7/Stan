@@ -16,9 +16,11 @@ def scheduler():
         time.sleep(300)
 
 
-@repeat(every().day.at('06:00'))
-def remind(chat_to_repeat=PYTHONCHATRU, today=dt.today()):
+@repeat(every().day.at('06:00'), PYTHONCHATRU, None)
+def remind(chat_to_repeat, today):
     """ Remind holiday. """
+    if not today:
+        today = dt.today()
     with open('holidays.csv', newline='', encoding='utf-8') as holidays_file:
         holidays = tuple(csv.reader(holidays_file))[1:]
     for entry in holidays:
