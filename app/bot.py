@@ -40,6 +40,18 @@ def send_lutz_command(message):
     logging(message)
 
 
+@bot.message_handler(commands=['lib', 'library', 'book', 'books'])
+def send_lutz_command(message):
+    bot.send_message(message.chat.id,
+                     '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>\n'
+                     'Список рекомендуемой чатом литературы.',
+                     parse_mode='HTML',
+                     disable_notification=True,
+                     disable_web_page_preview=True,
+                     )
+    logging(message)
+
+
 @bot.message_handler(commands=['start'])
 def send_start_notify_admin(message):
     bot.send_message(
