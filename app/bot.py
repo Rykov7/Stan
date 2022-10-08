@@ -18,7 +18,7 @@ app = Flask(__name__)
 print(">>> LutzBot is running! <<<")
 
 
-@bot.message_handler(commands=['rules', 'faq'])
+@bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
     bot.send_message(message.chat.id,
                      '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
@@ -27,6 +27,14 @@ def send_lutz_command(message):
                      )
     logging(message)
 
+@bot.message_handler(commands=['faq'])
+def send_lutz_command(message):
+    bot.send_message(message.chat.id,
+                     '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
+                     parse_mode='HTML',
+                     disable_notification=True,
+                     )
+    logging(message)
 
 @bot.message_handler(commands=['lutz'])
 def send_lutz_command(message):
@@ -43,11 +51,9 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
 def send_lutz_command(message):
     bot.send_message(message.chat.id,
-                     '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>\n'
-                     'Список рекомендуемой чатом литературы.',
+                     '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
                      parse_mode='HTML',
                      disable_notification=True,
-                     disable_web_page_preview=True,
                      )
     logging(message)
 
