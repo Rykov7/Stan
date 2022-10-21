@@ -1,5 +1,4 @@
 import telebot
-from telebot import util
 from flask import Flask, request, abort
 from datetime import datetime as dt
 from os.path import exists
@@ -11,11 +10,28 @@ from .config import bot, ADMIN_ID, TOKEN
 from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
+# https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
 
 
 app = Flask(__name__)
 
 print(">>> LutzBot is running! <<<")
+
+zen_rows = """Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren't special enough to break the rules. Although practicality beats purity.
+Errors should never pass silently. Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Now is better than never. Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!""".split('\n')
 
 
 @bot.message_handler(commands=['rules'])
@@ -27,6 +43,7 @@ def send_lutz_command(message):
                      )
     logging(message)
 
+
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
     bot.send_message(message.chat.id,
@@ -35,6 +52,7 @@ def send_lutz_command(message):
                      disable_notification=True,
                      )
     logging(message)
+
 
 @bot.message_handler(commands=['lutz'])
 def send_lutz_command(message):
@@ -79,9 +97,12 @@ def send_log(message):
             bot.send_message(ADMIN_ID, f'<code>{text}</code>', parse_mode='html')
 
 
-@bot.inline_handler(lambda query: len(query.query) == 0)
+
+
+
+@bot.inline_handler(lambda query: len(query.query) == 'b')
 def default_query(inline_query):
-    """Inline Aricles"""
+    """Inline Books"""
     lutz_rus = telebot.types.InlineQueryResultCachedDocument(
         id='44', title='📕 Изучаем Python 🇷🇺',
         document_file_id='BQACAgIAAxkBAAIBcGLHE2ryQewEP1ddXOd_jF3OOHUfAAISIAACaOk4SissgGKstQbqKQQ',
@@ -103,7 +124,7 @@ def default_query(inline_query):
     )
 
     lutz = telebot.types.InlineQueryResultDocument(
-        id='1', title='📕 Learning Python ⭐️',
+        id='77', title='📕 Learning Python ⭐️',
         document_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.pdf',
         description='Mark Lutz, 5th Edition',
         caption="""<i><b>Learning Python</b>, 5th Edition</i>
@@ -114,7 +135,7 @@ def default_query(inline_query):
         thumb_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.jpg', )
 
     matthes = telebot.types.InlineQueryResultDocument(
-        id='2', title='📕 Python Crash Course',
+        id='88', title='📕 Python Crash Course',
         document_url='https://fk7.ru/books/PythonCrashCourse.pdf',
         description='Eric Matthes, 2th Edition',
         caption="""<i><b>Python Crash Course</b>, 2th Edition</i>
@@ -126,7 +147,22 @@ def default_query(inline_query):
 
     bot.answer_inline_query(
         inline_query.id, [lutz, matthes, lutz_rus, matthes_rus],
-        cache_time=10)
+        cache_time=12)
+
+
+@bot.inline_handler(lambda query: True)
+def default_query(inline_query):
+    """Inline Texts"""
+    zen = []
+    for id_p, phrase in enumerate(zen_rows):
+        if inline_query.query.casefold() in phrase.casefold():
+            zen.append(telebot.types.InlineQueryResultArticle(
+                f"{id_p + 7000}", phrase, telebot.types.InputTextMessageContent(
+                    f"<i>{phrase}</i>", parse_mode='HTML'), description=f'The Zen of Python #{id_p + 1}'))
+
+    bot.answer_inline_query(
+        inline_query.id, zen,
+        cache_time=12)
 
 
 @bot.message_handler(content_types=['document'])
@@ -171,8 +207,6 @@ def list_jobs(message):
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
 def webhook():
-    """ Set webhook. """
-    bot.set_webhook(f'https://fk7.ru/bot{TOKEN}/', allowed_updates=util.update_types)
     """ Parse POST requests from Telegram. """
     if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
