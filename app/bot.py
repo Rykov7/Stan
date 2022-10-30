@@ -1,12 +1,14 @@
-import telebot
+from telebot import types
 from flask import Flask, request, abort
 from datetime import datetime as dt
 from os.path import exists
 import csv
+from time import sleep
+from threading import Thread
 
 from .query_log import logging
 from .me import get_me
-from .config import bot, ADMIN_ID, TOKEN
+from .config import bot, ADMIN_ID, TOKEN, TEST_CHAT
 from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -17,21 +19,36 @@ app = Flask(__name__)
 
 print(">>> LutzBot is running! <<<")
 
-zen_rows = """Beautiful is better than ugly.
-Explicit is better than implicit.
-Simple is better than complex.
-Complex is better than complicated.
-Flat is better than nested.
-Sparse is better than dense.
-Readability counts.
-Special cases aren't special enough to break the rules. Although practicality beats purity.
-Errors should never pass silently. Unless explicitly silenced.
-In the face of ambiguity, refuse the temptation to guess.
-There should be one-- and preferably only one --obvious way to do it.
-Now is better than never. Although never is often better than *right* now.
-If the implementation is hard to explain, it's a bad idea.
-If the implementation is easy to explain, it may be a good idea.
-Namespaces are one honking great idea -- let's do more of those!""".split('\n')
+zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
+            'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
+            'Readability counts.',
+            "Special cases aren't special enough to break the rules. Although practicality beats purity.",
+            'Errors should never pass silently. Unless explicitly silenced.',
+            'In the face of ambiguity, refuse the temptation to guess.',
+            'There should be one — and preferably only one — obvious way to do it.',
+            'Now is better than never. Although never is often better than *right* now.',
+            "If the implementation is hard to explain, it's a bad idea.",
+            'If the implementation is easy to explain, it may be a good idea.',
+            "Namespaces are one honking great idea — let's do more of those!"]
+
+
+def wait_for_readers(action, chat_id, msg_id):
+    sleep(60)
+    action(chat_id, msg_id)
+
+
+@bot.message_handler(func=(lambda message: message.text.startswith('https://tg.sv/') or
+                                           message.text.startswith('https://goo.by/') or
+                                           message.text.startswith('🍀GREEN ROOM🍀')),
+                     content_types=['animation', 'text'])
+def starts_with_handler(message: types.Message):
+    warn = bot.send_message(message.chat.id,
+                            f'♻ <b><a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a></b>'
+                            f' заблокирован.', parse_mode='HTML')
+    bot.ban_chat_member(message.chat.id, message.from_user.id)
+    bot.delete_message(message.chat.id, message.id)
+
+    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
 
 
 @bot.message_handler(commands=['rules'])
@@ -97,72 +114,18 @@ def send_log(message):
             bot.send_message(ADMIN_ID, f'<code>{text}</code>', parse_mode='html')
 
 
-
-
-
-@bot.inline_handler(lambda query: len(query.query) == 'b')
-def default_query(inline_query):
-    """Inline Books"""
-    lutz_rus = telebot.types.InlineQueryResultCachedDocument(
-        id='44', title='📕 Изучаем Python 🇷🇺',
-        document_file_id='BQACAgIAAxkBAAIBcGLHE2ryQewEP1ddXOd_jF3OOHUfAAISIAACaOk4SissgGKstQbqKQQ',
-        description='Марк Лутц, 5-е издание, Том 1',
-        caption="""<i><b>Изучаем Python</b>, 5-е издание</i>
-    ├ Автор: Марк Лутц
-    └ Год: 2019""",
-        parse_mode='HTML',
-    )
-
-    matthes_rus = telebot.types.InlineQueryResultCachedDocument(
-        id='45', title='📕 Изучаем Python 🇷🇺',
-        document_file_id='BQACAgIAAxkBAAIBdmLHF0InnLNlQuKzi1fZOYWOdu7eAAIrIAACaOk4StPj0vlMzwe2KQQ',
-        description='Эрик Мэтиз , 3-е издание',
-        caption="""<i><b>Изучаем Python</b>, 3-е издание</i>
-    ├ Автор: Эрик Мэтиз
-    └ Год: 2020""",
-        parse_mode='HTML',
-    )
-
-    lutz = telebot.types.InlineQueryResultDocument(
-        id='77', title='📕 Learning Python ⭐️',
-        document_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.pdf',
-        description='Mark Lutz, 5th Edition',
-        caption="""<i><b>Learning Python</b>, 5th Edition</i>
-    ├ by Mark Lutz
-    └ Released June 2013""",
-        parse_mode='HTML',
-        mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/OReilly.Learning.Python.5th.Edition.jpg', )
-
-    matthes = telebot.types.InlineQueryResultDocument(
-        id='88', title='📕 Python Crash Course',
-        document_url='https://fk7.ru/books/PythonCrashCourse.pdf',
-        description='Eric Matthes, 2th Edition',
-        caption="""<i><b>Python Crash Course</b>, 2th Edition</i>
-    ├ by Eric Matthes
-    └ Released 2019""",
-        parse_mode='HTML',
-        mime_type='application/pdf',
-        thumb_url='https://fk7.ru/books/PythonCrashCourse.jpg', )
-
-    bot.answer_inline_query(
-        inline_query.id, [lutz, matthes, lutz_rus, matthes_rus],
-        cache_time=12)
-
-
 @bot.inline_handler(lambda query: True)
 def default_query(inline_query):
     """Inline Texts"""
     zen = []
     for id_p, phrase in enumerate(zen_rows):
-        if inline_query.query.casefold() in phrase.casefold():
-            zen.append(telebot.types.InlineQueryResultArticle(
-                f"{id_p + 7000}", phrase, telebot.types.InputTextMessageContent(
-                    f"<i>{phrase}</i>", parse_mode='HTML'), description=f'The Zen of Python #{id_p + 1}'))
+        q = inline_query.query.casefold()
+        if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
+            zen.append(types.InlineQueryResultArticle(
+                f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
+                    f"<i>{phrase}</i>", parse_mode='HTML'), description=phrase))
 
-    bot.answer_inline_query(
-        inline_query.id, zen,
-        cache_time=12)
+    bot.answer_inline_query(inline_query.id, zen, cache_time=12)
 
 
 @bot.message_handler(content_types=['document'])
@@ -210,7 +173,7 @@ def webhook():
     """ Parse POST requests from Telegram. """
     if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
+        update = types.Update.de_json(json_string)
         bot.process_new_updates([update])
         return ''
     else:
