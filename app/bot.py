@@ -8,7 +8,7 @@ from threading import Thread
 
 from .query_log import logging
 from .me import get_me
-from .config import bot, ADMIN_ID, TOKEN, TEST_CHAT
+from .config import bot, ADMIN_ID, TOKEN
 from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -126,13 +126,6 @@ def default_query(inline_query):
                     f"<i>{phrase}</i>", parse_mode='HTML'), description=phrase))
 
     bot.answer_inline_query(inline_query.id, zen, cache_time=12)
-
-
-@bot.message_handler(content_types=['document'])
-def command_me(message):
-    """ GetMe Informer. """
-    if message.chat.id == ADMIN_ID:
-        bot.send_message(message.chat.id, message.document)
 
 
 @bot.message_handler(commands=['me'])
