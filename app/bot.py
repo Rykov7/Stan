@@ -41,7 +41,7 @@ def wait_for_readers(action, chat_id, msg_id):
                                            message.text.startswith('https://goo.by/') or
                                            message.text.startswith('🍀GREEN ROOM🍀')),
                      content_types=['animation', 'text'])
-def starts_with_handler(message: types.Message):
+def moderate_messages(message: types.Message):
     warn = bot.send_message(message.chat.id,
                             f'♻ <b><a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a></b>'
                             f' заблокирован.', parse_mode='HTML')
