@@ -33,6 +33,7 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
 
 
 def wait_for_readers(action, chat_id, msg_id):
+    """ Show message "User banned" until limited time, then delete. """
     sleep(60)
     action(chat_id, msg_id)
 
@@ -42,6 +43,7 @@ def wait_for_readers(action, chat_id, msg_id):
                                            message.text.startswith('🍀GREEN ROOM🍀')),
                      content_types=['animation', 'text'])
 def moderate_messages(message: types.Message):
+    """ Ban user and delete their message. """
     warn = bot.send_message(message.chat.id,
                             f'♻ <b><a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a></b>'
                             f' заблокирован.', parse_mode='HTML')
@@ -53,6 +55,7 @@ def moderate_messages(message: types.Message):
 
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
+    """ Send link to the Chat Rules. """
     bot.send_message(message.chat.id,
                      '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                      parse_mode='HTML',
@@ -63,6 +66,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
+    """ Send link to the Chat FAQ. """
     bot.send_message(message.chat.id,
                      '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
                      parse_mode='HTML',
@@ -73,6 +77,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['lutz'])
 def send_lutz_command(message):
+    """ Send the Lutz's Book. """
     bot.send_document(
         message.chat.id,
         document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
@@ -85,6 +90,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
 def send_lutz_command(message):
+    """ Send link to the Chat's Library. """
     bot.send_message(message.chat.id,
                      '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
                      parse_mode='HTML',
@@ -93,16 +99,9 @@ def send_lutz_command(message):
     logging(message)
 
 
-@bot.message_handler(commands=['start'])
-def send_start_notify_admin(message):
-    bot.send_message(
-        ADMIN_ID, get_me(message), parse_mode='HTML')
-    logging(message)
-
-
 @bot.message_handler(commands=['log'])
 def send_log(message):
-    """Send log from log.csv"""
+    """ Send the last log rows. """
     if message.from_user.id == ADMIN_ID:
         file_path = f"logs/log_{dt.now().strftime('%Y-%m')}.csv"
         if exists(file_path):
@@ -116,7 +115,7 @@ def send_log(message):
 
 @bot.inline_handler(lambda query: True)
 def default_query(inline_query):
-    """Inline Texts"""
+    """ Inline the Zen of Python. """
     zen = []
     for id_p, phrase in enumerate(zen_rows):
         q = inline_query.query.casefold()
@@ -130,14 +129,14 @@ def default_query(inline_query):
 
 @bot.message_handler(commands=['me'])
 def command_me(message):
-    """GetMe Informer"""
+    """ Send info about user and chat id [Service]. """
     bot.send_message(message.chat.id, get_me(message), parse_mode='HTML')
     logging(message)
 
 
 @bot.message_handler(commands=['remind'])
 def remind_manually(message):
-    """Remind manually"""
+    """ Remind holidays manually. """
     args = message.text.split()
     if len(args) > 1:
         try:
@@ -155,7 +154,7 @@ def remind_manually(message):
 
 @bot.message_handler(commands=['jobs'])
 def list_jobs(message):
-    """List all jobs"""
+    """ List all the jobs in schedule. """
     if message.chat.id == ADMIN_ID:
         text = reminder.print_get_jobs()
         bot.send_message(message.chat.id, text, parse_mode='HTML')

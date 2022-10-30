@@ -1,3 +1,5 @@
+""" Schedule holidays. """
+
 from schedule import repeat, every, get_jobs, run_pending
 import time
 from threading import Thread

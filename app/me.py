@@ -1,4 +1,4 @@
-""" Helper functions for bot.py """
+""" Send User's info. """
 
 
 def get_me(message):

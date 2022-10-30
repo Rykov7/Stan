@@ -1,3 +1,5 @@
+""" Logging in file. """
+
 import csv
 from os.path import exists
 import datetime as dt
