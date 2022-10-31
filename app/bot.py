@@ -33,7 +33,7 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
 
 
 def wait_for_readers(action, chat_id, msg_id):
-    """ Show message "User banned" until limited time, then delete. """
+    """ Delete message after limited time. """
     sleep(60)
     action(chat_id, msg_id)
 
@@ -55,7 +55,7 @@ def moderate_messages(message: types.Message):
 
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
-    """ Send link to the Chat Rules. """
+    """ Send Chat Rules link. """
     bot.send_message(message.chat.id,
                      '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                      parse_mode='HTML',
@@ -66,7 +66,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
-    """ Send link to the Chat FAQ. """
+    """ Send Chat FAQ link. """
     bot.send_message(message.chat.id,
                      '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
                      parse_mode='HTML',
@@ -90,7 +90,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
 def send_lutz_command(message):
-    """ Send link to the Chat's Library. """
+    """ Send Chat's Library link. """
     bot.send_message(message.chat.id,
                      '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
                      parse_mode='HTML',
@@ -171,7 +171,7 @@ def check_unwanted_list(message_text: types.Message) -> bool:
 @bot.message_handler(func=check_unwanted_list, content_types=['text'])
 def unwanted_mentions(message: types.Message):
     """ Reply to unwanted mentions. """
-    bot.reply_to(message, f'☢ У нас таких не любят! 🤮', parse_mode='HTML')
+    bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
