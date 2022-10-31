@@ -160,6 +160,20 @@ def list_jobs(message):
         bot.send_message(message.chat.id, text, parse_mode='HTML')
 
 
+def check_unwanted_list(message_text: types.Message) -> bool:
+    """ Check for mentioning unwanted persons in text. """
+    unwanted_phrases = ['дудар', 'хауди', 'howdy', 'dudar']
+    for phrase in unwanted_phrases:
+        if phrase in message_text.text.casefold():
+            return True
+
+
+@bot.message_handler(func=check_unwanted_list, content_types=['text'])
+def unwanted_mentions(message: types.Message):
+    """ Reply to unwanted mentions. """
+    bot.reply_to(message, f'☢ У нас таких не любят! 🤮', parse_mode='HTML')
+
+
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
 def webhook():
     """ Parse POST requests from Telegram. """
