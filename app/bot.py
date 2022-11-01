@@ -38,19 +38,23 @@ def wait_for_readers(action, chat_id, msg_id):
     action(chat_id, msg_id)
 
 
-@bot.message_handler(func=(lambda message: message.text.startswith('https://tg.sv/') or
-                                           message.text.startswith('https://goo.by/') or
-                                           message.text.startswith('🍀GREEN ROOM🍀')),
-                     content_types=['animation', 'text'])
+def check_spam_list(type_message: types.Message) -> bool:
+    """ Check for mentioning unwanted persons in text. """
+    unwanted_phrases = ['https://tg.sv/', 'https://goo.by/', '🍀GREEN ROOM🍀']
+    for phrase in unwanted_phrases:
+        if phrase in type_message.text.casefold():
+            return True
+
+
+@bot.message_handler(func=check_spam_list, content_types=['text'])
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
     warn = bot.send_message(message.chat.id,
                             f'♻ <b><a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a></b>'
                             f' заблокирован.', parse_mode='HTML')
+    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     bot.delete_message(message.chat.id, message.id)
-
-    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
 
 
 @bot.message_handler(commands=['rules'])
@@ -160,11 +164,11 @@ def list_jobs(message):
         bot.send_message(message.chat.id, text, parse_mode='HTML')
 
 
-def check_unwanted_list(message_text: types.Message) -> bool:
+def check_unwanted_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
     unwanted_phrases = ['дудар', 'хауди', 'howdy', 'dudar']
     for phrase in unwanted_phrases:
-        if phrase in message_text.text.casefold():
+        if phrase in type_message.text.casefold():
             return True
 
 
