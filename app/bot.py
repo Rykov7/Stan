@@ -186,6 +186,11 @@ def list_jobs(message):
         text = reminder.print_get_jobs()
         bot.send_message(message.chat.id, text, parse_mode='HTML')
 
+        with shelve.open('chat_stats') as s:
+            bot.send_message(ADMIN_ID, f"""🚨 <b>Статистика нарушений за сутки</b>
+    ├ <b>Заблокировано спамеров:</b> {s['Banned']}
+    └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
+
 
 def check_unwanted_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """

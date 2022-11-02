@@ -42,9 +42,10 @@ def remind(chat_to_repeat, today):
 @repeat(every().day.at('05:00'), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
     with shelve.open('chat_stats') as s:
-        bot.send_message(chat_to_repeat, f"""🚨 <b>Статистика нарушений</b>
-    ├ <b>Удалено спамеров:</b> {s['Banned']}
+        bot.send_message(chat_to_repeat, f"""🚨 <b>Статистика нарушений за сутки</b>
+    ├ <b>Заблокировано спамеров:</b> {s['Banned']}
     └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
+        s['Banned'] = s['Deleted'] = 0  # Clear
 
 
 def print_get_jobs():
