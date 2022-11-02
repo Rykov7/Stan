@@ -19,6 +19,7 @@ app = Flask(__name__)
 
 print(">>> LutzBot is running! <<<")
 
+
 zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
             'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
             'Readability counts.',
@@ -63,9 +64,10 @@ def check_delete_list(type_message: types.Message) -> bool:
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
-        for entity in type_message.entities:
-            if phrase in entity.url:
-                return True
+        if type_message.entities:
+            for entity in type_message.entities:
+                if entity.url and phrase in entity.url:
+                    return True
 
 
 @bot.message_handler(func=check_delete_list, content_types=['text'])
