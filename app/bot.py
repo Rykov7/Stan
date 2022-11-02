@@ -187,7 +187,9 @@ def list_jobs(message):
         bot.send_message(message.chat.id, text, parse_mode='HTML')
 
         with shelve.open('chat_stats') as s:
-            bot.send_message(ADMIN_ID, f"""🚨 <b>Статистика нарушений за сутки</b>
+            bot.send_message(ADMIN_ID, f"""<code>Доброе утро, мир!</code>
+            
+👮🏼 <b>Статистика нарушений за сутки</b>
     ├ <b>Заблокировано спамеров:</b> {s['Banned']}
     └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
 
