@@ -40,7 +40,7 @@ def wait_for_readers(action, chat_id, msg_id):
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['https://tg.sv/', 'https://goo.by/', '🍀GREEN ROOM🍀']
+    unwanted_phrases = ['tg.sv', 'goo.by', '🍀GREEN ROOM🍀']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -59,10 +59,13 @@ def moderate_messages(message: types.Message):
 
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for unwanted text in message and delete. """
-    unwanted_phrases = ['https://t.me/']
+    unwanted_phrases = ['t.me']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
+        for entity in type_message.entities:
+            if phrase in entity.url:
+                return True
 
 
 @bot.message_handler(func=check_delete_list, content_types=['text'])
