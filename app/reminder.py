@@ -5,7 +5,7 @@ import time
 from threading import Thread
 from datetime import datetime as dt
 import csv
-
+import shelve
 from .config import PYTHONCHATRU, bot
 
 
@@ -37,6 +37,14 @@ def remind(chat_to_repeat, today):
                 age = today.year - date.year
                 notification += f'\n\n🥳 <i>{age}-ая годовщина</i>'
             bot.send_message(chat_to_repeat, notification, parse_mode='HTML')
+
+
+@repeat(every().day.at('05:00'), PYTHONCHATRU)
+def stat_report(chat_to_repeat):
+    with shelve.open('chat_stats') as s:
+        bot.send_message(chat_to_repeat, f"""🚨 <b>Статистика нарушений</b>
+    ├ <b>Удалено спамеров:</b> {s['Banned']}
+    └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
 
 
 def print_get_jobs():

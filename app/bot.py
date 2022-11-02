@@ -5,6 +5,7 @@ from os.path import exists
 import csv
 from time import sleep
 from threading import Thread
+import shelve
 
 from .query_log import logging
 from .me import get_me
@@ -18,7 +19,6 @@ from . import reminder
 app = Flask(__name__)
 
 print(">>> LutzBot is running! <<<")
-
 
 zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
             'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
@@ -56,6 +56,8 @@ def moderate_messages(message: types.Message):
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     bot.delete_message(message.chat.id, message.id)
+    with shelve.open('chat_stats') as chat_stats:
+        chat_stats['Banned'] += 1
 
 
 def check_delete_list(type_message: types.Message) -> bool:
@@ -74,6 +76,8 @@ def check_delete_list(type_message: types.Message) -> bool:
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
     bot.delete_message(message.chat.id, message.id)
+    with shelve.open('chat_stats') as chat_stats:
+        chat_stats['Deleted'] += 1
 
 
 @bot.message_handler(commands=['rules'])
