@@ -57,6 +57,20 @@ def moderate_messages(message: types.Message):
     bot.delete_message(message.chat.id, message.id)
 
 
+def check_delete_list(type_message: types.Message) -> bool:
+    """ Check for unwanted text in message and delete. """
+    unwanted_phrases = ['https://t.me/']
+    for phrase in unwanted_phrases:
+        if phrase in type_message.text.casefold():
+            return True
+
+
+@bot.message_handler(func=check_delete_list, content_types=['text'])
+def delete_message(message: types.Message):
+    """ Delete unwanted message. """
+    bot.delete_message(message.chat.id, message.id)
+
+
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
     """ Send Chat Rules link. """
