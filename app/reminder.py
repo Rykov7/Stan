@@ -5,8 +5,8 @@ import time
 from threading import Thread
 from datetime import datetime as dt
 import csv
-import shelve
 from .config import PYTHONCHATRU, bot
+from . import report
 
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -41,13 +41,9 @@ def remind(chat_to_repeat, today):
 
 @repeat(every().day.at('05:00'), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
-    with shelve.open('chat_stats') as s:
-        bot.send_message(chat_to_repeat, f"""<code>Доброе утро, мир!</code>
-            
-👮🏼 <b>Статистика нарушений за сутки</b>
-    ├ <b>Заблокировано спамеров:</b> {s['Banned']}
-    └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
-        s['Banned'] = s['Deleted'] = 0  # Clear
+    bot.send_message(chat_to_repeat, report.create_report_text(),
+                     parse_mode='HTML', disable_web_page_preview=True)
+    report.reset_report_stats()
 
 
 def print_get_jobs():

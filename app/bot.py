@@ -7,6 +7,7 @@ from time import sleep
 from threading import Thread
 import shelve
 
+from . import report
 from .query_log import logging
 from .me import get_me
 from .config import bot, ADMIN_ID, TOKEN
@@ -183,15 +184,21 @@ def remind_manually(message):
 def list_jobs(message):
     """ List all the jobs in schedule. """
     if message.chat.id == ADMIN_ID:
-        text = reminder.print_get_jobs()
-        bot.send_message(message.chat.id, text, parse_mode='HTML')
+        bot.send_message(ADMIN_ID, reminder.print_get_jobs(),
+                         parse_mode='HTML', disable_web_page_preview=True)
 
-        with shelve.open('chat_stats') as s:
-            bot.send_message(ADMIN_ID, f"""<code>Доброе утро, мир!</code>
-            
-👮🏼 <b>Статистика нарушений за сутки</b>
-    ├ <b>Заблокировано спамеров:</b> {s['Banned']}
-    └ <b>Удалено сообщений:</b> {s['Deleted']}""", parse_mode='HTML')
+
+@bot.message_handler(commands=['stats'])
+def send_stats(message):
+    bot.send_message(message.chat.id, report.create_report_text(),
+                     parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['reset_stats'])
+def send_stats(message):
+    report.reset_report_stats()
+    bot.send_message(message.chat.id, report.reset_report_stats(),
+                     parse_mode='HTML', disable_web_page_preview=True)
 
 
 def check_unwanted_list(type_message: types.Message) -> bool:
@@ -206,6 +213,17 @@ def check_unwanted_list(type_message: types.Message) -> bool:
 def unwanted_mentions(message: types.Message):
     """ Reply to unwanted mentions. """
     bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
+
+
+@bot.message_handler(func=lambda a: True)
+def unwanted_mentions(message: types.Message):
+    """ Count messages. """
+    with shelve.open('chat_stats', writeback=True) as s:
+        s['Messages'][message.from_user.id] = s['Messages'].get(message.from_user.id,
+                                                                {'Name': message.from_user.first_name,
+                                                                 'Username': message.from_user.username,
+                                                                 'Count': 0})
+        s['Messages'][message.from_user.id]['Count'] += 1
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
