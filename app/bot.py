@@ -67,6 +67,7 @@ def catch_videos(message: types.Message):
     if message.video.file_name in ['Новый грин.mp4']:
         warn = bot.send_message(message.chat.id, f"♻ Видео {message.video.file_name} заблокировано.")
         bot.delete_message(message.chat.id, message.id)
+        bot.ban_chat_member(message.chat.id, message.from_user.id)
         Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
         with shelve.open('chat_stats') as chat_stats:
             chat_stats['Banned'] += 1
