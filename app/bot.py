@@ -36,7 +36,7 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
 
 def wait_for_readers(action, chat_id, msg_id):
     """ Delete message after limited time. """
-    sleep(60)
+    sleep(45)
     action(chat_id, msg_id)
 
 
@@ -59,6 +59,17 @@ def moderate_messages(message: types.Message):
     bot.delete_message(message.chat.id, message.id)
     with shelve.open('chat_stats') as chat_stats:
         chat_stats['Banned'] += 1
+
+
+@bot.message_handler(content_types=['video'])
+def catch_videos(message: types.Message):
+    """Catch offensive videos"""
+    if message.video.file_name in ['Новый грин.mp4']:
+        warn = bot.send_message(message.chat.id, f"♻ Видео {message.video.file_name} заблокировано.")
+        bot.delete_message(message.chat.id, message.id)
+        Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
+        with shelve.open('chat_stats') as chat_stats:
+            chat_stats['Banned'] += 1
 
 
 def check_delete_list(type_message: types.Message) -> bool:
