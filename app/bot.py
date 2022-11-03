@@ -10,7 +10,7 @@ import shelve
 from . import report
 from .query_log import logging
 from .me import get_me
-from .config import bot, ADMIN_ID, TOKEN
+from .config import bot, ADMIN_ID, TOKEN, PYTHONCHATRU
 from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -215,7 +215,12 @@ def unwanted_mentions(message: types.Message):
     bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
 
 
-@bot.message_handler(func=lambda a: True)
+def check_chat(message: types.Message):
+    if message.chat.id == PYTHONCHATRU:
+        return True
+
+
+@bot.message_handler(func=check_chat)
 def unwanted_mentions(message: types.Message):
     """ Count messages. """
     with shelve.open('chat_stats', writeback=True) as s:

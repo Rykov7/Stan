@@ -14,9 +14,8 @@ def create_report_text():
             name = flooder['Name']
             count = flooder['Count']
             text += f'\n    {i + 1}. <a href="https://t.me/{username}">{name}</a> ({count})'
-        report = f"""<code>Доброе утро, мир!</code>
-
-<b>ЗА ПРОШЕДШИЕ СУТКИ:</b>
+        report = f"""<code>Доброе утро, Мир!</code>
+<b>За прошедшие сутки</b>
 
 👮🏼 <b>Заблокировано</b>
     ├ <b>Пользователей: </b>{s['Banned']}
