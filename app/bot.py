@@ -57,8 +57,10 @@ def moderate_messages(message: types.Message):
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     bot.delete_message(message.chat.id, message.id)
-    with shelve.open('chat_stats') as chat_stats:
-        chat_stats['Banned'] += 1
+
+    if message.chat.id == PYTHONCHATRU:
+        with shelve.open('chat_stats') as chat_stats:
+            chat_stats['Banned'] += 1
 
 
 @bot.message_handler(content_types=['video'])
@@ -89,14 +91,15 @@ def check_delete_list(type_message: types.Message) -> bool:
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
     bot.delete_message(message.chat.id, message.id)
-    with shelve.open('chat_stats') as chat_stats:
-        chat_stats['Deleted'] += 1
+    if message.chat.id == PYTHONCHATRU:
+        with shelve.open('chat_stats') as chat_stats:
+            chat_stats['Deleted'] += 1
 
 
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
     """ Send Chat Rules link. """
-    bot.send_message(message.chat.id,
+    bot.reply_to(message,
                      '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                      parse_mode='HTML',
                      disable_notification=True,
@@ -107,7 +110,7 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
     """ Send Chat FAQ link. """
-    bot.send_message(message.chat.id,
+    bot.reply_to(message,
                      '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
                      parse_mode='HTML',
                      disable_notification=True,
@@ -131,7 +134,7 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
 def send_lutz_command(message):
     """ Send Chat's Library link. """
-    bot.send_message(message.chat.id,
+    bot.reply_to(message,
                      '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
                      parse_mode='HTML',
                      disable_notification=True,
@@ -232,7 +235,8 @@ def check_chat(message: types.Message):
         return True
 
 
-@bot.message_handler(func=check_chat)
+@bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
+                                                     'audio', 'document'])
 def unwanted_mentions(message: types.Message):
     """ Count messages. """
     with shelve.open('chat_stats', writeback=True) as s:
