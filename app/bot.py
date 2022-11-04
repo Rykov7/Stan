@@ -36,13 +36,13 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
 
 def wait_for_readers(action, chat_id, msg_id):
     """ Delete message after limited time. """
-    sleep(45)
+    sleep(30)
     action(chat_id, msg_id)
 
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['tg.sv', 'goo.by', '🍀GREEN ROOM🍀']
+    unwanted_phrases = ['tg.sv', 'goo.by', 'go.sv']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -100,10 +100,10 @@ def delete_message(message: types.Message):
 def send_lutz_command(message):
     """ Send Chat Rules link. """
     bot.reply_to(message,
-                     '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
-                     parse_mode='HTML',
-                     disable_notification=True,
-                     )
+                 '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
+                 parse_mode='HTML',
+                 disable_notification=True,
+                 )
     logging(message)
 
 
@@ -111,10 +111,10 @@ def send_lutz_command(message):
 def send_lutz_command(message):
     """ Send Chat FAQ link. """
     bot.reply_to(message,
-                     '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
-                     parse_mode='HTML',
-                     disable_notification=True,
-                     )
+                 '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
+                 parse_mode='HTML',
+                 disable_notification=True,
+                 )
     logging(message)
 
 
@@ -135,10 +135,10 @@ def send_lutz_command(message):
 def send_lutz_command(message):
     """ Send Chat's Library link. """
     bot.reply_to(message,
-                     '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
-                     parse_mode='HTML',
-                     disable_notification=True,
-                     )
+                 '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
+                 parse_mode='HTML',
+                 disable_notification=True,
+                 )
     logging(message)
 
 
