@@ -42,7 +42,7 @@ def wait_for_readers(action, chat_id, msg_id):
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['tg.sv', 'goo.by', 'go.sv']
+    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -63,21 +63,28 @@ def moderate_messages(message: types.Message):
             chat_stats['Banned'] += 1
 
 
-@bot.message_handler(content_types=['video'])
+def check_caption_spam_list(type_message: types.Message) -> bool:
+    """ Check for mentioning unwanted words in caption. """
+    unwanted_phrases = ['GREEN ROOM']
+    for phrase in unwanted_phrases:
+        if type_message.caption and phrase in type_message.caption:
+            return True
+
+
+@bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    if message.video.file_name in ['Новый грин.mp4']:
-        warn = bot.send_message(message.chat.id, f"♻ Видео {message.video.file_name} заблокировано.")
-        bot.delete_message(message.chat.id, message.id)
-        bot.ban_chat_member(message.chat.id, message.from_user.id)
-        Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
-        with shelve.open('chat_stats') as chat_stats:
-            chat_stats['Banned'] += 1
+    warn = bot.send_message(message.chat.id, f"♻ {message.from_user.first_name} заблокирован.")
+    bot.delete_message(message.chat.id, message.id)
+    bot.ban_chat_member(message.chat.id, message.from_user.id)
+    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
+    with shelve.open('chat_stats') as chat_stats:
+        chat_stats['Banned'] += 1
 
 
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for unwanted text in message and delete. """
-    unwanted_phrases = ['t.me']
+    unwanted_phrases = ['t.me/']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -233,6 +240,22 @@ def unwanted_mentions(message: types.Message):
 def check_chat(message: types.Message):
     if message.chat.id == PYTHONCHATRU:
         return True
+
+
+@bot.message_handler(
+    func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('del', 'ban', 'unban'),
+    content_types=['text'])
+def admin_panel(message: types.Message):
+    """ Admin panel. """
+    if message.text == 'del':
+        bot.delete_message(message.chat.id, message.reply_to_message.id)
+        bot.delete_message(message.chat.id, message.id)
+    elif message.text == 'ban':
+        bot.delete_message(message.chat.id, message.reply_to_message.id)
+        bot.delete_message(message.chat.id, message.id)
+        bot.ban_chat_member(message.chat.id, message.from_user.id)
+    elif message.text.split()[0] == 'unban':
+        bot.unban_chat_member(message.chat.id, message.text.split()[1])
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
