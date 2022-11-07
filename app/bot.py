@@ -255,7 +255,12 @@ def admin_panel(message: types.Message):
         bot.delete_message(message.chat.id, message.id)
         bot.ban_chat_member(message.chat.id, message.from_user.id)
     elif message.text.split()[0] == '!unban':
-        bot.unban_chat_member(message.chat.id, message.text.split()[1])
+        try:
+            user_id = int(message.text.split()[1])
+        except ValueError:
+            print(f'User ID must be integer. Got: {message.text.split()[1]}')
+        else:
+            bot.unban_chat_member(message.chat.id, user_id)
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
