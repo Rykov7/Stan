@@ -18,7 +18,7 @@ def scheduler():
         time.sleep(300)
 
 
-@repeat(every().day.at('06:00'), PYTHONCHATRU, None)
+@repeat(every().day.at('07:00'), PYTHONCHATRU, None)
 def remind(chat_to_repeat, today):
     """ Remind holiday. """
     if not today:
@@ -39,7 +39,7 @@ def remind(chat_to_repeat, today):
             bot.send_message(chat_to_repeat, notification, parse_mode='HTML')
 
 
-@repeat(every().day.at('05:00'), PYTHONCHATRU)
+@repeat(every().day.at('06:00'), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
     bot.send_message(chat_to_repeat, report.create_report_text(),
                      parse_mode='HTML', disable_web_page_preview=True)

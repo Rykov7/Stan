@@ -225,7 +225,7 @@ def send_stats(message):
 
 def check_unwanted_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['дудар', 'хауди', 'howdy', 'dudar']
+    unwanted_phrases = ['дудар', 'хауди', 'dudar']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -243,18 +243,18 @@ def check_chat(message: types.Message):
 
 
 @bot.message_handler(
-    func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('del', 'ban', 'unban'),
+    func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('!del', '!ban', '!unban'),
     content_types=['text'])
 def admin_panel(message: types.Message):
     """ Admin panel. """
-    if message.text == 'del':
+    if message.text == '!del':
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.delete_message(message.chat.id, message.id)
-    elif message.text == 'ban':
+    elif message.text == '!ban':
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.delete_message(message.chat.id, message.id)
         bot.ban_chat_member(message.chat.id, message.from_user.id)
-    elif message.text.split()[0] == 'unban':
+    elif message.text.split()[0] == '!unban':
         bot.unban_chat_member(message.chat.id, message.text.split()[1])
 
 
@@ -264,8 +264,7 @@ def unwanted_mentions(message: types.Message):
     """ Count messages. """
     with shelve.open('chat_stats', writeback=True) as s:
         s['Messages'][message.from_user.id] = s['Messages'].get(message.from_user.id,
-                                                                {'Name': message.from_user.first_name,
-                                                                 'Username': message.from_user.username,
+                                                                {'User': message.from_user,
                                                                  'Count': 0})
         s['Messages'][message.from_user.id]['Count'] += 1
 

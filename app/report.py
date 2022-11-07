@@ -10,10 +10,9 @@ def create_report_text():
                 s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]])
 
         for i, flooder in enumerate(flooders):
-            username = flooder['Username']
-            name = flooder['Name']
+            user = flooder['User']
             count = flooder['Count']
-            text += f'\n    {i + 1}. <a href="https://t.me/{username}">{name}</a> ({count})'
+            text += f'\n    {i + 1}. <a href="tg://user?id={user.id}">{user.first_name}</a> ({count})'
         report = f"""<code>Доброе утро, Мир!</code>
 <b>За прошедшие сутки</b>
 
@@ -21,7 +20,7 @@ def create_report_text():
     ├ <b>Пользователей: </b>{s['Banned']}
     └ <b>Сообщений: </b>{s['Deleted']}
 
-🏆 <b>Почётные флудеры</b>{text}"""
+🏆 <b>Главные флудеры</b>{text}"""
     return report
 
 
