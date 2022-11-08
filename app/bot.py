@@ -52,8 +52,8 @@ def check_spam_list(type_message: types.Message) -> bool:
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
     warn = bot.send_message(message.chat.id,
-                            f'♻ <b><a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a></b>'
-                            f' заблокирован.', parse_mode='HTML')
+                            f'♻ <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
+                            f' заблокирован (запрещённые ссылки).', parse_mode='HTML')
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     bot.delete_message(message.chat.id, message.id)
@@ -74,7 +74,7 @@ def check_caption_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    warn = bot.send_message(message.chat.id, f"♻ {message.from_user.first_name} заблокирован.")
+    warn = bot.send_message(message.chat.id, f'♻ <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a> заблокирован (наркотики).')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()

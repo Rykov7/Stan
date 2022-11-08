@@ -12,7 +12,8 @@ def create_report_text():
         for i, flooder in enumerate(flooders):
             user = flooder['User']
             count = flooder['Count']
-            text += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{user.first_name}</a> ({count})'
+            name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
+            text += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({count})'
         report = f"""<code>Доброе утро, Мир!</code>
 <b>За прошедшие сутки</b>
 
