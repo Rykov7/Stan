@@ -12,15 +12,15 @@ def create_report_text():
         for i, flooder in enumerate(flooders):
             user = flooder['User']
             count = flooder['Count']
-            text += f'\n    {i + 1}. <a href="tg://user?id={user.id}">{user.first_name}</a> ({count})'
+            text += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{user.first_name}</a> ({count})'
         report = f"""<code>Доброе утро, Мир!</code>
 <b>За прошедшие сутки</b>
 
-👮🏼 <b>Заблокировано</b>
-    ├ <b>Пользователей: </b>{s['Banned']}
-    └ <b>Сообщений: </b>{s['Deleted']}
+<b>Заблокировано</b> 👮🏼
+├ <b>Пользователей: </b>{s['Banned']}
+└ <b>Сообщений: </b>{s['Deleted']}
 
-🏆 <b>Главные флудеры</b>{text}"""
+<b>Главные флудеры</b> 🏆{text}"""
     return report
 
 
