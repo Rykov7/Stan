@@ -48,11 +48,11 @@ def check_spam_list(type_message: types.Message) -> bool:
             return True
 
 
-@bot.message_handler(func=check_spam_list, content_types=['text'])
+@bot.message_handler(func=check_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
     warn = bot.send_message(message.chat.id,
-                            f'♻ <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
+                            f'👮🏼 <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
                             f' заблокирован (запрещённые ссылки).', parse_mode='HTML')
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     bot.ban_chat_member(message.chat.id, message.from_user.id)
@@ -74,7 +74,8 @@ def check_caption_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    warn = bot.send_message(message.chat.id, f'♻ <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a> заблокирован (наркотики).')
+    warn = bot.send_message(message.chat.id,
+                            f'👮🏼 <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a> заблокирован (наркотики).')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
@@ -94,7 +95,7 @@ def check_delete_list(type_message: types.Message) -> bool:
                     return True
 
 
-@bot.message_handler(func=check_delete_list, content_types=['text'])
+@bot.message_handler(func=check_delete_list)
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
     bot.delete_message(message.chat.id, message.id)
@@ -231,7 +232,7 @@ def check_unwanted_list(type_message: types.Message) -> bool:
             return True
 
 
-@bot.message_handler(func=check_unwanted_list, content_types=['text'])
+@bot.message_handler(func=check_unwanted_list)
 def unwanted_mentions(message: types.Message):
     """ Reply to unwanted mentions. """
     bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
@@ -242,9 +243,7 @@ def check_chat(message: types.Message):
         return True
 
 
-@bot.message_handler(
-    func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('!del', '!ban', '!unban'),
-    content_types=['text'])
+@bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('!del', '!ban', '!unban'))
 def admin_panel(message: types.Message):
     """ Admin panel. """
     if message.text == '!del':
@@ -261,6 +260,13 @@ def admin_panel(message: types.Message):
             print(f'User ID must be integer. Got: {message.text.split()[1]}')
         else:
             bot.unban_chat_member(message.chat.id, user_id)
+
+
+@bot.message_handler(commands=['tsya'])
+def send_tsya_link(message: types.Message):
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, '<a href="https://tsya.ru/">-ТСЯ/-ТЬСЯ</a>', parse_mode='HTML',
+                     disable_web_page_preview=True)
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
