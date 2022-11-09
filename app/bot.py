@@ -42,7 +42,7 @@ def wait_for_readers(action, chat_id, msg_id):
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/']
+    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -252,21 +252,23 @@ def admin_panel(message: types.Message):
     elif message.text == '!ban':
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.delete_message(message.chat.id, message.id)
-        bot.ban_chat_member(message.chat.id, message.from_user.id)
+        bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
     elif message.text.split()[0] == '!unban':
         try:
             user_id = int(message.text.split()[1])
         except ValueError:
             print(f'User ID must be integer. Got: {message.text.split()[1]}')
         else:
-            bot.unban_chat_member(message.chat.id, user_id)
+            bot.unban_chat_member(PYTHONCHATRU, user_id)
 
 
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
+    link = '<a href="https://tsya.ru/">-ТСЯ/-ТЬСЯ</a>'
     if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, '<a href="https://tsya.ru/">-ТСЯ/-ТЬСЯ</a>', parse_mode='HTML',
-                     disable_web_page_preview=True)
+        bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, link, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
