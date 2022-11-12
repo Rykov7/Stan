@@ -10,7 +10,7 @@ import shelve
 from . import report
 from .query_log import logging
 from .me import get_me
-from .config import bot, ADMIN_ID, TOKEN, PYTHONCHATRU
+from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
 from . import reminder
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -42,7 +42,8 @@ def wait_for_readers(action, chat_id, msg_id):
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/']
+    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
+                        'uclck.ru/']
     for phrase in unwanted_phrases:
         if phrase in type_message.text.casefold():
             return True
@@ -83,16 +84,21 @@ def catch_videos(message: types.Message):
         chat_stats['Banned'] += 1
 
 
+def check_no_allowed(word_list, msg):
+    for word in word_list:
+        if word in msg.casefold():
+            return False
+    return True
+
+
 def check_delete_list(type_message: types.Message) -> bool:
-    """ Check for unwanted text in message and delete. """
-    unwanted_phrases = ['t.me/']
-    for phrase in unwanted_phrases:
-        if phrase in type_message.text.casefold():
-            return True
-        if type_message.entities:
-            for entity in type_message.entities:
-                if entity.url and phrase in entity.url:
-                    return True
+    """ Check for URLs in message and delete. """
+    if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
+        return True
+    if type_message.entities:
+        for entity in type_message.entities:
+            if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
+                return True
 
 
 @bot.message_handler(func=check_delete_list)
