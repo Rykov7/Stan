@@ -1,17 +1,19 @@
-from telebot import types
-from flask import Flask, request, abort
+import csv
+import shelve
 from datetime import datetime as dt
 from os.path import exists
-import csv
-from time import sleep
 from threading import Thread
-import shelve
+from time import sleep
 
-from . import report
-from .query_log import logging
-from .me import get_me
-from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
+from flask import Flask, request, abort
+from telebot import types
+
 from . import reminder
+from . import report
+from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
+from .me import get_me
+from .query_log import logging
+from . import trolling
 
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
@@ -183,7 +185,7 @@ def default_query(inline_query):
                 f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
                     f"<i>{phrase}</i>", parse_mode='HTML'), description=phrase))
 
-    bot.answer_inline_query(inline_query.id, zen, cache_time=12)
+    bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
 
 @bot.message_handler(commands=['me'])
@@ -232,18 +234,7 @@ def send_stats(message):
                      parse_mode='HTML', disable_web_page_preview=True)
 
 
-def check_unwanted_list(type_message: types.Message) -> bool:
-    """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['дудар', 'хауди', 'dudar']
-    for phrase in unwanted_phrases:
-        if phrase in type_message.text.casefold():
-            return True
 
-
-@bot.message_handler(func=check_unwanted_list)
-def unwanted_mentions(message: types.Message):
-    """ Reply to unwanted mentions. """
-    bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
 
 
 def check_chat(message: types.Message):
@@ -268,15 +259,6 @@ def admin_panel(message: types.Message):
             print(f'User ID must be integer. Got: {message.text.split()[1]}')
         else:
             bot.unban_chat_member(PYTHONCHATRU, user_id)
-
-
-@bot.message_handler(commands=['tsya'])
-def send_tsya_link(message: types.Message):
-    link = '<a href="https://tsya.ru/">-ТСЯ/-ТЬСЯ</a>'
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, link, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
