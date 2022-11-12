@@ -59,9 +59,8 @@ def moderate_messages(message: types.Message):
                             f'👮🏼 <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
                             f' заблокирован (запрещённые ссылки).', parse_mode='HTML')
     Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
-    bot.ban_chat_member(message.chat.id, message.from_user.id)
     bot.delete_message(message.chat.id, message.id)
-
+    bot.ban_chat_member(message.chat.id, message.from_user.id)
     if message.chat.id == PYTHONCHATRU:
         with shelve.open('chat_stats') as chat_stats:
             chat_stats['Banned'] += 1
@@ -232,9 +231,6 @@ def send_stats(message):
     report.reset_report_stats()
     bot.send_message(message.chat.id, report.reset_report_stats(),
                      parse_mode='HTML', disable_web_page_preview=True)
-
-
-
 
 
 def check_chat(message: types.Message):

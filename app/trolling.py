@@ -5,7 +5,7 @@ from telebot import types
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
     """ тся/ться """
-    link = '<a href="https://tsya.ru/">-ТСЯ/-ТЬСЯ</a>'
+    link = '<a href="https://tsya.ru/">-тся/-ться</a>'
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
     else:
