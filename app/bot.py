@@ -49,6 +49,7 @@ def check_spam_list(type_message: types.Message) -> bool:
             return True
 
 
+@bot.edited_message_handler(func=check_spam_list)
 @bot.message_handler(func=check_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
@@ -101,6 +102,7 @@ def check_delete_list(type_message: types.Message) -> bool:
                 return True
 
 
+@bot.edited_message_handler(func=check_delete_list)
 @bot.message_handler(func=check_delete_list)
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
