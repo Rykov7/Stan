@@ -2,6 +2,7 @@ from .config import bot
 from telebot import types
 from urllib import parse
 
+
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
     """ тся/ться """
