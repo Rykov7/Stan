@@ -1,6 +1,6 @@
 from .config import bot
 from telebot import types
-
+from urllib import parse
 
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
@@ -10,6 +10,15 @@ def send_tsya_link(message: types.Message):
         bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
     else:
         bot.send_message(message.chat.id, link, parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['g'])
+def google_it(message: types.Message):
+    """ Google it! """
+    if message.reply_to_message.text:
+        search = parse.quote_plus(message.reply_to_message.text)
+        bot.reply_to(message.reply_to_message, f"https://www.google.ru/search?q={search}", parse_mode='HTML',
+                     disable_web_page_preview=True)
 
 
 def check_unwanted_list(type_message: types.Message) -> bool:

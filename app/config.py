@@ -14,4 +14,4 @@ TEST_CHAT = -1001622893830
 
 URL_RX = re.compile(r'\w+\.\w+/\w+')
 ALLOWED_WORDS = ['pastebin', 'github', 'google', 'nometa', 'python',
-                 'stackoverflow', 'habr', 'medium']
+                 'stackoverflow', 'habr', 'medium', 'youtube']
