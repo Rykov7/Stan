@@ -9,8 +9,6 @@ def send_tsya_link(message: types.Message):
     link = '<a href="https://tsya.ru/">-тся/-ться</a>'
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, link, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['g'])
