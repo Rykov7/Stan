@@ -1,5 +1,5 @@
-# lutz-bot
-Multifunctional Telegram Bot for Python group
+# Lutz Bot
+Multipurpose Telegram Bot for Python group named after Mark Lutz, author of "Learning Python" the book.
 
 It can:
  * Send links on command (chat rules, FAQs, libraries etc.)
@@ -11,3 +11,7 @@ It can:
  * Help users with googling when they send search query to your group instead of Google
  * Make faces when doubtful bloggers are mentioned
  * Etc. (functionality is growing up)
+
+## Usage
+You can use this repository as an precoded customizeble bot.
+Original bot username: @LutzPyBot
