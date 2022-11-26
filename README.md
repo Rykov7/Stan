@@ -1,5 +1,5 @@
 # Lutz Bot
-Multipurpose Telegram Bot for Python group (after Mark Lutz, author of "Learning Python")
+Multipurpose Telegram Bot for Python group
 
 ### What does this project do?
  * Send links on command (chat rules, FAQs, libraries etc.)
