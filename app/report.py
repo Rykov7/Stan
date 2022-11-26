@@ -6,8 +6,9 @@ def create_report_text():
         text = ''
         flooders = []
         for n in range(min(3, len(s['Messages']))):
-            flooders.append(
-                s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]])
+            top_user = s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
+            if top_user['Count'] >= 10:
+                flooders.append(top_user)
 
         for i, flooder in enumerate(flooders):
             user = flooder["User"]
@@ -19,8 +20,13 @@ def create_report_text():
 <b>Заблокировано</b>
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
-
+"""
+        if flooders:
+            report += """
 <b>Главные флудеры</b> 🏆{text}"""
+        else:
+            report += """
+До звания флудера никто не дотянул :-("""
     return report
 
 
