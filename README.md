@@ -6,15 +6,15 @@ Multipurpose Telegram Bot for Python group
  * Ban users and delete messages
  * Filter links
  * Remind for dates
- * Publicate daily statistics (how much banned, deleted, sent messages)
+ * Daily statistics publication (how much banned, deleted, sent messages)
  * Search for the Zen of Python quotes (inline query)
  * Help users with googling when they send search query to your group instead of Google
  * Make faces when doubtful bloggers are mentioned
  * Etc. (functionality is growing up)
 
 ### Why is this project useful?
-You can use this project as a precoded customizeble bot.
-Original (and currenly working) bot Telegram username: @LutzPyBot
+You can use this project as a pre-coded customizable bot.
+Original (and currently working) bot Telegram username: @LutzPyBot
 
 ### How do I get started?
 Clone repository, edit code if needed and deploy on your sever.
