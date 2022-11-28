@@ -14,10 +14,10 @@ from .me import get_me
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
 
-logging.basicConfig(level=logging.INFO, format=' %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 
-print(">>> LutzBot is running! <<<")
+print(">>> PYBOT IS RUNNING!")
 
 zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
             'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
@@ -32,7 +32,7 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
             "Namespaces are one honking great idea — let's do more of those!"]
 
 if trolling:
-    print('trolling loaded')
+    pass
 
 
 def check_spam_list(type_message: types.Message) -> bool:
@@ -48,7 +48,7 @@ def check_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
-    logging.warning(f'Banned: {message.from_user.first_name} - {message.text}')
+    logging.warning(f'[BAN] {message.from_user.first_name} - {message.text}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     if message.chat.id == PYTHONCHATRU:
@@ -67,7 +67,7 @@ def check_caption_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    logging.warning(f'Banned: {message.from_user.first_name} - {message.video.file_name}')
+    logging.warning(f'[BAN] {message.from_user.first_name} - {message.video.file_name}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     with shelve.open('chat_stats') as chat_stats:
@@ -84,12 +84,12 @@ def check_no_allowed(word_list, msg):
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
     if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
-        logging.info(f'Deleted: {type_message.from_user.first_name} - {type_message.text}')
+        logging.info(f'[DEL] {type_message.from_user.first_name} - {type_message.text}')
         return True
     if type_message.entities:
         for entity in type_message.entities:
             if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                logging.info(f'Deleted: {type_message.from_user.first_name} - {entity.url}')
+                logging.info(f'[DEL] {type_message.from_user.first_name} - {entity.url}')
                 return True
 
 
@@ -215,23 +215,23 @@ def check_chat(message: types.Message):
         return True
 
 
-@bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID and a.text.split()[0] in ('!del', '!ban', '!unban'))
+@bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID, commands=['pydel', 'pyban', 'unban_id'])
 def admin_panel(message: types.Message):
     """ Admin panel. """
-    if message.text == '!del':
-        bot.delete_message(message.chat.id, message.reply_to_message.id)
+    if message.text == '/pydel' and message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
-    elif message.text == '!ban':
         bot.delete_message(message.chat.id, message.reply_to_message.id)
+        logging.warning(
+            f'[DEL (M)] {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
+    elif message.text == '/pyban' and message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
+        bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
-    elif message.text.split()[0] == '!unban':
-        try:
-            user_id = int(message.text.split()[1])
-        except ValueError:
-            print(f'User ID must be integer. Got: {message.text.split()[1]}')
-        else:
-            bot.unban_chat_member(PYTHONCHATRU, user_id)
+        logging.warning(f'[BAN (M)] {message.from_user.first_name} - {message.text}')
+    elif message.text.split()[0] == '/unban_id' and message.text.split()[-1].isdigit():
+        unban_id = int(message.text.split()[-1])
+        bot.unban_chat_member(PYTHONCHATRU, unban_id)
+        logging.warning(f'[UNBAN (M)] {unban_id}')
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
