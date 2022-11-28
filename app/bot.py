@@ -1,6 +1,5 @@
 import shelve
 from datetime import datetime as dt
-import sys
 from flask import Flask, request, abort
 from telebot import types
 import logging
