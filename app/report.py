@@ -2,9 +2,9 @@ import shelve
 
 
 def create_report_text():
+    top_users = ''
+    flooders = []
     with shelve.open('chat_stats') as s:
-        text = ''
-        flooders = []
         for n in range(min(3, len(s['Messages']))):
             top_user = s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
             if top_user['Count'] >= 10:
@@ -13,20 +13,16 @@ def create_report_text():
         for i, flooder in enumerate(flooders):
             user = flooder["User"]
             name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
-            text += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
-        report = f"""<code>Доброе утро, Мир!</code>
-<b>За прошлые сутки</b>
+            top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
+        report = f"""<code>Hello, World!</code> 🌍
 
-<b>Заблокировано</b>
+<b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
 """
-        if flooders:
-            report += """
-<b>Главные флудеры</b> 🏆{text}"""
-        else:
-            report += """
-До звания флудера никто не дотянул :-("""
+    if flooders:
+        report += f"""
+<b>Топ</b> 🏆{top_users}"""
     return report
 
 

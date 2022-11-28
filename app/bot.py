@@ -10,10 +10,11 @@ from telebot import types
 
 from . import reminder
 from . import report
+from .admin import reload_modules
 from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
 from .me import get_me
 from .query_log import logging
-from . import trolling
+
 
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
@@ -224,6 +225,13 @@ def list_jobs(message):
 def send_stats(message):
     bot.send_message(message.chat.id, report.create_report_text(),
                      parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['reload'])
+def send_stats(message):
+    reload_modules()
+    bot.send_message(message.chat.id, 'Reloaded successful',
+                     parse_mode='HTML')
 
 
 @bot.message_handler(commands=['reset_stats'])
