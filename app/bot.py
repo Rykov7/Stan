@@ -1,12 +1,9 @@
-import csv
 import shelve
 from datetime import datetime as dt
-from os.path import exists
-from threading import Thread
-from time import sleep
-
+import sys
 from flask import Flask, request, abort
 from telebot import types
+import logging
 
 from . import reminder
 from . import trolling
@@ -14,12 +11,11 @@ from . import admin
 from . import report
 from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
 from .me import get_me
-from .query_log import logging
 
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
 
-
+logging.basicConfig(level=logging.INFO, format=' %(message)s')
 app = Flask(__name__)
 
 print(">>> LutzBot is running! <<<")
@@ -36,11 +32,8 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
             'If the implementation is easy to explain, it may be a good idea.',
             "Namespaces are one honking great idea — let's do more of those!"]
 
-
-def wait_for_readers(action, chat_id, msg_id):
-    """ Delete message after limited time. """
-    sleep(30)
-    action(chat_id, msg_id)
+if trolling:
+    print('trolling loaded')
 
 
 def check_spam_list(type_message: types.Message) -> bool:
@@ -56,10 +49,7 @@ def check_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
-    warn = bot.send_message(message.chat.id,
-                            f'👮🏼 <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a>'
-                            f' заблокирован (запрещённые ссылки).', parse_mode='HTML')
-    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
+    logging.warning(f'Banned: {message.from_user.first_name} - {message.text}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     if message.chat.id == PYTHONCHATRU:
@@ -78,11 +68,9 @@ def check_caption_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    warn = bot.send_message(message.chat.id,
-                            f'👮🏼 <a href="tg://user?id={message.from_user.id}">{message.from_user.first_name}</a> заблокирован (наркотики).')
+    logging.warning(f'Banned: {message.from_user.first_name} - {message.video.file_name}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
-    Thread(target=wait_for_readers, args=(bot.delete_message, message.chat.id, warn.id)).start()
     with shelve.open('chat_stats') as chat_stats:
         chat_stats['Banned'] += 1
 
@@ -97,10 +85,12 @@ def check_no_allowed(word_list, msg):
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
     if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
+        logging.info(f'Deleting: {type_message.text}')
         return True
     if type_message.entities:
         for entity in type_message.entities:
             if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
+                logging.info(f'Deleting: {entity.url}')
                 return True
 
 
@@ -122,7 +112,6 @@ def send_lutz_command(message):
                  parse_mode='HTML',
                  disable_notification=True,
                  )
-    logging(message)
 
 
 @bot.message_handler(commands=['faq'])
@@ -133,7 +122,6 @@ def send_lutz_command(message):
                  parse_mode='HTML',
                  disable_notification=True,
                  )
-    logging(message)
 
 
 @bot.message_handler(commands=['lutz'])
@@ -146,7 +134,6 @@ def send_lutz_command(message):
     ├ by Mark Lutz
     └ Released June 2013""",
         parse_mode='HTML')
-    logging(message)
 
 
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
@@ -157,21 +144,6 @@ def send_lutz_command(message):
                  parse_mode='HTML',
                  disable_notification=True,
                  )
-    logging(message)
-
-
-@bot.message_handler(commands=['log'])
-def send_log(message):
-    """ Send the last log rows. """
-    if message.from_user.id == ADMIN_ID:
-        file_path = f"logs/log_{dt.now().strftime('%Y-%m')}.csv"
-        if exists(file_path):
-            with open(file_path, "r", newline='', encoding='utf-8') as f:
-                all_rows = list(csv.reader(f))
-            text = ''
-            for row in all_rows[-min(len(all_rows), 5):]:
-                text += str(row) + '\n'
-            bot.send_message(ADMIN_ID, f'<code>{text}</code>', parse_mode='html')
 
 
 @bot.inline_handler(lambda query: True)
@@ -192,7 +164,6 @@ def default_query(inline_query):
 def command_me(message):
     """ Send info about user and chat id [Service]. """
     bot.send_message(message.chat.id, get_me(message), parse_mode='HTML')
-    logging(message)
 
 
 @bot.message_handler(commands=['remind'])
