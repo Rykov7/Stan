@@ -1,4 +1,4 @@
-from imp import reload
+from importlib import reload
 
 from . import config
 from . import me
@@ -13,5 +13,3 @@ def reload_modules():
     reload(config)
     reload(me)
     reload(bot_mod)
-
-

@@ -89,7 +89,7 @@ def check_delete_list(type_message: types.Message) -> bool:
     if type_message.entities:
         for entity in type_message.entities:
             if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                logging.info(f'[DEL] {type_message.from_user.first_name} - {entity.url}')
+                logging.info(f'[DEL] {type_message.from_user.first_name} - Entity ({entity.url})')
                 return True
 
 
