@@ -85,12 +85,12 @@ def check_no_allowed(word_list, msg):
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
     if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
-        logging.info(f'Deleting: {type_message.text}')
+        logging.info(f'Deleted: {type_message.from_user.first_name} - {type_message.text}')
         return True
     if type_message.entities:
         for entity in type_message.entities:
             if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                logging.info(f'Deleting: {entity.url}')
+                logging.info(f'Deleted: {type_message.from_user.first_name} - {entity.url}')
                 return True
 
 
