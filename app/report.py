@@ -14,15 +14,15 @@ def create_report_text():
             user = flooder["User"]
             name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
             top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
-        report = f"""<code>Hello, World!</code> 🌍
-
+        report = f"<code>Hello, World!</code> 🌍"
+        if s['Banned'] or s['Deleted']:
+            report += f"""
 <b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
 """
     if flooders:
-        report += f"""
-<b>Топ</b> 🏆{top_users}"""
+        report += f"\n<b>Топ</b> 🗣{top_users}"
     return report
 
 

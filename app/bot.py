@@ -9,12 +9,12 @@ from flask import Flask, request, abort
 from telebot import types
 
 from . import reminder
+from . import trolling
+from . import admin
 from . import report
-from .admin import reload_modules
 from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
 from .me import get_me
 from .query_log import logging
-
 
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
@@ -227,18 +227,17 @@ def send_stats(message):
                      parse_mode='HTML', disable_web_page_preview=True)
 
 
-@bot.message_handler(commands=['reload'])
-def send_stats(message):
-    reload_modules()
-    bot.send_message(message.chat.id, 'Reloaded successful',
-                     parse_mode='HTML')
-
-
 @bot.message_handler(commands=['reset_stats'])
 def send_stats(message):
     report.reset_report_stats()
     bot.send_message(message.chat.id, report.reset_report_stats(),
                      parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['reload'])
+def send_stats(message):
+    admin.reload_modules()
+    bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
 def check_chat(message: types.Message):
