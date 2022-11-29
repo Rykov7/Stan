@@ -8,7 +8,7 @@ from . import reminder
 from . import trolling
 from . import admin
 from . import report
-from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU
+from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU, WHITEUN, WHITEIDS
 from .me import get_me
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -37,18 +37,19 @@ if trolling:
 
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
-                        'uclck.ru/']
-    for phrase in unwanted_phrases:
-        if phrase in type_message.text.casefold():
-            return True
+    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
+        unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
+                            'uclck.ru/']
+        for phrase in unwanted_phrases:
+            if phrase in type_message.text.casefold():
+                return True
 
 
 @bot.edited_message_handler(func=check_spam_list)
 @bot.message_handler(func=check_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
-    logging.warning(f'[BAN] {message.from_user.first_name} - {message.text}')
+    logging.warning(f'[BAN] {message.from_user.id} {message.from_user.username} - {message.text}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     if message.chat.id == PYTHONCHATRU:
@@ -67,7 +68,7 @@ def check_caption_spam_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    logging.warning(f'[BAN] {message.from_user.first_name} - {message.video.file_name}')
+    logging.warning(f'[BAN] {message.from_user.id} {message.from_user.first_name} - {message.video.file_name}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     with shelve.open('chat_stats') as chat_stats:
@@ -83,14 +84,15 @@ def check_no_allowed(word_list, msg):
 
 def check_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
-    if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
-        logging.info(f'[DEL] {type_message.from_user.first_name} - {type_message.text}')
-        return True
-    if type_message.entities:
-        for entity in type_message.entities:
-            if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                logging.info(f'[DEL] {type_message.from_user.first_name} - Entity ({entity.url})')
-                return True
+    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
+        if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
+            logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - {type_message.text}')
+            return True
+        if type_message.entities:
+            for entity in type_message.entities:
+                if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
+                    logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})')
+                    return True
 
 
 @bot.edited_message_handler(func=check_delete_list)

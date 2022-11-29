@@ -16,7 +16,8 @@ def create_report_text():
             top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
         report = f"<code>Hello, World!</code> 🌍\n"
         if s['Banned'] or s['Deleted']:
-            report += f"""<b>Заблокировано</b> ⛔
+            report += f"""
+<b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
 """
