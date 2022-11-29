@@ -8,7 +8,6 @@ from . import bot as bot_mod
 
 
 def reload_modules():
-    reload(reminder)
     reload(report)
     reload(config)
     reload(me)
