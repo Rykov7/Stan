@@ -91,7 +91,8 @@ def check_delete_list(type_message: types.Message) -> bool:
         if type_message.entities:
             for entity in type_message.entities:
                 if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                    logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})')
+                    logging.info(
+                        f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})')
                     return True
 
 
@@ -108,6 +109,7 @@ def delete_message(message: types.Message):
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
     """ Send Chat Rules link. """
+    logging.warning('Send Rules link')
     bot.reply_to(message,
                  '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                  parse_mode='HTML',
@@ -118,6 +120,7 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
     """ Send Chat FAQ link. """
+    logging.warning('Send FAQ link')
     bot.reply_to(message,
                  '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
                  parse_mode='HTML',
@@ -128,6 +131,7 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['lutz'])
 def send_lutz_command(message):
     """ Send the Lutz's Book. """
+    logging.warning('Send the Lutz Book')
     bot.send_document(
         message.chat.id,
         document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
@@ -140,6 +144,7 @@ def send_lutz_command(message):
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
 def send_lutz_command(message):
     """ Send Chat's Library link. """
+    logging.warning('Send Library link')
     bot.reply_to(message,
                  '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
                  parse_mode='HTML',
@@ -212,11 +217,6 @@ def send_stats(message):
     bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
-def check_chat(message: types.Message):
-    if message.chat.id == PYTHONCHATRU:
-        return True
-
-
 @bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID, commands=['pydel', 'pyban', 'unban_id'])
 def admin_panel(message: types.Message):
     """ Admin panel. """
@@ -236,15 +236,21 @@ def admin_panel(message: types.Message):
         logging.warning(f'[UNBAN (M)] {unban_id}')
 
 
+def check_chat(message: types.Message):
+    if message.chat.id == PYTHONCHATRU:
+        return True
+
+
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
                                                      'audio', 'document'])
 def unwanted_mentions(message: types.Message):
     """ Count messages. """
     with shelve.open('chat_stats', writeback=True) as s:
-        s['Messages'][message.from_user.id] = s['Messages'].get(message.from_user.id,
-                                                                {'User': message.from_user,
-                                                                 'Count': 0})
-        s['Messages'][message.from_user.id]['Count'] += 1
+        if message.from_user.id not in s['Messages']:
+            s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 0}
+            logging.warning(f'New counter: {message.from_user.id} - {message.from_user.first_name}')
+        else:
+            s['Messages'][message.from_user.id]['Count'] += 1
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
