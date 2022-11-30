@@ -17,7 +17,7 @@ PYTHONCHATRU = -1001338616632  # pythonchatru
 
 URL_RX = re.compile(r'\w+\.\w+/\w+')
 ALLOWED_WORDS = ['pastebin', 'github', 'google', 'nometa', 'python', 'django', 'flask', 'fastapi',
-                 'stackoverflow', 'habr', 'medium', 'youtube', 'stepik', 'telegraph']
+                 'stackoverflow', 'habr', 'medium', 'youtube', 'stepik', 'telegraph', '#rtfm']
 
 WHITEUN = set(os.environ.get('whitelist', '<<<ERR_USRS').split(','))
 logging.warning(f'White users {WHITEUN}')
