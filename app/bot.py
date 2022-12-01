@@ -221,12 +221,13 @@ def admin_panel(message: types.Message):
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         logging.warning(
-            f'[DEL (M)] {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
+            f'[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
     elif message.text == '/pyban' and message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
-        logging.warning(f'[BAN (M)] {message.from_user.first_name} - {message.text}')
+        logging.warning(
+            f'[BAN (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
     elif message.text.split()[0] == '/unban_id' and message.text.split()[-1].isdigit():
         unban_id = int(message.text.split()[-1])
         bot.unban_chat_member(PYTHONCHATRU, unban_id)
