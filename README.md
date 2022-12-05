@@ -21,3 +21,9 @@ Clone repository, edit code if needed and deploy on your sever.
 
 ### Where can I get more help, if I need it?
 Bot is easily understandable reading in-code comments of the handler functions, also read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for library help.
+
+
+### How do I read logs of running Lutz bot daemon?
+Continuous log reading on Linux:
+
+```# journalctl --unit=lutz.service -f --no-pager```

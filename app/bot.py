@@ -32,6 +32,15 @@ zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.
             "Namespaces are one honking great idea — let's do more of those!"]
 
 
+@bot.message_handler(commands=['start'])
+def start(message: types.Message):
+    """ Start """
+    log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
+    if message.from_user.last_name:
+        log_msg += f' {message.from_user.first_name}'
+    logging.warning(log_msg)
+
+
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
     if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
@@ -245,6 +254,22 @@ def send_tsya_link(message: types.Message):
     link = '<a href="https://tsya.ru/">-тся/-ться</a>'
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['nometa'])
+def send_nometa(message: types.Message):
+    """ No meta """
+    answer = 'Пожалуйста, не задавайте <a href="https://nometa.xyz/ru.html">мета-вопросов</a> в чате!'
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['neprivet'])
+def send_neprivet(message: types.Message):
+    """ Neprivet. """
+    answer = '<a href="https://neprivet.com/">Непривет</a>'
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['g'])
