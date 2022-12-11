@@ -17,7 +17,7 @@ from .me import get_me
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 app = Flask(__name__)
 
-print(">>> PYBOT IS RUNNING!")
+logging.warning('>>> PYBOT STARTED!')
 
 zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
             'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
@@ -44,10 +44,10 @@ def start(message: types.Message):
 def check_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
     if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
-        unwanted_phrases = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
-                            'uclck.ru/']
-        for phrase in unwanted_phrases:
-            if phrase in type_message.text.casefold():
+        spam_urls = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
+                     'uclck.ru/']
+        for url in spam_urls:
+            if url in type_message.text.casefold():
                 return True
 
 
@@ -251,9 +251,11 @@ def check_chat(message: types.Message):
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
     """ тся/ться """
-    link = '<a href="https://tsya.ru/">-тся/-ться</a>'
+    answer = '<a href="https://tsya.ru/">-тся/-ться</a>'
     if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, link, parse_mode='HTML', disable_web_page_preview=True)
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['nometa'])
@@ -262,6 +264,8 @@ def send_nometa(message: types.Message):
     answer = 'Пожалуйста, не задавайте <a href="https://nometa.xyz/ru.html">мета-вопросов</a> в чате!'
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['neprivet'])
@@ -270,6 +274,8 @@ def send_neprivet(message: types.Message):
     answer = '<a href="https://neprivet.com/">Непривет</a>'
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['g'])
