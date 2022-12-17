@@ -278,6 +278,41 @@ def send_neprivet(message: types.Message):
         bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
+"""
+Caution commands: nobot, noparse, nogui
+"""
+
+
+@bot.message_handler(commands=['nobot'])
+def nobot(message: types.Message):
+    answer = """<b>Внимание</b>:
+Телеграм бот <i>не должен</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['noparse'])
+def noparse(message: types.Message):
+    answer = """<b>Внимание</b>:
+Парсер <i>не должен</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы JS</code> и <code>отладку</code> до начала парсинга сайтов. Существует много ресурсов для этого в интернете."""
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['nogui'])
+def nogui(message: types.Message):
+    answer = """<b>Внимание</b>:
+GUI приложение <i>не должно</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+
+
 @bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
@@ -285,6 +320,9 @@ def google_it(message: types.Message):
         search = parse.quote_plus(message.reply_to_message.text)
         bot.reply_to(message.reply_to_message, f"https://www.google.ru/search?q={search}", parse_mode='HTML',
                      disable_web_page_preview=True)
+
+
+""" Tease for blogger mentions. """
 
 
 def check_unwanted_list(type_message: types.Message) -> bool:
