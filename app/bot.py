@@ -286,7 +286,7 @@ Caution commands: nobot, noparse, nogui
 @bot.message_handler(commands=['nobot'])
 def nobot(message: types.Message):
     answer = """<b>Внимание</b>:
-Телеграм бот <i>не должен</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
+Телеграм бот <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
     else:
@@ -296,7 +296,7 @@ def nobot(message: types.Message):
 @bot.message_handler(commands=['noparse'])
 def noparse(message: types.Message):
     answer = """<b>Внимание</b>:
-Парсер <i>не должен</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы JS</code> и <code>отладку</code> до начала парсинга сайтов. Существует много ресурсов для этого в интернете."""
+Парсер <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code> и <code>отладку</code> до начала парсинга сайтов. Существует много ресурсов для этого в интернете."""
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
     else:
@@ -306,7 +306,7 @@ def noparse(message: types.Message):
 @bot.message_handler(commands=['nogui'])
 def nogui(message: types.Message):
     answer = """<b>Внимание</b>:
-GUI приложение <i>не должно</i> быть твоим первым Python-проектом. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
+GUI приложение <i>не должно</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
     else:
@@ -316,10 +316,18 @@ GUI приложение <i>не должно</i> быть твоим первы
 @bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
-    if message.reply_to_message.text:
-        search = parse.quote_plus(message.reply_to_message.text)
-        bot.reply_to(message.reply_to_message, f"https://www.google.ru/search?q={search}", parse_mode='HTML',
+    search_engine = 'https://www.google.ru/search?q='
+    if message.reply_to_message and message.reply_to_message.text:
+        if len(message.text.split()) == 1:
+            r = parse.quote_plus(message.reply_to_message.text)
+        else:
+            r = parse.quote_plus(' '.join(message.text.split()[1:]))
+        bot.reply_to(message.reply_to_message, f"{search_engine}{r}",
                      disable_web_page_preview=True)
+    else:
+        if len(message.text.split()) > 1:
+            r = parse.quote_plus(' '.join(message.text.split()[1:]))
+            bot.reply_to(message, f"{search_engine}{r}", disable_web_page_preview=True)
 
 
 """ Tease for blogger mentions. """
