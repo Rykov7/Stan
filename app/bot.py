@@ -5,10 +5,12 @@ from telebot import types
 import logging
 from urllib import parse
 
+from . import stan
 from . import reminder
 from . import admin
 from . import report
-from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU, WHITEUN, WHITEIDS
+from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU, WHITEUN, WHITEIDS, RUS_ENG_TABLE, \
+    ENG_RUS_TABLE, RUS
 from .me import get_me
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -141,10 +143,21 @@ def send_lutz_command(message):
     bot.send_document(
         message.chat.id,
         document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
-        caption="""<i><b>Learning Python</b>, 5th Edition</i>
-    ├ by Mark Lutz
-    └ Released June 2013""",
-        parse_mode='HTML')
+        caption="вот, не позорься")
+
+
+@bot.message_handler(commands=['bdmtss'])
+def send_bdmtss_audio(message):
+    bot.send_audio(message.chat.id, 'CQACAgIAAxkBAAIJT2Oej0ir56sDp5v2lbUsT75rxmKVAAKAJwACOo7xSEuuBINnWxEKLAQ')
+
+
+@bot.message_handler(commands=['tr'])
+def translate_layout(message):
+    if message.reply_to_message and message.reply_to_message.text:
+        if message.reply_to_message.text[0] in RUS:
+            bot.send_message(message.chat.id, message.reply_to_message.text.translate(RUS_ENG_TABLE))
+        else:
+            bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
 
 
 @bot.message_handler(commands=['lib', 'library', 'book', 'books'])
@@ -210,6 +223,20 @@ def send_stats(message):
                      parse_mode='HTML', disable_web_page_preview=True)
 
 
+@bot.message_handler(commands=['add'])
+def add_stan_quote(message):
+    if message.reply_to_message and message.reply_to_message.text:
+        with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
+            stan_quotes.write('\n' + message.reply_to_message.text)
+            bot.send_message(message.chat.id, f'Добавил: {message.reply_to_message.text}',
+                             parse_mode='HTML', disable_web_page_preview=True)
+
+
+@bot.message_handler(commands=['quote'])
+def stan_speak(message):
+    bot.send_message(message.chat.id, stan.speak(0))
+
+
 @bot.message_handler(commands=['reset_stats'])
 def send_stats(message):
     report.reset_report_stats()
@@ -241,11 +268,6 @@ def admin_panel(message: types.Message):
         unban_id = int(message.text.split()[-1])
         bot.unban_chat_member(PYTHONCHATRU, unban_id)
         logging.warning(f'[UNBAN (M)] {unban_id}')
-
-
-def check_chat(message: types.Message):
-    if message.chat.id == PYTHONCHATRU:
-        return True
 
 
 @bot.message_handler(commands=['tsya'])
@@ -344,7 +366,12 @@ def check_unwanted_list(type_message: types.Message) -> bool:
 @bot.message_handler(func=check_unwanted_list)
 def unwanted_mentions(message: types.Message):
     """ Reply to unwanted mentions. """
-    bot.reply_to(message, f'У нас таких не любят! 🥴', parse_mode='HTML')
+    bot.reply_to(message, f'у нас тут таких не любят')
+
+
+def check_chat(message: types.Message):
+    if message.chat.id == PYTHONCHATRU:
+        return True
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
@@ -357,6 +384,10 @@ def unwanted_mentions(message: types.Message):
             logging.warning(f'New counter: {message.from_user.id} - {message.from_user.first_name}')
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
+
+    quote = stan.speak(20)
+    if quote:
+        bot.send_message(message.chat.id, quote)
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
