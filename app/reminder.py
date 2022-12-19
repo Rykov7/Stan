@@ -36,13 +36,12 @@ def remind(chat_to_repeat, today):
             if date.year != 1000:
                 age = today.year - date.year
                 notification += f'\n\n🥳 <i>{age}-ая годовщина</i>'
-            bot.send_message(chat_to_repeat, notification, parse_mode='HTML')
+            bot.send_message(chat_to_repeat, notification)
 
 
 @repeat(every().day.at('06:00'), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
-    bot.send_message(chat_to_repeat, report.create_report_text(),
-                     parse_mode='HTML', disable_web_page_preview=True)
+    bot.send_message(chat_to_repeat, report.create_report_text())
     report.reset_report_stats()
 
 

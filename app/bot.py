@@ -118,20 +118,14 @@ def delete_message(message: types.Message):
 def send_lutz_command(message):
     """ Send Chat Rules link. """
     logging.warning('Sent Rules link')
-    bot.reply_to(message,
-                 '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
-                 parse_mode='HTML',
-                 )
+    bot.reply_to(message, '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>')
 
 
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
     """ Send Chat FAQ link. """
     logging.warning('Sent FAQ link')
-    bot.reply_to(message,
-                 '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
-                 parse_mode='HTML',
-                 )
+    bot.reply_to(message, '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">Частые вопросы</a></u></b>')
 
 
 @bot.message_handler(commands=['lutz'])
@@ -162,11 +156,7 @@ def translate_layout(message):
 def send_lutz_command(message):
     """ Send Chat's Library link. """
     logging.warning('Send Library link')
-    bot.reply_to(message,
-                 '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>',
-                 parse_mode='HTML',
-                 disable_notification=True,
-                 )
+    bot.reply_to(message, '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>')
 
 
 @bot.inline_handler(lambda query: True)
@@ -178,7 +168,7 @@ def default_query(inline_query):
         if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
             zen.append(types.InlineQueryResultArticle(
                 f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
-                    f"<i>{phrase}</i>", parse_mode='HTML'), description=phrase))
+                    f"<i>{phrase}</i>"), description=phrase))
 
     bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
@@ -186,7 +176,7 @@ def default_query(inline_query):
 @bot.message_handler(commands=['me'])
 def command_me(message):
     """ Send info about user and chat id [Service]. """
-    bot.send_message(message.chat.id, get_me(message), parse_mode='HTML')
+    bot.send_message(message.chat.id, get_me(message))
 
 
 @bot.message_handler(commands=['remind'])
@@ -197,28 +187,26 @@ def remind_manually(message):
         try:
             today = dt.strptime(args[1], "%m-%d-%Y")
         except ValueError as ve:
-            bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}", parse_mode='HTML')
+            bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}")
         else:
             reminder.remind(message.chat.id, today)
     else:
         bot.send_message(message.chat.id, f"<b>Формат даты: MM-DD-YYYY</b>\n\n"
                                           f"Примеры:\n"
                                           f"/remind 09-12-2024\n"
-                                          f"/remind 09-13-2022", parse_mode='HTML')
+                                          f"/remind 09-13-2022")
 
 
 @bot.message_handler(commands=['jobs'])
 def list_jobs(message):
     """ List all the jobs in schedule. """
     if message.chat.id == ADMIN_ID:
-        bot.send_message(ADMIN_ID, reminder.print_get_jobs(),
-                         parse_mode='HTML', disable_web_page_preview=True)
+        bot.send_message(ADMIN_ID, reminder.print_get_jobs())
 
 
 @bot.message_handler(commands=['stats'])
 def send_stats(message):
-    bot.send_message(message.chat.id, report.create_report_text(),
-                     parse_mode='HTML', disable_web_page_preview=True)
+    bot.send_message(message.chat.id, report.create_report_text())
 
 
 @bot.message_handler(commands=['add'])
@@ -226,8 +214,7 @@ def add_stan_quote(message):
     if message.reply_to_message and message.reply_to_message.text:
         with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
             stan_quotes.write('\n' + message.reply_to_message.text)
-            bot.send_message(message.chat.id, f'Добавил: {message.reply_to_message.text}',
-                             parse_mode='HTML', disable_web_page_preview=True)
+            bot.send_message(message.chat.id, f'Добавил: {message.reply_to_message.text}')
 
 
 @bot.message_handler(commands=['quote'])
@@ -238,8 +225,7 @@ def stan_speak(message):
 @bot.message_handler(commands=['reset_stats'])
 def send_stats(message):
     report.reset_report_stats()
-    bot.send_message(message.chat.id, report.reset_report_stats(),
-                     parse_mode='HTML', disable_web_page_preview=True)
+    bot.send_message(message.chat.id, report.reset_report_stats())
 
 
 @bot.message_handler(commands=['reload'])
@@ -268,14 +254,34 @@ def admin_panel(message: types.Message):
         logging.warning(f'[UNBAN (M)] {unban_id}')
 
 
+def send_or_reply(m: types.Message, answer):
+    if m.reply_to_message:
+        bot.reply_to(m.reply_to_message, answer)
+    else:
+        bot.send_message(m.chat.id, answer)
+
+
 @bot.message_handler(commands=['tsya'])
 def send_tsya_link(message: types.Message):
     """ тся/ться """
-    answer = '<a href="https://tsya.ru/">-тся/-ться</a>'
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+    send_or_reply(message, '<a href="https://tsya.ru/">-тся/-ться</a>')
+
+
+@bot.message_handler(commands=['nometa'])
+def send_nometa(message: types.Message):
+    """ No meta """
+    send_or_reply(message, 'Пожалуйста, не задавайте <a href="https://nometa.xyz/ru.html">мета-вопросов</a> в чате!')
+
+
+@bot.message_handler(commands=['neprivet'])
+def send_neprivet(message: types.Message):
+    """ Neprivet. """
+    send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>')
+
+
+"""
+Caution commands: nojob, nobot, nogui
+"""
 
 
 @bot.message_handler(commands=['nojob'])
@@ -284,55 +290,21 @@ def send_no_job(message):
     answer = """Мы здесь не для того, чтобы за тебя решать задачи.
 
 Здесь помогают по конкретным вопросам <u>в ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и объяснить где и почему застрял... всё просто. 🤷🏻‍♂️"""
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
-
-
-@bot.message_handler(commands=['nometa'])
-def send_nometa(message: types.Message):
-    """ No meta """
-    answer = 'Пожалуйста, не задавайте <a href="https://nometa.xyz/ru.html">мета-вопросов</a> в чате!'
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
-
-
-@bot.message_handler(commands=['neprivet'])
-def send_neprivet(message: types.Message):
-    """ Neprivet. """
-    answer = '<a href="https://neprivet.com/">Непривет</a>'
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
-
-
-"""
-Caution commands: nobot, noparse, nogui
-"""
+    send_or_reply(message, answer)
 
 
 @bot.message_handler(commands=['nobot'])
 def nobot(message: types.Message):
     answer = """<b>Внимание</b>:
 Телеграм бот <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+    send_or_reply(message, answer)
 
 
 @bot.message_handler(commands=['nogui'])
 def nogui(message: types.Message):
     answer = """<b>Внимание</b>:
 GUI приложение <i>не должно</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+    send_or_reply(message, answer)
 
 
 @bot.message_handler(commands=['g'])
@@ -349,7 +321,7 @@ def google_it(message: types.Message):
     else:
         if len(message.text.split()) > 1:
             r = parse.quote_plus(' '.join(message.text.split()[1:]))
-            bot.reply_to(message, f"{search_engine}{r}", disable_web_page_preview=True)
+            bot.reply_to(message, f"{search_engine}{r}")
 
 
 """ Tease for blogger mentions. """

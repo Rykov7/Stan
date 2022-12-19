@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')
-bot = TeleBot(TOKEN)
+bot = TeleBot(TOKEN, 'HTML', skip_pending=True, disable_web_page_preview=True, allow_sending_without_reply=True)
 
 ADMIN_ID = 280887861  # Rykov7
 PYTHONCHATRU = -1001338616632  # pythonchatru
