@@ -39,7 +39,7 @@ def start(message: types.Message):
     """ Start """
     log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
     if message.from_user.last_name:
-        log_msg += f' {message.from_user.first_name}'
+        log_msg += f' {message.from_user.last_name}'
     logging.warning(log_msg)
 
 
@@ -117,22 +117,20 @@ def delete_message(message: types.Message):
 @bot.message_handler(commands=['rules'])
 def send_lutz_command(message):
     """ Send Chat Rules link. """
-    logging.warning('Send Rules link')
+    logging.warning('Sent Rules link')
     bot.reply_to(message,
                  '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>',
                  parse_mode='HTML',
-                 disable_notification=True,
                  )
 
 
 @bot.message_handler(commands=['faq'])
 def send_lutz_command(message):
     """ Send Chat FAQ link. """
-    logging.warning('Send FAQ link')
+    logging.warning('Sent FAQ link')
     bot.reply_to(message,
                  '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">FAQ</a></u></b>',
                  parse_mode='HTML',
-                 disable_notification=True,
                  )
 
 
@@ -148,7 +146,7 @@ def send_lutz_command(message):
 
 @bot.message_handler(commands=['bdmtss'])
 def send_bdmtss_audio(message):
-    bot.send_audio(message.chat.id, 'CQACAgIAAxkBAAIJT2Oej0ir56sDp5v2lbUsT75rxmKVAAKAJwACOo7xSEuuBINnWxEKLAQ')
+    bot.send_voice(message.chat.id, 'AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ')
 
 
 @bot.message_handler(commands=['tr'])
@@ -280,6 +278,18 @@ def send_tsya_link(message: types.Message):
         bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
 
 
+@bot.message_handler(commands=['nojob'])
+def send_no_job(message):
+    logging.warning('Sent no job')
+    answer = """Мы здесь не для того, чтобы за тебя решать задачи.
+
+Здесь помогают по конкретным вопросам <u>в ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и объяснить где и почему застрял... всё просто. 🤷🏻‍♂️"""
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
+    else:
+        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
+
+
 @bot.message_handler(commands=['nometa'])
 def send_nometa(message: types.Message):
     """ No meta """
@@ -309,16 +319,6 @@ Caution commands: nobot, noparse, nogui
 def nobot(message: types.Message):
     answer = """<b>Внимание</b>:
 Телеграм бот <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
-    else:
-        bot.send_message(message.chat.id, answer, parse_mode='HTML', disable_web_page_preview=True)
-
-
-@bot.message_handler(commands=['noparse'])
-def noparse(message: types.Message):
-    answer = """<b>Внимание</b>:
-Парсер <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code> и <code>отладку</code> до начала парсинга сайтов. Существует много ресурсов для этого в интернете."""
     if message.reply_to_message:
         bot.reply_to(message.reply_to_message, answer, parse_mode='HTML', disable_web_page_preview=True)
     else:
