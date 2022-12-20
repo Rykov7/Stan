@@ -41,8 +41,8 @@ def remind(chat_to_repeat, today):
 
 @repeat(every().day.at('06:00'), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
-    bot.send_message(chat_to_repeat, report.create_report_text())
-    report.reset_report_stats()
+    bot.send_message(chat_to_repeat, report.create_report_text(PYTHONCHATRU))
+    report.reset_report_stats(PYTHONCHATRU)
 
 
 def print_get_jobs():

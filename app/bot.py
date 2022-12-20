@@ -34,9 +34,8 @@ def moderate_messages(message: types.Message):
     logging.warning(f'[BAN] {message.from_user.id} {message.from_user.username} - {message.text}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
-    if message.chat.id == PYTHONCHATRU:
-        with shelve.open('chat_stats') as chat_stats:
-            chat_stats['Banned'] += 1
+    with shelve.open(f'{DATA}{message.chat.id}') as s:
+        s['Banned'] += 1
 
 
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
@@ -45,8 +44,8 @@ def catch_videos(message: types.Message):
     logging.warning(f'[BAN] {message.from_user.id} {message.from_user.first_name} - {message.video.file_name}')
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
-    with shelve.open('chat_stats') as chat_stats:
-        chat_stats['Banned'] += 1
+    with shelve.open(f'{DATA}{message.chat.id}') as s:
+        s['Banned'] += 1
 
 
 @bot.edited_message_handler(func=check_delete_list)
@@ -54,9 +53,8 @@ def catch_videos(message: types.Message):
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
     bot.delete_message(message.chat.id, message.id)
-    if message.chat.id == PYTHONCHATRU:
-        with shelve.open('chat_stats') as chat_stats:
-            chat_stats['Deleted'] += 1
+    with shelve.open(f'{DATA}{message.chat.id}') as s:
+        s['Deleted'] += 1
 
 
 @bot.message_handler(commands=['links'])
@@ -138,61 +136,9 @@ def remind_manually(message):
                                           f"/remind 09-13-2022")
 
 
-@bot.message_handler(commands=['jobs'])
-def list_jobs(message):
-    """ List all the jobs in schedule. """
-    if message.chat.id == ADMIN_ID:
-        bot.send_message(ADMIN_ID, reminder.print_get_jobs())
-
-
-@bot.message_handler(commands=['stats'])
-def send_stats(message):
-    bot.send_message(message.chat.id, report.create_report_text())
-
-
-@bot.message_handler(commands=['add'])
-def add_stan_quote(message):
-    if message.reply_to_message and message.reply_to_message.text:
-        with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
-            stan_quotes.write('\n' + message.reply_to_message.text)
-            bot.send_message(message.chat.id, f'Добавил: {message.reply_to_message.text}')
-
-
 @bot.message_handler(commands=['quote'])
 def stan_speak(message):
     bot.send_message(message.chat.id, stan.speak(0))
-
-
-@bot.message_handler(commands=['reset_stats'])
-def send_stats(message):
-    report.reset_report_stats()
-    bot.send_message(message.chat.id, report.reset_report_stats())
-
-
-@bot.message_handler(commands=['reload'])
-def send_stats(message):
-    reloads.reload_modules()
-    bot.send_message(message.chat.id, 'Reloaded successfully')
-
-
-@bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID, commands=['pydel', 'pyban', 'unban_id'])
-def admin_panel(message: types.Message):
-    """ Admin panel. """
-    if message.text == '/ddel' and message.reply_to_message:
-        bot.delete_message(message.chat.id, message.id)
-        bot.delete_message(message.chat.id, message.reply_to_message.id)
-        logging.warning(
-            f'[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
-    elif message.text == '/bban' and message.reply_to_message:
-        bot.delete_message(message.chat.id, message.id)
-        bot.delete_message(message.chat.id, message.reply_to_message.id)
-        bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
-        logging.warning(
-            f'[BAN (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
-    elif message.text.split()[0] == '/unban_id' and message.text.split()[-1].isdigit():
-        unban_id = int(message.text.split()[-1])
-        bot.unban_chat_member(PYTHONCHATRU, unban_id)
-        logging.warning(f'[UNBAN (M)] {unban_id}')
 
 
 @bot.message_handler(commands=['tsya'])
@@ -262,14 +208,78 @@ def tease_nongrata(message: types.Message):
     bot.reply_to(message, f'у нас тут таких не любят')
 
 
-@bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
-                                                     'audio', 'document'])
+"""
+                   [ ADMIN PANEL ]
+"""
+
+
+@bot.message_handler(func=is_admin, commands=['reload'])
+def send_stats(message):
+    logging.warning('Reloading...')
+    reloads.reload_modules()
+    bot.send_message(message.chat.id, 'Reloaded successfully')
+
+
+@bot.message_handler(func=is_admin, commands=['ddel', 'bban', 'unban_id'])
+def admin_panel(message: types.Message):
+    """ Admin panel. """
+    if message.text == '/ddel' and message.reply_to_message:
+        bot.delete_message(message.chat.id, message.id)
+        bot.delete_message(message.chat.id, message.reply_to_message.id)
+        logging.warning(
+            f'[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
+    elif message.text == '/bban' and message.reply_to_message:
+        bot.delete_message(message.chat.id, message.id)
+        bot.delete_message(message.chat.id, message.reply_to_message.id)
+        bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
+        logging.warning(
+            f'[BAN (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
+    elif message.text.split()[0] == '/unban_id' and message.text.split()[-1].isdigit():
+        unban_id = int(message.text.split()[-1])
+        bot.unban_chat_member(PYTHONCHATRU, unban_id)
+        logging.warning(f'[UNBAN (M)] {unban_id}')
+
+
+@bot.message_handler(func=is_admin, commands=['jobs'])
+def list_jobs(message):
+    """ List all the jobs in schedule. """
+    bot.send_message(ADMIN_ID, reminder.print_get_jobs())
+
+
+@bot.message_handler(func=is_admin, commands=['add'])
+def add_stan_quote(message):
+    if message.reply_to_message and message.reply_to_message.text:
+        with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
+            stan_quotes.write('\n' + message.reply_to_message.text)
+            bot.send_message(message.chat.id, f'Добавил: {message.reply_to_message.text}')
+
+
+@bot.message_handler(func=is_admin, commands=['stats'])
+def send_stats(message: types.Message):
+    if len(message.text.split()) == 1:
+        bot.send_message(message.chat.id, report.create_report_text(message.chat.id))
+    else:
+        bot.send_message(message.chat.id, report.create_report_text(message.text.split()[-1]))
+
+
+@bot.message_handler(func=is_admin, commands=['reset_stats'], chat_types=['supergroup', 'group'])
+def send_stats(message: types.Message):
+    logging.warning('reset_stats')
+    report.reset_report_stats(message.chat.id)
+    bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
+
+
+@bot.message_handler(content_types=['text', 'sticker', 'photo', 'animation', 'video', 'audio', 'document'],
+                     chat_types=['supergroup', 'group'])
 def handle_msg(message: types.Message):
-    """ Count messages, Stan speak. """
-    with shelve.open('chat_stats', writeback=True) as s:
+    """ Count messages, Stan. """
+    with shelve.open(f'{DATA}{message.chat.id}', writeback=True) as s:
+        if 'Messages' not in s:
+            report.reset_report_stats(message.chat.id)
+
         if message.from_user.id not in s['Messages']:
-            s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 0}
-            logging.warning(f'New counter: {message.from_user.id} - {message.from_user.first_name}')
+            s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 1}
+            logging.warning(f'CNTR {message.chat.id}: {message.from_user.first_name} ({message.from_user.id})')
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 

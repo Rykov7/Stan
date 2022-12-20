@@ -1,15 +1,17 @@
 from importlib import reload
 
+from . import bot as bot_mod
+from . import check
 from . import config
 from . import me
-from . import stan
 from . import report
-from . import bot as bot_mod
+from . import stan
 
 
 def reload_modules():
-    reload(report)
+    reload(bot_mod)
+    reload(check)
     reload(config)
     reload(me)
-    reload(bot_mod)
+    reload(report)
     reload(stan)

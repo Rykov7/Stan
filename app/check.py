@@ -45,9 +45,8 @@ def check_nongrata(type_message: types.Message) -> bool:
             return True
 
 
-def check_chat(message: types.Message):
-    if message.chat.id == PYTHONCHATRU:
-        return True
+def is_admin(message: types.Message) -> bool:
+    return message.from_user.id == ADMIN_ID
 
 
 def send_or_reply(m: types.Message, answer):
