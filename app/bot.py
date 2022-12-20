@@ -9,9 +9,8 @@ from . import stan
 from . import reminder
 from . import admin
 from . import report
-from .config import bot, URL_RX, ALLOWED_WORDS, ADMIN_ID, TOKEN, PYTHONCHATRU, WHITEUN, WHITEIDS, RUS_ENG_TABLE, \
-    ENG_RUS_TABLE, RUS
 from .me import get_me
+from .config import *
 
 # https://core.telegram.org/bots/api Telegram Bot API
 # https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
@@ -114,28 +113,31 @@ def delete_message(message: types.Message):
             chat_stats['Deleted'] += 1
 
 
+@bot.message_handler(commands=['links'])
+def send_links(message):
+    send_or_reply(message, f"{RULES}\n{FAQ}\n{LIB}")
+
+
 @bot.message_handler(commands=['rules'])
-def send_lutz_command(message):
-    """ Send Chat Rules link. """
-    logging.warning('Sent Rules link')
-    bot.reply_to(message, '<b>🟡 <u><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></u></b>')
+def send_rules(message):
+    send_or_reply(message, f'{RULES}')
 
 
 @bot.message_handler(commands=['faq'])
-def send_lutz_command(message):
-    """ Send Chat FAQ link. """
-    logging.warning('Sent FAQ link')
-    bot.reply_to(message, '<b>🔵 <u><a href="https://telegra.ph/faq-10-07-4">Частые вопросы</a></u></b>')
+def send_faq(message):
+    send_or_reply(message, f'{FAQ}')
+
+
+@bot.message_handler(commands=['lib', 'library', 'book', 'books'])
+def send_lib(message):
+    send_or_reply(message, f'{LIB}')
 
 
 @bot.message_handler(commands=['lutz'])
-def send_lutz_command(message):
-    """ Send the Lutz's Book. """
-    logging.warning('Send the Lutz Book')
-    bot.send_document(
-        message.chat.id,
-        document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
-        caption="вот, не позорься")
+def send_lutz(message):
+    bot.send_document(message.chat.id,
+                      document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
+                      caption="вот, не позорься")
 
 
 @bot.message_handler(commands=['bdmtss'])
@@ -150,13 +152,6 @@ def translate_layout(message):
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(RUS_ENG_TABLE))
         else:
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
-
-
-@bot.message_handler(commands=['lib', 'library', 'book', 'books'])
-def send_lutz_command(message):
-    """ Send Chat's Library link. """
-    logging.warning('Send Library link')
-    bot.reply_to(message, '📚 <b><u><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></u></b>')
 
 
 @bot.inline_handler(lambda query: True)
@@ -270,7 +265,13 @@ def send_tsya_link(message: types.Message):
 @bot.message_handler(commands=['nometa'])
 def send_nometa(message: types.Message):
     """ No meta """
-    send_or_reply(message, 'Пожалуйста, не задавайте <a href="https://nometa.xyz/ru.html">мета-вопросов</a> в чате!')
+    send_or_reply(message, """Не задавай мета-вопросов, вроде:
+<i>  «Можно задать вопрос?»
+  «Кто-нибудь пользовался .. ?»
+  «Привет, мне нужна помощь по .. !»</i>
+
+Просто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь.
+<i><a href="https://nometa.xyz/ru.html">nometa.xyz</a></i>""")
 
 
 @bot.message_handler(commands=['neprivet'])
@@ -289,7 +290,7 @@ def send_no_job(message):
     logging.warning('Sent no job')
     answer = """Мы здесь не для того, чтобы за тебя решать задачи.
 
-Здесь помогают по конкретным вопросам <u>в ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и объяснить где и почему застрял... всё просто. 🤷🏻‍♂️"""
+Здесь помогают по конкретным вопросам в <u>ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и объяснить где и почему застрял... всё просто. 🤷🏼️"""
     send_or_reply(message, answer)
 
 

@@ -18,8 +18,11 @@ ALLOWED_WORDS = ['paste', 'github', 'google', 'nometa', 'python', 'django', 'fla
 WHITEUN = set(os.environ.get('whitelist', '<<<ERR_USRS').split(','))
 WHITEIDS = {int(i) for i in os.environ.get('whiteids', '<<<ERR_IDS').split(',')}
 
-
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)
+
+RULES = '🟡 <b><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></b>'
+FAQ = '🔵 <b><a href="https://telegra.ph/faq-10-07-4">Частые вопросы</a></b>'
+LIB = '📚 <b><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></b>'
