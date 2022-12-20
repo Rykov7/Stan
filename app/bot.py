@@ -1,15 +1,14 @@
 import shelve
 from datetime import datetime as dt
 from flask import Flask, request, abort
-from telebot import types
-import logging
 from urllib import parse
 
 from . import stan
 from . import reminder
-from . import admin
+from . import reloads
 from . import report
 from .me import get_me
+from .check import *
 from .config import *
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -20,18 +19,6 @@ app = Flask(__name__)
 
 logging.warning('>>> PYBOT STARTED!')
 
-zen_rows = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
-            'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',
-            'Readability counts.',
-            "Special cases aren't special enough to break the rules. Although practicality beats purity.",
-            'Errors should never pass silently. Unless explicitly silenced.',
-            'In the face of ambiguity, refuse the temptation to guess.',
-            'There should be one — and preferably only one — obvious way to do it.',
-            'Now is better than never. Although never is often better than *right* now.',
-            "If the implementation is hard to explain, it's a bad idea.",
-            'If the implementation is easy to explain, it may be a good idea.',
-            "Namespaces are one honking great idea — let's do more of those!"]
-
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -40,16 +27,6 @@ def start(message: types.Message):
     if message.from_user.last_name:
         log_msg += f' {message.from_user.last_name}'
     logging.warning(log_msg)
-
-
-def check_spam_list(type_message: types.Message) -> bool:
-    """ Check for mentioning unwanted persons in text. """
-    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
-        spam_urls = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/',
-                     'uclck.ru/']
-        for url in spam_urls:
-            if url in type_message.text.casefold():
-                return True
 
 
 @bot.edited_message_handler(func=check_spam_list)
@@ -64,14 +41,6 @@ def moderate_messages(message: types.Message):
             chat_stats['Banned'] += 1
 
 
-def check_caption_spam_list(type_message: types.Message) -> bool:
-    """ Check for mentioning unwanted words in caption. """
-    unwanted_phrases = ['GREEN ROOM']
-    for phrase in unwanted_phrases:
-        if type_message.caption and phrase in type_message.caption:
-            return True
-
-
 @bot.message_handler(func=check_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
@@ -80,27 +49,6 @@ def catch_videos(message: types.Message):
     bot.ban_chat_member(message.chat.id, message.from_user.id)
     with shelve.open('chat_stats') as chat_stats:
         chat_stats['Banned'] += 1
-
-
-def check_no_allowed(word_list, msg):
-    for word in word_list:
-        if word in msg.casefold():
-            return False
-    return True
-
-
-def check_delete_list(type_message: types.Message) -> bool:
-    """ Check for URLs in message and delete. """
-    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
-        if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
-            logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - {type_message.text}')
-            return True
-        if type_message.entities:
-            for entity in type_message.entities:
-                if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
-                    logging.info(
-                        f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})')
-                    return True
 
 
 @bot.edited_message_handler(func=check_delete_list)
@@ -128,7 +76,7 @@ def send_faq(message):
     send_or_reply(message, f'{FAQ}')
 
 
-@bot.message_handler(commands=['lib', 'library', 'book', 'books'])
+@bot.message_handler(commands=['lib', 'library', 'books'])
 def send_lib(message):
     send_or_reply(message, f'{LIB}')
 
@@ -158,7 +106,7 @@ def translate_layout(message):
 def default_query(inline_query):
     """ Inline the Zen of Python. """
     zen = []
-    for id_p, phrase in enumerate(zen_rows):
+    for id_p, phrase in enumerate(ZEN):
         q = inline_query.query.casefold()
         if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
             zen.append(types.InlineQueryResultArticle(
@@ -225,19 +173,19 @@ def send_stats(message):
 
 @bot.message_handler(commands=['reload'])
 def send_stats(message):
-    admin.reload_modules()
+    reloads.reload_modules()
     bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
 @bot.message_handler(func=lambda a: a.from_user.id == ADMIN_ID, commands=['pydel', 'pyban', 'unban_id'])
 def admin_panel(message: types.Message):
     """ Admin panel. """
-    if message.text == '/pydel' and message.reply_to_message:
+    if message.text == '/ddel' and message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         logging.warning(
             f'[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
-    elif message.text == '/pyban' and message.reply_to_message:
+    elif message.text == '/bban' and message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
@@ -247,13 +195,6 @@ def admin_panel(message: types.Message):
         unban_id = int(message.text.split()[-1])
         bot.unban_chat_member(PYTHONCHATRU, unban_id)
         logging.warning(f'[UNBAN (M)] {unban_id}')
-
-
-def send_or_reply(m: types.Message, answer):
-    if m.reply_to_message:
-        bot.reply_to(m.reply_to_message, answer)
-    else:
-        bot.send_message(m.chat.id, answer)
 
 
 @bot.message_handler(commands=['tsya'])
@@ -276,7 +217,6 @@ def send_nometa(message: types.Message):
 
 @bot.message_handler(commands=['neprivet'])
 def send_neprivet(message: types.Message):
-    """ Neprivet. """
     send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>')
 
 
@@ -311,7 +251,7 @@ GUI приложение <i>не должно</i> быть твоим первы
 @bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
-    search_engine = 'https://www.google.ru/search?q='
+    search_engine = 'https://www.google.com/search?q='
     if message.reply_to_message and message.reply_to_message.text:
         if len(message.text.split()) == 1:
             r = parse.quote_plus(message.reply_to_message.text)
@@ -328,23 +268,10 @@ def google_it(message: types.Message):
 """ Tease for blogger mentions. """
 
 
-def check_unwanted_list(type_message: types.Message) -> bool:
-    """ Check for bloggers. """
-    unwanted_phrases = ['дудар', 'хауди', 'dudar']
-    for phrase in unwanted_phrases:
-        if phrase in type_message.text.casefold():
-            return True
-
-
-@bot.message_handler(func=check_unwanted_list)
+@bot.message_handler(func=check_nongrata)
 def unwanted_mentions(message: types.Message):
     """ Reply to unwanted mentions. """
     bot.reply_to(message, f'у нас тут таких не любят')
-
-
-def check_chat(message: types.Message):
-    if message.chat.id == PYTHONCHATRU:
-        return True
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
