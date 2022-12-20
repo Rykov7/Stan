@@ -1,4 +1,3 @@
-import logging
 from telebot import types
 from .config import *
 
@@ -13,8 +12,7 @@ def check_spam_list(type_message: types.Message) -> bool:
 
 def check_caption_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted words in caption. """
-    unwanted_phrases = ['GREEN ROOM']
-    for phrase in unwanted_phrases:
+    for phrase in BAN_WORDS:
         if type_message.caption and phrase in type_message.caption:
             return True
 
@@ -41,7 +39,7 @@ def check_delete_list(type_message: types.Message) -> bool:
 
 
 def check_nongrata(type_message: types.Message) -> bool:
-    """ Check for bloggers. """
+    """ Check for non grata persons. """
     for phrase in NON_GRATA:
         if phrase in type_message.text.casefold():
             return True

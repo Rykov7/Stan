@@ -1,7 +1,11 @@
 import os
 import re
+import logging
 from telebot import TeleBot
 from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logging.warning('>>> PYBOT STARTED!')
 
 load_dotenv()
 
@@ -29,6 +33,7 @@ LIB = '📚 <b><a href="https://telegra.ph/what-to-read-10-06">Библиоте�
 
 SPAM = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/', 'uclck.ru/']
 NON_GRATA = ['дудар', 'хауди', 'dudar']
+BAN_WORDS = ['GREEN ROOM']
 
 ZEN = ['Beautiful is better than ugly.', 'Explicit is better than implicit.', 'Simple is better than complex.',
        'Complex is better than complicated.', 'Flat is better than nested.', 'Sparse is better than dense.',

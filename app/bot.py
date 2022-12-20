@@ -12,12 +12,10 @@ from .check import *
 from .config import *
 
 # https://core.telegram.org/bots/api Telegram Bot API
-# https://github.com/eternnoir/pyTelegramBotAPI/tree/master/examples
+# https://github.com/eternnoir/pyTelegramBotAPI/tree/master/
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+
 app = Flask(__name__)
-
-logging.warning('>>> PYBOT STARTED!')
 
 
 @bot.message_handler(commands=['start'])
@@ -198,14 +196,12 @@ def admin_panel(message: types.Message):
 
 
 @bot.message_handler(commands=['tsya'])
-def send_tsya_link(message: types.Message):
-    """ тся/ться """
+def send_tsya(message: types.Message):
     send_or_reply(message, '<a href="https://tsya.ru/">-тся/-ться</a>')
 
 
 @bot.message_handler(commands=['nometa'])
 def send_nometa(message: types.Message):
-    """ No meta """
     send_or_reply(message, """Не задавай мета-вопросов, вроде:
 <i>  «Можно задать вопрос?»
   «Кто-нибудь пользовался .. ?»
@@ -220,13 +216,8 @@ def send_neprivet(message: types.Message):
     send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>')
 
 
-"""
-Caution commands: nojob, nobot, nogui
-"""
-
-
 @bot.message_handler(commands=['nojob'])
-def send_no_job(message):
+def send_nojob(message):
     logging.warning('Sent no job')
     answer = """Мы здесь не для того, чтобы за тебя решать задачи.
 
@@ -265,19 +256,16 @@ def google_it(message: types.Message):
             bot.reply_to(message, f"{search_engine}{r}")
 
 
-""" Tease for blogger mentions. """
-
-
 @bot.message_handler(func=check_nongrata)
-def unwanted_mentions(message: types.Message):
-    """ Reply to unwanted mentions. """
+def tease_nongrata(message: types.Message):
+    """ Reply to non grata mentions. """
     bot.reply_to(message, f'у нас тут таких не любят')
 
 
 @bot.message_handler(func=check_chat, content_types=['text', 'sticker', 'photo', 'animation', 'video',
                                                      'audio', 'document'])
-def unwanted_mentions(message: types.Message):
-    """ Count messages. """
+def handle_msg(message: types.Message):
+    """ Count messages, Stan speak. """
     with shelve.open('chat_stats', writeback=True) as s:
         if message.from_user.id not in s['Messages']:
             s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 0}
