@@ -5,10 +5,10 @@ from urllib import parse
 
 from . import stan
 from . import reminder
-from . import reloads
+from . import reloader
 from . import report
 from .me import get_me
-from .check import *
+from .filters import *
 from .config import *
 
 # https://core.telegram.org/bots/api Telegram Bot API
@@ -216,7 +216,7 @@ def tease_nongrata(message: types.Message):
 @bot.message_handler(func=is_admin, commands=['reload'])
 def send_stats(message):
     logging.warning('Reloading...')
-    reloads.reload_modules()
+    reloader.reload_modules()
     bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
@@ -283,7 +283,7 @@ def handle_msg(message: types.Message):
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 
-    quote = stan.speak(20)
+    quote = stan.speak(30)
     if quote:
         bot.send_message(message.chat.id, quote)
 

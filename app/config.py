@@ -18,7 +18,7 @@ ADMIN_ID = 280887861           # Rykov7
 PYTHONCHATRU = -1001338616632  # pythonchatru
 
 URL_RX = re.compile(r'\w+\.\w+/\w+')
-ALLOWED_WORDS = ['paste', 'github', 'google', 'nometa', 'python', 'django', 'flask', 'fastapi',
+ALLOWED_WORDS = ['paste', 'github', 'google', 'nometa', 'python', 'django', 'flask', 'fastapi', 'wiki'
                  'stackoverflow', 'habr', 'medium', 'youtu', 'stepik', 'telegraph', '#rtfm', 'support']
 
 WHITEUN = set(os.environ.get('whitelist', '<<<ERR_USRS').split(','))

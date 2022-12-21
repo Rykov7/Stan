@@ -2,13 +2,15 @@ import shelve
 import os
 from .config import DATA
 
+
 def create_report_text(chat_id):
     top_users = ''
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):
         with shelve.open(f'{DATA}{chat_id}') as s:
             for n in range(min(3, len(s['Messages']))):
-                top_user = s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
+                top_user = s['Messages'][
+                    sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
                 if top_user['Count'] >= 10:
                     flooders.append(top_user)
 
