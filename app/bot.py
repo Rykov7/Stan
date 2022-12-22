@@ -13,17 +13,23 @@ from .me import get_me
 from .filters import *
 from .config import *
 
-
 app = Flask(__name__)
 
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    """ Start """
+    """ Just write log. Nothing happen. """
     log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
     if message.from_user.last_name:
         log_msg += f' {message.from_user.last_name}'
+    bot.send_message(message.chat.id,
+                     f'Привет, {message.from_user.first_name}\nЗдесь можно опробовать команды из меню.')
     logging.warning(log_msg)
+
+
+"""
+            [ ANTISPAM FILTERS ]
+"""
 
 
 @bot.edited_message_handler(func=check_spam_list)
@@ -54,6 +60,11 @@ def delete_message(message: types.Message):
     bot.delete_message(message.chat.id, message.id)
     with shelve.open(f'{DATA}{message.chat.id}') as s:
         s['Deleted'] += 1
+
+
+"""
+            [ COMMANDS ]
+"""
 
 
 @bot.message_handler(commands=['links'])
@@ -95,20 +106,6 @@ def translate_layout(message):
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(RUS_ENG_TABLE))
         else:
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
-
-
-@bot.inline_handler(lambda query: True)
-def default_query(inline_query):
-    """ Inline the Zen of Python. """
-    zen = []
-    for id_p, phrase in enumerate(ZEN):
-        q = inline_query.query.casefold()
-        if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
-            zen.append(types.InlineQueryResultArticle(
-                f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
-                    f"<i>{phrase}</i>"), description=phrase))
-
-    bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
 
 @bot.message_handler(commands=['me'])
@@ -208,6 +205,25 @@ def tease_nongrata(message: types.Message):
 
 
 """
+            [ INLINE QUERIES ]
+"""
+
+
+@bot.inline_handler(lambda query: True)
+def default_query(inline_query):
+    """ Inline the Zen of Python. """
+    zen = []
+    for id_p, phrase in enumerate(ZEN):
+        q = inline_query.query.casefold()
+        if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
+            zen.append(types.InlineQueryResultArticle(
+                f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
+                    f"<i>{phrase}</i>"), description=phrase))
+
+    bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
+
+
+"""
                    [ ADMIN PANEL ]
 """
 
@@ -274,9 +290,10 @@ def send_stats(message: types.Message):
 
 
 def send_quote(after_sec, message, quote):
-    sleep(after_sec/3)
+    """ Imitate Reading first, then imitate Typing. """
+    sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action='typing')
-    sleep(after_sec)
+    sleep(after_sec)  # Typing time
     bot.send_message(message.chat.id, quote)
 
 
@@ -297,6 +314,11 @@ def handle_msg(message: types.Message):
     quote = stan.speak(22)
     if quote:
         threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
+
+
+"""
+            [ WEBHOOK ROUTE ]
+"""
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
