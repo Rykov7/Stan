@@ -2,6 +2,8 @@ import shelve
 from datetime import datetime as dt
 from flask import Flask, request, abort
 from urllib import parse
+import threading
+from time import sleep
 
 from . import stan
 from . import reminder
@@ -10,9 +12,6 @@ from . import report
 from .me import get_me
 from .filters import *
 from .config import *
-
-# https://core.telegram.org/bots/api Telegram Bot API
-# https://github.com/eternnoir/pyTelegramBotAPI/tree/master/
 
 
 app = Flask(__name__)
@@ -269,6 +268,18 @@ def send_stats(message: types.Message):
     bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
 
 
+"""
+            [ MAIN MESSAGE HANDLER ]
+"""
+
+
+def send_quote(after_sec, message, quote):
+    sleep(after_sec/3)
+    bot.send_chat_action(message.chat.id, action='typing')
+    sleep(after_sec)
+    bot.send_message(message.chat.id, quote)
+
+
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'animation', 'video', 'audio', 'document'],
                      chat_types=['supergroup', 'group'])
 def handle_msg(message: types.Message):
@@ -283,9 +294,9 @@ def handle_msg(message: types.Message):
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 
-    quote = stan.speak(30)
+    quote = stan.speak(22)
     if quote:
-        bot.send_message(message.chat.id, quote)
+        threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])

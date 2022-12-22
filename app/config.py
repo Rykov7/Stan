@@ -1,16 +1,19 @@
 import os
 import re
 import logging
-from telebot import TeleBot
+from telebot import TeleBot, logger
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logging.warning('>>> PYBOT STARTED!')
 
+
+logger.setLevel(logging.INFO)
 load_dotenv()
 
 TOKEN = os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')
-bot = TeleBot(TOKEN, 'HTML', disable_web_page_preview=True, allow_sending_without_reply=True)
+bot = TeleBot(TOKEN, 'HTML', disable_web_page_preview=True, allow_sending_without_reply=True,
+              num_threads=3, colorful_logs=True)
 
 DATA = 'data/chat'
 
