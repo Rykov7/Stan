@@ -291,7 +291,8 @@ def send_stats(message: types.Message):
 
 def send_quote(after_sec, message, quote):
     """ Imitate Reading first, then imitate Typing. """
-    sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
+    if message.text:
+        sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action='typing')
     sleep(after_sec)  # Typing time
     bot.send_message(message.chat.id, quote)
@@ -311,7 +312,7 @@ def handle_msg(message: types.Message):
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 
-    quote = stan.speak(22)
+    quote = stan.speak(25)
     if quote:
         threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 

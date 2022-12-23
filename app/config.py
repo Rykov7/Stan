@@ -4,20 +4,19 @@ import logging
 from telebot import TeleBot, logger
 from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logging.warning('>>> PYBOT STARTED!')
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y.%m.%d %H:%M:%S')
+logging.critical('STAN STARTED!')
 
 logger.setLevel(logging.INFO)
 load_dotenv()
 
 TOKEN = os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')
 bot = TeleBot(TOKEN, 'HTML', disable_web_page_preview=True, allow_sending_without_reply=True,
-              num_threads=3, colorful_logs=True)
+              colorful_logs=True)
 
 DATA = 'data/chat'
 
-ADMIN_ID = 280887861           # Rykov7
+ADMIN_ID = 280887861  # Rykov7
 PYTHONCHATRU = -1001338616632  # pythonchatru
 
 URL_RX = re.compile(r'\w+\.\w+/\w+')
