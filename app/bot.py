@@ -235,24 +235,31 @@ def send_stats(message):
     bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
-@bot.message_handler(func=is_admin, commands=['ddel', 'bban', 'unban_id'])
-def admin_panel(message: types.Message):
-    """ Admin panel. """
-    if message.text == '/ddel' and message.reply_to_message:
+@bot.message_handler(func=is_admin, commands=['ddel'])
+def delete_user(message: types.Message):
+    if message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         logging.warning(
             f'[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
-    elif message.text == '/bban' and message.reply_to_message:
+
+
+@bot.message_handler(func=is_admin, commands=['bban'])
+def ban_user(message: types.Message):
+    if message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
         logging.warning(
             f'[BAN (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - {message.reply_to_message.text}')
-    elif message.text.split()[0] == '/unban_id' and message.text.split()[-1].isdigit():
-        unban_id = int(message.text.split()[-1])
-        bot.unban_chat_member(PYTHONCHATRU, unban_id)
-        logging.warning(f'[UNBAN (M)] {unban_id}')
+
+
+@bot.message_handler(func=is_admin, commands=['unban_id'])
+def unban_user(message: types.Message):
+    if message.text.split()[-1].isdigit():
+        user_id = int(message.text.split()[-1])
+        bot.unban_chat_member(PYTHONCHATRU, user_id)
+        logging.warning(f'[UNBAN (M)] {user_id}')
 
 
 @bot.message_handler(func=is_admin, commands=['jobs'])
