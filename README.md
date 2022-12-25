@@ -34,14 +34,14 @@ Bot can recieve commands and behave depending on chat situation.
 
 Standard command pack for bot father includes:
 * nobot - Telebot shouldn't be your first Python project
-* noparse - Web-scraper shouldn't be your first Python project
 * nogui - GUI app shouldn't be your first Python project
 * nometa - Don't ask meta questions
 * neprivet - Don't hello
+* bdmtss - Rimshot
 * quote - Random quote
 * add - Add quote
 * g - Google it [Request text can be any text from replied message or arguments if there's text after `\g example`]
 * rules - Chat rules
 * faq - FAQ
-* books - Pythonista's Library (
+* books - Pythonista's Library
 * lutz - Send Lutz book

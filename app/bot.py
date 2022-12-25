@@ -1,7 +1,7 @@
 import shelve
 from datetime import datetime as dt
 from flask import Flask, request, abort
-from urllib import parse
+
 import threading
 from time import sleep
 
@@ -9,7 +9,7 @@ from . import stan
 from . import reminder
 from . import reloader
 from . import report
-from .me import get_me
+from .helpers import get_me, search_it
 from .filters import *
 from .config import *
 
@@ -184,18 +184,13 @@ GUI приложение <i>не должно</i> быть твоим первы
 @bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
-    search_engine = 'https://www.google.com/search?q='
-    if message.reply_to_message and message.reply_to_message.text:
-        if len(message.text.split()) == 1:
-            r = parse.quote_plus(message.reply_to_message.text)
-        else:
-            r = parse.quote_plus(' '.join(message.text.split()[1:]))
-        bot.reply_to(message.reply_to_message, f"{search_engine}{r}",
-                     disable_web_page_preview=True)
-    else:
-        if len(message.text.split()) > 1:
-            r = parse.quote_plus(' '.join(message.text.split()[1:]))
-            bot.reply_to(message, f"{search_engine}{r}")
+    search_it('https://www.google.com/search?q=', message)
+
+
+@bot.message_handler(commands=['s'])
+def google_it(message: types.Message):
+    """ Stackoverflow it! """
+    search_it('https://stackoverflow.com/search?q=', message)
 
 
 @bot.message_handler(func=check_nongrata)
