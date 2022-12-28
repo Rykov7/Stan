@@ -314,7 +314,7 @@ def handle_msg(message: types.Message):
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 
-    quote = stan.speak(25)
+    quote = stan.speak(30)
     if quote:
         threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
