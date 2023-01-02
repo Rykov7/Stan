@@ -55,14 +55,14 @@ Continuous log reading on Linux:
 
 
 ### Hot to interact with Lutz bot?
-Bot can recieve commands and behave depending on chat situation.
+Bot can receive commands and behave depending on chat situation.
 
 Standard command pack for bot father includes:
 * nobot - Telebot shouldn't be your first Python project
 * nogui - GUI app shouldn't be your first Python project
 * nometa - Don't ask meta questions
 * neprivet - Don't hello
-* bdmtss - Rimshot
+* bdmtss - Rim shot
 * quote - Random quote
 * add - Add quote
 * g - Google it [Request text can be any text from replied message or arguments if there's text after `\g example`]
