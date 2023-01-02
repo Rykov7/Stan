@@ -4,17 +4,16 @@ Multipurpose Telegram Bot for Python group
 ### What does this project do?
  * Send links on command (chat rules, FAQs, libraries etc.)
  * Ban users and delete messages
- * Filter links
  * Remind dates
- * Daily statistics publication (how many banned, deleted, sent messages)
+ * Report Daily statistics (how many banned, deleted, sent messages)
  * Search for the Zen of Python quotes (inline query)
  * Help users with googling their queries
  * Make faces when doubtful bloggers are mentioned
- * Etc. (functionality is growing up)
+ * Etc.
 
 ### Why is this project useful?
 You can use this project as a pre-coded customizable bot.
-Original (and currently working) bot Telegram username: @LutzPyBot
+Original (and currently working example) bot Telegram username: @LutzPyBot
 
 ### How to deploy it?
  1. Clone repository on your linux server into `lutzpybot` user's home directory.
