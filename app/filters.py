@@ -2,11 +2,11 @@ from telebot import types
 from .config import *
 
 
-def check_spam_list(type_message: types.Message) -> bool:
+def check_spam_list(message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
+    if message.from_user.username not in WHITEUN and message.from_user.id not in WHITEIDS:
         for url in SPAM:
-            if url in type_message.text.casefold():
+            if url in message.text.casefold():
                 return True
 
 
@@ -47,6 +47,10 @@ def check_nongrata(type_message: types.Message) -> bool:
 
 def is_admin(message: types.Message) -> bool:
     return message.from_user.id == ADMIN_ID
+
+
+def is_white(message: types.Message) -> bool:
+    return message.from_user.username in WHITEUN or message.from_user.id in WHITEIDS
 
 
 def send_or_reply(m: types.Message, answer):

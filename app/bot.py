@@ -263,7 +263,7 @@ def list_jobs(message):
     bot.send_message(ADMIN_ID, reminder.print_get_jobs())
 
 
-@bot.message_handler(func=is_admin, commands=['add'])
+@bot.message_handler(func=is_white, commands=['add'])
 def add_stan_quote(message):
     if message.reply_to_message and message.reply_to_message.text:
         with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:

@@ -42,7 +42,7 @@ ExecStart=/bin/bash -c 'source /home/inferno/lutzpybot/venv/bin/activate; gunico
 [Install]
 WantedBy=multi-user.target
 ```
-2. Enable and start with `systemctl enable lutz.service`, `systemctl enable lutz.service`.
+2. Enable and start with `systemctl enable lutz.service`, `systemctl start lutz.service`.
 
 ### Where can I get more help, if I need it?
 Bot is easily understandable reading in-code comments of the handler functions, additionally read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for library help.
