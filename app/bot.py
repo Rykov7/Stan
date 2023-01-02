@@ -266,8 +266,8 @@ def list_jobs(message):
 @bot.message_handler(func=is_white, commands=['add'])
 def add_stan_quote(message):
     if message.reply_to_message and message.reply_to_message.text:
-        with open('Stan.txt', 'a+', encoding='utf8') as stan_quotes:
-            if message.reply_to_message.text not in (i.rstrip() for i in stan_quotes):
+        with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
+            if message.reply_to_message.text not in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
                 stan_quotes.write('\n' + message.reply_to_message.text)
                 bot.send_message(message.chat.id, f'✅ <b>Добавил</b>\n  └ <i>{message.reply_to_message.text}</i>')
             else:
