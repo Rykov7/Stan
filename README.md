@@ -16,17 +16,42 @@ Multipurpose Telegram Bot for Python group
 You can use this project as a pre-coded customizable bot.
 Original (and currently working) bot Telegram username: @LutzPyBot
 
-### How do I get started?
-Clone repository, edit code if needed and deploy on your sever.
+### How to deploy it?
+ 1. Clone repository on your linux server into `lutzpybot` user's home directory.
+ 2. Create virtual environment, activate virtual environment, install required packages from `requirements.txt`.
+ 3. Create `.env` file in `lutzbot` directory with 3 variables: `LUTZPYBOT` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
+ 4. Install `gunicorn` package additionally with `pip install gunicorn`
+ 5. Set webhook using Python interactive shell with `bot.set_webhook()` or manually according [Telegram Bot API Documentation](https://core.telegram.org/bots/api#setwebhook).
+ 6. Configure nginx as a reverse proxy.
+ 7. Configure the bot as a daemon.
+
+### How to configure bot as a daemon?
+1. Create daemon unit file in `/etc/systemd/system/lutz.service` with the content (replace `inferno` with your username):
+```
+[Unit]
+Description=@Lutz Telegram Bot
+After=network.target
+
+[Service]
+User=inferno
+Group=inferno
+WorkingDirectory=/home/inferno/lutzpybot
+Environment="PATH=/home/inferno/lutzpybot/venv/bin"
+ExecStart=/bin/bash -c 'source /home/inferno/lutzpybot/venv/bin/activate; gunicorn --bind unix:/tmp/lutz.sock wsgi:app' #Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+2. Enable and start with `systemctl enable lutz.service`, `systemctl enable lutz.service`.
 
 ### Where can I get more help, if I need it?
-Bot is easily understandable reading in-code comments of the handler functions, also read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for library help.
+Bot is easily understandable reading in-code comments of the handler functions, additionally read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for library help.
 
 
 ### How do I read logs of running Lutz bot daemon?
 Continuous log reading on Linux:
 
-```# journalctl --unit=lutz.service -f --no-pager```
+```# journalctl --unit=lutz.service -f```
 
 
 ### Hot to interact with Lutz bot?
