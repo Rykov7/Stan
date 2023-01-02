@@ -268,7 +268,7 @@ def add_stan_quote(message):
     if message.reply_to_message and message.reply_to_message.text:
         with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
             if message.reply_to_message.text not in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
-                stan_quotes.write('\n' + message.reply_to_message.text)
+                stan_quotes.write(message.reply_to_message.text + '\n')
                 bot.send_message(message.chat.id, f'✅ <b>Добавил</b>\n  └ <i>{message.reply_to_message.text}</i>')
             else:
                 bot.send_message(message.chat.id,
@@ -279,9 +279,9 @@ def add_stan_quote(message):
 def remove_stan_quote(message):
     if message.reply_to_message and message.reply_to_message.text:
         if message.reply_to_message.text in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
-            quotes = [i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')]
+            quotes = list(open('Stan.txt', 'r', encoding='utf8'))
             with open('Stan.txt', 'w', encoding='utf8') as stan_quotes:
-                quotes.remove(message.reply_to_message.text)
+                quotes.remove(message.reply_to_message.text + '\n')
                 stan_quotes.writelines(quotes)
             bot.send_message(message.chat.id, f'✅ <b>Удолил</b>\n  └ <i>{message.reply_to_message.text}</i>')
         else:
