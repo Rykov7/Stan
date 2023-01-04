@@ -155,7 +155,8 @@ def send_nometa(message: types.Message):
 
 @bot.message_handler(commands=['neprivet'])
 def send_neprivet(message: types.Message):
-    send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>')
+    send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>\n'
+                           'Пожалуйста, не пишите просто «Привет» в чате.')
 
 
 @bot.message_handler(commands=['nojob'])
@@ -331,7 +332,7 @@ def handle_msg(message: types.Message):
         else:
             s['Messages'][message.from_user.id]['Count'] += 1
 
-    quote = stan.speak(30)
+    quote = stan.speak(50)
     if quote:
         threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
