@@ -270,7 +270,9 @@ def add_stan_quote(message):
         with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
             if message.reply_to_message.text not in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
                 stan_quotes.write(message.reply_to_message.text.replace('\n', ' ') + '\n')
-                bot.send_message(message.chat.id, '✅ <b>Добавил</b>\n  └ <i>' + message.reply_to_message.text.replace("\n", " ") + '</i>')
+                bot.send_message(message.chat.id,
+                                 '✅ <b>Добавил</b>\n  └ <i>' + message.reply_to_message.text.replace("\n",
+                                                                                                     " ") + '</i>')
             else:
                 bot.send_message(message.chat.id,
                                  f'⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{message.reply_to_message.text}</i>')
