@@ -9,6 +9,7 @@ from . import stan
 from . import reminder
 from . import reloader
 from . import report
+from . import get
 from .helpers import get_me, search_it
 from .filters import *
 from .config import *
@@ -222,6 +223,11 @@ def default_query(inline_query):
 """
                    [ ADMIN PANEL ]
 """
+
+
+@bot.message_handler(func=is_admin, commands=['ip'])
+def get_ip(message):
+    bot.send_message(message.chat.id, get.my_ip())
 
 
 @bot.message_handler(func=is_admin, commands=['reload'])
