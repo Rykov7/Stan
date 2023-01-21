@@ -300,7 +300,9 @@ def remove_stan_quote(message):
 @bot.message_handler(func=is_admin, commands=['stats'])
 def send_stats(message: types.Message):
     if len(message.text.split()) == 1:
-        bot.send_message(message.chat.id, report.create_report_text(message.chat.id))
+        rep = report.create_report_text(message.chat.id)
+        if rep:
+            bot.send_message(message.chat.id, rep)
     else:
         bot.send_message(message.chat.id, report.create_report_text(message.text.split()[-1]))
 

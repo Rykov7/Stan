@@ -4,6 +4,7 @@ from .config import DATA
 
 
 def create_report_text(chat_id):
+    report = ''
     top_users = ''
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):
@@ -18,8 +19,9 @@ def create_report_text(chat_id):
                 user = flooder["User"]
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
                 top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
-            report = f"<code>Hello, World!</code> 🌍\n"
+
             if s['Banned'] or s['Deleted']:
+                report = f"<code>Hello, World!</code> 🌍\n"
                 report += f"""
 <b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
