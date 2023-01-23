@@ -10,6 +10,7 @@ from . import reminder
 from . import reloader
 from . import report
 from . import get
+from . import rules
 from .helpers import get_me, search_it
 from .filters import *
 from .config import *
@@ -73,9 +74,13 @@ def send_links(message):
     send_or_reply(message, f"{RULES}\n{FAQ}\n{LIB}")
 
 
-@bot.message_handler(commands=['rules'])
+@bot.message_handler(commands=['rules', 'r'])
 def send_rules(message):
-    send_or_reply(message, f'{RULES}')
+    args = message.text.split()
+    if len(args) > 1 and args[-1].isdigit():
+        send_or_reply(message, rules.get_rule(args[-1]))
+    else:
+        send_or_reply(message, f'{RULES}')
 
 
 @bot.message_handler(commands=['faq'])
