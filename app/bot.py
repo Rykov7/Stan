@@ -78,7 +78,7 @@ def send_rules(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(RULES, row_width=1)
     args = message.text.split()
-    if len(args) > 1 and args[-1].isdigit():
+    if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(message, f'<b>Правило {args[-1]}</b>\n<i>{rules.get_rule(args[-1])}</i>', reply_markup=markup)
     else:
         send_or_reply(message, 'Почитай', reply_markup=markup)
