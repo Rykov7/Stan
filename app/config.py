@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from telebot import TeleBot, logger
+from telebot import TeleBot, logger, types
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y.%m.%d %H:%M:%S')
@@ -31,9 +31,9 @@ ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVB
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)
 
-RULES = '🟡 <b><a href="https://telegra.ph/pythonchatru-07-07">Правила чата</a></b>'
-FAQ = '🔵 <b><a href="https://telegra.ph/faq-10-07-4">Частые вопросы</a></b>'
-LIB = '📚 <b><a href="https://telegra.ph/what-to-read-10-06">Библиотека питониста</a></b>'
+RULES = types.InlineKeyboardButton('🟡 Правила чата', url='https://telegra.ph/pythonchatru-07-07')
+FAQ = types.InlineKeyboardButton('🔵 Частые вопросы', url='https://telegra.ph/faq-10-07-4')
+LIB = types.InlineKeyboardButton('📚 Библиотека', url='https://telegra.ph/what-to-read-10-06')
 
 SPAM = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/', 'uclck.ru/']
 NON_GRATA = ['дудар', 'хауди', 'dudar']

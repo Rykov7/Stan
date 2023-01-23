@@ -71,26 +71,38 @@ def delete_message(message: types.Message):
 
 @bot.message_handler(commands=['links'])
 def send_links(message):
-    send_or_reply(message, f"{RULES}\n{FAQ}\n{LIB}")
+    markup = types.InlineKeyboardMarkup()
+    markup.add(RULES, FAQ, LIB, row_width=1)
+    answer = "Почитай на досуге"
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, reply_maarkup=markup)
+    else:
+        bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
-@bot.message_handler(commands=['rules', 'r'])
+@bot.message_handler(commands=['rules', 'rule', 'r'])
 def send_rules(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(RULES, row_width=1)
     args = message.text.split()
     if len(args) > 1 and args[-1].isdigit():
-        send_or_reply(message, rules.get_rule(args[-1]))
+        send_or_reply(message, f'<b>Правило {args[-1]}</b>\n<i>{rules.get_rule(args[-1])}</i>', reply_markup=markup)
     else:
-        send_or_reply(message, f'{RULES}')
+        send_or_reply(message, 'Почитай', reply_markup=markup)
 
 
 @bot.message_handler(commands=['faq'])
 def send_faq(message):
-    send_or_reply(message, f'{FAQ}')
+    markup = types.InlineKeyboardMarkup()
+    markup.add(FAQ, row_width=1)
+    send_or_reply(message, 'Почитай', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lib', 'library', 'books'])
 def send_lib(message):
-    send_or_reply(message, f'{LIB}')
+    markup = types.InlineKeyboardMarkup()
+    markup.add(LIB, row_width=1)
+    send_or_reply(message, 'Советую', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lutz'])
