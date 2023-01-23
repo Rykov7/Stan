@@ -26,11 +26,7 @@ def start(message: types.Message):
 
     markup = types.InlineKeyboardMarkup()
     markup.add(RULES, FAQ, LIB, row_width=1)
-    answer = "Начни с прочтения"
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, reply_maarkup=markup)
-    else:
-        bot.send_message(message.chat.id, answer, reply_markup=markup)
+    send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
 
 """
