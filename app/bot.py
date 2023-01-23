@@ -18,15 +18,19 @@ from .config import *
 app = Flask(__name__)
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 'links'])
 def start(message: types.Message):
-    """ Just write log. Nothing happen. """
+    """ What to begin with. """
     log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
-    if message.from_user.last_name:
-        log_msg += f' {message.from_user.last_name}'
-    bot.send_message(message.chat.id,
-                     f'Привет, {message.from_user.first_name}\nЗдесь можно опробовать команды из меню.')
     logging.warning(log_msg)
+
+    markup = types.InlineKeyboardMarkup()
+    markup.add(RULES, FAQ, LIB, row_width=1)
+    answer = "Начни с прочтения"
+    if message.reply_to_message:
+        bot.reply_to(message.reply_to_message, answer, reply_maarkup=markup)
+    else:
+        bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
 """
@@ -67,17 +71,6 @@ def delete_message(message: types.Message):
 """
             [ COMMANDS ]
 """
-
-
-@bot.message_handler(commands=['links'])
-def send_links(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(RULES, FAQ, LIB, row_width=1)
-    answer = "Почитай на досуге"
-    if message.reply_to_message:
-        bot.reply_to(message.reply_to_message, answer, reply_maarkup=markup)
-    else:
-        bot.send_message(message.chat.id, answer, reply_markup=markup)
 
 
 @bot.message_handler(commands=['rules', 'rule', 'r'])

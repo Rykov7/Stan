@@ -10,7 +10,3 @@ def get_rule(li):
         return html.find_all('li')[li - 1].text
     except IndexError:
         return 'Нет такого правила.'
-
-
-if __name__ == '__main__':
-    print(get_rule(1))

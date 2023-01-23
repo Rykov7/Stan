@@ -33,7 +33,7 @@ ENG_RUS_TABLE = str.maketrans(ENG, RUS)
 
 RULES = types.InlineKeyboardButton('🟡 Правила чата', url='https://telegra.ph/pythonchatru-07-07')
 FAQ = types.InlineKeyboardButton('🔵 Частые вопросы', url='https://telegra.ph/faq-10-07-4')
-LIB = types.InlineKeyboardButton('📚 Библиотека', url='https://telegra.ph/what-to-read-10-06')
+LIB = types.InlineKeyboardButton('📚 Книги', url='https://telegra.ph/what-to-read-10-06')
 
 SPAM = ['me.sv/', 'tg.sv/', 'goo.by/', 'go.sv/', 'intim.video/', 'uclck.ru/']
 NON_GRATA = ['дудар', 'хауди', 'dudar']
