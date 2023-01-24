@@ -199,7 +199,7 @@ def google_it(message: types.Message):
 
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('🔍 Google Поиск', url=get_query), row_width=1)
-    send_or_reply(message, query, reply_markup=markup)
+    send_or_reply(message, f'<i>Ищем «{query}» в Гугле...</i>', reply_markup=markup)
 
 
 @bot.message_handler(func=check_nongrata)
