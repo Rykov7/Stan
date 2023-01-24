@@ -1,6 +1,6 @@
 """ Send User's info. """
 from urllib import parse
-from .config import bot
+from telebot import types
 
 
 def get_me(message):
@@ -21,15 +21,16 @@ def get_me(message):
     return msg
 
 
-def search_it(engine, message):
+def represent_as_get(message: types.Message):
+    return parse.quote_plus(detect_args(message))
+
+
+def detect_args(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         if len(message.text.split()) == 1:
-            r = parse.quote_plus(message.reply_to_message.text)
+            return message.reply_to_message.text
         else:
-            r = parse.quote_plus(' '.join(message.text.split()[1:]))
-        bot.reply_to(message.reply_to_message, f"{engine}{r}",
-                     disable_web_page_preview=True)
+            return ' '.join(message.text.split()[1:])
     else:
         if len(message.text.split()) > 1:
-            r = parse.quote_plus(' '.join(message.text.split()[1:]))
-            bot.reply_to(message, f"{engine}{r}")
+            return ' '.join(message.text.split()[1:])

@@ -11,7 +11,7 @@ from . import reloader
 from . import report
 from . import get
 from . import rules
-from .helpers import get_me, search_it
+from .helpers import get_me, represent_as_get, detect_args
 from .filters import *
 from .config import *
 
@@ -151,19 +151,21 @@ def send_tsya(message: types.Message):
 
 @bot.message_handler(commands=['nometa'])
 def send_nometa(message: types.Message):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('❓ nometa.xyz', url='https://nometa.xyz/ru.html'), row_width=1)
     send_or_reply(message, """Не задавай мета-вопросов, вроде:
 <i>  «Можно задать вопрос?»
   «Кто-нибудь пользовался .. ?»
   «Привет, мне нужна помощь по .. !»</i>
 
-Просто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь.
-<i><a href="https://nometa.xyz/ru.html">nometa.xyz</a></i>""")
+Просто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь.""", reply_markup=markup)
 
 
 @bot.message_handler(commands=['neprivet'])
 def send_neprivet(message: types.Message):
-    send_or_reply(message, '<a href="https://neprivet.com/">Непривет</a>\n'
-                           'Пожалуйста, не пишите просто «Привет» в чате.')
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('👋 Непривет', url='https://neprivet.com/'), row_width=1)
+    send_or_reply(message, 'Пожалуйста, не пишите просто «Привет» в чате.', reply_markup=markup)
 
 
 @bot.message_handler(commands=['nojob'])
@@ -192,13 +194,12 @@ GUI приложение <i>не должно</i> быть твоим первы
 @bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
-    search_it('https://www.google.com/search?q=', message)
+    query = f'<i>{detect_args(message)}</i>'
+    get_query = 'https://www.google.com/search?q=' + represent_as_get(message)
 
-
-@bot.message_handler(commands=['s'])
-def google_it(message: types.Message):
-    """ Stackoverflow it! """
-    search_it('https://stackoverflow.com/search?q=', message)
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('🔍 Google Поиск', url=get_query), row_width=1)
+    send_or_reply(message, query, reply_markup=markup)
 
 
 @bot.message_handler(func=check_nongrata)
