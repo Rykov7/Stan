@@ -18,7 +18,7 @@ from .config import *
 app = Flask(__name__)
 
 
-@bot.message_handler(commands=['start', 'links'])
+@bot.message_handler(commands=['start', 'links', 'начни', 'ссылки'])
 def start(message: types.Message):
     """ What to begin with. """
     log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
@@ -69,7 +69,7 @@ def delete_message(message: types.Message):
 """
 
 
-@bot.message_handler(commands=['rules', 'rule', 'r'])
+@bot.message_handler(commands=['rules', 'rule', 'r', 'правила', 'правило', 'п'])
 def send_rules(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(RULES, row_width=1)
@@ -80,28 +80,28 @@ def send_rules(message):
         send_or_reply(message, 'Почитай...', reply_markup=markup)
 
 
-@bot.message_handler(commands=['faq'])
+@bot.message_handler(commands=['faq', 'чзв'])
 def send_faq(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(FAQ, row_width=1)
     send_or_reply(message, 'Почитай...', reply_markup=markup)
 
 
-@bot.message_handler(commands=['lib', 'library', 'books'])
+@bot.message_handler(commands=['lib', 'library', 'books', 'книги', 'библиотека'])
 def send_lib(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(LIB, row_width=1)
     send_or_reply(message, 'Советую', reply_markup=markup)
 
 
-@bot.message_handler(commands=['lutz'])
+@bot.message_handler(commands=['lutz', 'лутц'])
 def send_lutz(message):
     bot.send_document(message.chat.id,
                       document='BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA',
                       caption="вот, не позорься")
 
 
-@bot.message_handler(commands=['bdmtss'])
+@bot.message_handler(commands=['bdmtss', 'бдмтсс'])
 def send_bdmtss_audio(message):
     bot.send_voice(message.chat.id, 'AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ')
 
@@ -144,16 +144,18 @@ def stan_speak(message):
     bot.send_message(message.chat.id, stan.speak(0))
 
 
-@bot.message_handler(commands=['tsya'])
+@bot.message_handler(commands=['tsya', 'тся', 'ться'])
 def send_tsya(message: types.Message):
-    send_or_reply(message, '<a href="https://tsya.ru/">-тся/-ться</a>')
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton('🧑🏼‍🎓 Читать правило', url='https://tsya.ru/'), row_width=1)
+    send_or_reply(message, '<i>-тся</i> и <i>-ться</i> в глаголах', reply_markup=markup)
 
 
 @bot.message_handler(commands=['nometa'])
 def send_nometa(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('❓ nometa.xyz', url='https://nometa.xyz/ru.html'), row_width=1)
-    send_or_reply(message, """Не задавай мета-вопросов, вроде:
+    send_or_reply(message, """Не задавай мета-вопросов вроде:
 <i>  «Можно задать вопрос?»
   «Кто-нибудь пользовался .. ?»
   «Привет, мне нужна помощь по .. !»</i>
@@ -161,7 +163,7 @@ def send_nometa(message: types.Message):
 Просто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь.""", reply_markup=markup)
 
 
-@bot.message_handler(commands=['neprivet'])
+@bot.message_handler(commands=['neprivet', 'непривет'])
 def send_neprivet(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('👋 Непривет', url='https://neprivet.com/'), row_width=1)
