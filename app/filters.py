@@ -1,7 +1,7 @@
 from .config import *
 
 
-def check_spam_list(message: types.Message) -> bool:
+def in_spam_list(message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
     if message.from_user.username not in WHITEUN and message.from_user.id not in WHITEIDS:
         for url in SPAM:
@@ -9,35 +9,35 @@ def check_spam_list(message: types.Message) -> bool:
                 return True
 
 
-def check_caption_spam_list(type_message: types.Message) -> bool:
+def in_caption_spam_list(type_message: types.Message) -> bool:
     """ Check for mentioning unwanted words in caption. """
     for phrase in BAN_WORDS:
         if type_message.caption and phrase in type_message.caption:
             return True
 
 
-def check_no_allowed(word_list, msg):
+def in_not_allowed(word_list, msg):
     for word in word_list:
         if word in msg.casefold():
             return False
     return True
 
 
-def check_delete_list(type_message: types.Message) -> bool:
+def in_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
     if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
-        if URL_RX.search(type_message.text) and check_no_allowed(ALLOWED_WORDS, type_message.text):
+        if URL_RX.search(type_message.text) and in_not_allowed(ALLOWED_WORDS, type_message.text):
             logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - {type_message.text}')
             return True
         if type_message.entities:
             for entity in type_message.entities:
-                if entity.url and check_no_allowed(ALLOWED_WORDS, entity.url):
+                if entity.url and in_not_allowed(ALLOWED_WORDS, entity.url):
                     logging.info(
                         f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})')
                     return True
 
 
-def check_nongrata(type_message: types.Message) -> bool:
+def is_nongrata(type_message: types.Message) -> bool:
     """ Check for non grata persons. """
     for phrase in NON_GRATA:
         if phrase in type_message.text.casefold():

@@ -34,8 +34,8 @@ def start(message: types.Message):
 """
 
 
-@bot.edited_message_handler(func=check_spam_list)
-@bot.message_handler(func=check_spam_list)
+@bot.edited_message_handler(func=in_spam_list)
+@bot.message_handler(func=in_spam_list)
 def moderate_messages(message: types.Message):
     """ Ban user and delete their message. """
     logging.warning(f'[BAN] {message.from_user.id} {message.from_user.username} - {message.text}')
@@ -45,7 +45,7 @@ def moderate_messages(message: types.Message):
         s['Banned'] += 1
 
 
-@bot.message_handler(func=check_caption_spam_list, content_types=['video'])
+@bot.message_handler(func=in_caption_spam_list, content_types=['video'])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
     logging.warning(f'[BAN] {message.from_user.id} {message.from_user.first_name} - {message.video.file_name}')
@@ -55,8 +55,8 @@ def catch_videos(message: types.Message):
         s['Banned'] += 1
 
 
-@bot.edited_message_handler(func=check_delete_list)
-@bot.message_handler(func=check_delete_list)
+@bot.edited_message_handler(func=in_delete_list)
+@bot.message_handler(func=in_delete_list)
 def delete_message(message: types.Message):
     """ Delete unwanted message. """
     bot.delete_message(message.chat.id, message.id)
@@ -77,14 +77,14 @@ def send_rules(message):
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(message, f'<b>Правило {args[-1]}</b>\n<i>{rules.get_rule(args[-1])}</i>', reply_markup=markup)
     else:
-        send_or_reply(message, 'Почитай', reply_markup=markup)
+        send_or_reply(message, 'Почитай...', reply_markup=markup)
 
 
 @bot.message_handler(commands=['faq'])
 def send_faq(message):
     markup = types.InlineKeyboardMarkup()
     markup.add(FAQ, row_width=1)
-    send_or_reply(message, 'Почитай', reply_markup=markup)
+    send_or_reply(message, 'Почитай...', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lib', 'library', 'books'])
@@ -202,7 +202,7 @@ def google_it(message: types.Message):
     send_or_reply(message, f'<i>Ищем «{query}» в Гугле...</i>', reply_markup=markup)
 
 
-@bot.message_handler(func=check_nongrata)
+@bot.message_handler(func=is_nongrata)
 def tease_nongrata(message: types.Message):
     """ Reply to non grata mentions. """
     bot.reply_to(message, f'у нас тут таких не любят')
