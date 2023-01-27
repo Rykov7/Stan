@@ -1,18 +1,21 @@
 import os
 import re
 import logging
+from flask import Flask
 from telebot import TeleBot, logger, types
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y.%m.%d %H:%M:%S')
 logging.critical('STAN STARTED!')
 
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 load_dotenv()
 
 TOKEN = os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')
 bot = TeleBot(TOKEN, 'HTML', disable_web_page_preview=True, allow_sending_without_reply=True,
               colorful_logs=True)
+
+app = Flask(__name__)
 
 DATA = 'data/chat'
 

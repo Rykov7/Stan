@@ -1,6 +1,6 @@
 import shelve
 from datetime import datetime as dt
-from flask import Flask, request, abort
+from flask import request, abort
 
 import threading
 from time import sleep
@@ -15,20 +15,8 @@ from .helpers import get_me, represent_as_get, detect_args
 from .filters import *
 from .config import *
 
-app = Flask(__name__)
-
-
-@bot.message_handler(commands=['start', 'links', 'начни', 'ссылки'])
-def start(message: types.Message):
-    """ What to begin with. """
-    log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
-    logging.warning(log_msg)
-    markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
-    send_or_reply(message, "Начни с прочтения", reply_markup=markup)
-
-
 """
-            [ ANTISPAM FILTERS ]
+            [ ANTISPAM ]
 """
 
 
@@ -67,6 +55,15 @@ def delete_message(message: types.Message):
 """
 
 
+@bot.message_handler(commands=['start', 'links', 'ссылки'])
+def start(message: types.Message):
+    """ What to begin with. """
+    log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
+    logging.warning(log_msg)
+    markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
+    send_or_reply(message, "Начни с прочтения", reply_markup=markup)
+
+
 @bot.message_handler(commands=['rules', 'rule', 'r', 'правила', 'правило', 'п'])
 def send_rules(message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
@@ -96,7 +93,7 @@ def send_lutz(message):
                       caption="вот, не позорься")
 
 
-@bot.message_handler(commands=['bdmtss', 'бдмтсс'])
+@bot.message_handler(commands=['bdmtss'])
 def send_bdmtss_audio(message):
     bot.send_voice(message.chat.id, 'AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ')
 
@@ -206,7 +203,7 @@ def tease_nongrata(message: types.Message):
 
 
 """
-            [ INLINE QUERIES ]
+            [ INLINE ]
 """
 
 
@@ -218,7 +215,7 @@ def default_query(inline_query):
         q = inline_query.query.casefold()
         if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
             zen.append(types.InlineQueryResultArticle(
-                f"{id_p + 7000}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
+                f"{id_p}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
                     f"<i>{phrase}</i>"), description=phrase))
 
     bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
@@ -296,7 +293,7 @@ def remove_stan_quote(message):
             with open('Stan.txt', 'w', encoding='utf8') as stan_quotes:
                 quotes.remove(message.reply_to_message.text + '\n')
                 stan_quotes.writelines(quotes)
-            bot.send_message(message.chat.id, f'✅ <b>Удолил</b>\n  └ <i>{message.reply_to_message.text}</i>')
+            bot.send_message(message.chat.id, f'✅ <b>Удалил</b>\n  └ <i>{message.reply_to_message.text}</i>')
         else:
             bot.send_message(message.chat.id, f'⛔️ <b>Нет такого</b>\n  └ <i>{message.reply_to_message.text}</i>')
 
@@ -324,7 +321,7 @@ def send_stats(message: types.Message):
 
 
 def send_quote(after_sec, message, quote):
-    """ Imitate Reading first, then imitate Typing. """
+    """ Pretend Reading, pretend Typing, send. """
     if message.text:
         sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action='typing')
@@ -352,12 +349,12 @@ def handle_msg(message: types.Message):
 
 
 """
-            [ WEBHOOK ROUTE ]
+            [ WEBHOOK ]
 """
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
-def webhook():
+def bot_webhook():
     """ Parse POST requests from Telegram. """
     if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
