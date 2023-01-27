@@ -4,7 +4,7 @@ from urllib.request import urlopen
 html = BeautifulSoup(urlopen('https://telegra.ph/pythonchatru-07-07'), 'lxml')
 
 
-def get_rule(li):
+def fetch_rule(li):
     li = int(li)
     lis = html.find_all('li')
     if li <= len(lis):
