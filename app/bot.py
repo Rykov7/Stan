@@ -23,9 +23,7 @@ def start(message: types.Message):
     """ What to begin with. """
     log_msg = f'[START] {message.from_user.id} {message.from_user.first_name}'
     logging.warning(log_msg)
-
-    markup = types.InlineKeyboardMarkup()
-    markup.add(RULES, FAQ, LIB, row_width=1)
+    markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
     send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
 
@@ -71,8 +69,7 @@ def delete_message(message: types.Message):
 
 @bot.message_handler(commands=['rules', 'rule', 'r', 'правила', 'правило', 'п'])
 def send_rules(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(RULES, row_width=1)
+    markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(message, f'<b>Правило {args[-1]}</b>\n<i>{rules.fetch_rule(args[-1])}</i>', reply_markup=markup)
@@ -82,15 +79,13 @@ def send_rules(message):
 
 @bot.message_handler(commands=['faq', 'чзв'])
 def send_faq(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(FAQ, row_width=1)
+    markup = types.InlineKeyboardMarkup([[FAQ]], 1)
     send_or_reply(message, '⤵️', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lib', 'library', 'books', 'книги', 'библиотека'])
 def send_lib(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(LIB, row_width=1)
+    markup = types.InlineKeyboardMarkup([[LIB]], 1)
     send_or_reply(message, '⤵️', reply_markup=markup)
 
 
