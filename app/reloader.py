@@ -3,7 +3,7 @@ from importlib import reload
 from . import bot
 from . import filters
 from . import config
-from . import get
+from .commands import get, service
 from . import helpers
 from . import report
 from . import rules
@@ -14,6 +14,7 @@ def reload_modules():
     reload(bot)
     reload(filters)
     reload(get)
+    reload(service)
     reload(config)
     reload(helpers)
     reload(report)

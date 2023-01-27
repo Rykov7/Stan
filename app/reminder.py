@@ -9,9 +9,6 @@ from .config import PYTHONCHATRU, bot
 from . import report
 
 
-# https://core.telegram.org/bots/api Telegram Bot API
-
-
 def scheduler():
     while True:
         run_pending()

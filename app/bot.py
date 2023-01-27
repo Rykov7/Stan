@@ -1,17 +1,15 @@
 import shelve
-from datetime import datetime as dt
+
 from flask import request, abort
 
 import threading
 from time import sleep
 
 from . import stan
-from . import reminder
-from . import reloader
 from . import report
-from . import get
 from . import rules
-from .helpers import get_me, represent_as_get, detect_args
+
+from .helpers import represent_as_get, detect_args
 from .filters import *
 from .config import *
 
@@ -107,30 +105,6 @@ def translate_layout(message):
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
 
 
-@bot.message_handler(commands=['me'])
-def command_me(message):
-    """ Send info about user and chat id [Service]. """
-    bot.send_message(message.chat.id, get_me(message))
-
-
-@bot.message_handler(commands=['remind'])
-def remind_manually(message):
-    """ Remind holidays manually. """
-    args = message.text.split()
-    if len(args) > 1:
-        try:
-            today = dt.strptime(args[1], "%m-%d-%Y")
-        except ValueError as ve:
-            bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}")
-        else:
-            reminder.remind(message.chat.id, today)
-    else:
-        bot.send_message(message.chat.id, f"<b>Формат даты: MM-DD-YYYY</b>\n\n"
-                                          f"Примеры:\n"
-                                          f"/remind 09-12-2024\n"
-                                          f"/remind 09-13-2022")
-
-
 @bot.message_handler(commands=['quote'])
 def stan_speak(message):
     bot.send_message(message.chat.id, stan.speak(0))
@@ -196,46 +170,9 @@ def google_it(message: types.Message):
     send_or_reply(message, f'<i>Ищем «{query}» в Гугле...</i>', reply_markup=markup)
 
 
-@bot.message_handler(func=is_nongrata)
-def tease_nongrata(message: types.Message):
-    """ Reply to non grata mentions. """
-    bot.reply_to(message, f'у нас тут таких не любят')
-
-
-"""
-            [ INLINE ]
-"""
-
-
-@bot.inline_handler(lambda query: True)
-def default_query(inline_query):
-    """ Inline the Zen of Python. """
-    zen = []
-    for id_p, phrase in enumerate(ZEN):
-        q = inline_query.query.casefold()
-        if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
-            zen.append(types.InlineQueryResultArticle(
-                f"{id_p}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
-                    f"<i>{phrase}</i>"), description=phrase))
-
-    bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
-
-
 """
                    [ ADMIN PANEL ]
 """
-
-
-@bot.message_handler(func=is_admin, commands=['ip'])
-def get_ip(message):
-    bot.send_message(message.chat.id, get.my_ip())
-
-
-@bot.message_handler(func=is_admin, commands=['reload'])
-def send_stats(message):
-    logging.warning('Reloading...')
-    reloader.reload_modules()
-    bot.send_message(message.chat.id, 'Reloaded successfully')
 
 
 @bot.message_handler(func=is_admin, commands=['ddel'])
@@ -265,58 +202,27 @@ def unban_user(message: types.Message):
         logging.warning(f'[UNBAN (M)] {user_id}')
 
 
-@bot.message_handler(func=is_admin, commands=['jobs'])
-def list_jobs(message):
-    """ List all the jobs in schedule. """
-    bot.send_message(ADMIN_ID, reminder.print_get_jobs())
+"""
+            [ INLINE ]
+"""
 
 
-@bot.message_handler(func=is_white, commands=['add'])
-def add_stan_quote(message):
-    if message.reply_to_message and message.reply_to_message.text:
-        with open('Stan.txt', 'a', encoding='utf8') as stan_quotes:
-            if message.reply_to_message.text not in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
-                stan_quotes.write(message.reply_to_message.text.replace('\n', ' ') + '\n')
-                bot.send_message(message.chat.id,
-                                 '✅ <b>Добавил</b>\n  └ <i>' + message.reply_to_message.text.replace("\n",
-                                                                                                     " ") + '</i>')
-            else:
-                bot.send_message(message.chat.id,
-                                 f'⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{message.reply_to_message.text}</i>')
+@bot.inline_handler(lambda query: True)
+def default_query(inline_query):
+    """ Inline the Zen of Python. """
+    zen = []
+    for id_p, phrase in enumerate(ZEN):
+        q = inline_query.query.casefold()
+        if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
+            zen.append(types.InlineQueryResultArticle(
+                f"{id_p}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
+                    f"<i>{phrase}</i>"), description=phrase))
 
-
-@bot.message_handler(func=is_white, commands=['remove'])
-def remove_stan_quote(message):
-    if message.reply_to_message and message.reply_to_message.text:
-        if message.reply_to_message.text in (i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8')):
-            quotes = list(open('Stan.txt', 'r', encoding='utf8'))
-            with open('Stan.txt', 'w', encoding='utf8') as stan_quotes:
-                quotes.remove(message.reply_to_message.text + '\n')
-                stan_quotes.writelines(quotes)
-            bot.send_message(message.chat.id, f'✅ <b>Удалил</b>\n  └ <i>{message.reply_to_message.text}</i>')
-        else:
-            bot.send_message(message.chat.id, f'⛔️ <b>Нет такого</b>\n  └ <i>{message.reply_to_message.text}</i>')
-
-
-@bot.message_handler(func=is_admin, commands=['stats'])
-def send_stats(message: types.Message):
-    if len(message.text.split()) == 1:
-        rep = report.create_report_text(message.chat.id)
-        if rep:
-            bot.send_message(message.chat.id, rep)
-    else:
-        bot.send_message(message.chat.id, report.create_report_text(message.text.split()[-1]))
-
-
-@bot.message_handler(func=is_admin, commands=['reset_stats'], chat_types=['supergroup', 'group'])
-def send_stats(message: types.Message):
-    logging.warning('reset_stats')
-    report.reset_report_stats(message.chat.id)
-    bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
+    bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
 
 """
-            [ MAIN MESSAGE HANDLER ]
+            [ COUNTER ]
 """
 
 
@@ -354,7 +260,7 @@ def handle_msg(message: types.Message):
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
-def bot_webhook():
+def webhook():
     """ Parse POST requests from Telegram. """
     if request.headers.get('content-type') == 'application/json':
         json_string = request.get_data().decode('utf-8')
