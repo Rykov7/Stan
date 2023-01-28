@@ -1,6 +1,5 @@
 from importlib import reload
 
-from . import bot
 from . import filters
 from . import config
 from .commands import get, service
@@ -11,7 +10,6 @@ from . import stan
 
 
 def reload_modules():
-    reload(bot)
     reload(filters)
     reload(get)
     reload(service)
