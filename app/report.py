@@ -10,8 +10,7 @@ def create_report_text(chat_id):
     if os.path.exists(f'{DATA}{chat_id}.db'):
         with shelve.open(f'{DATA}{chat_id}') as s:
             for n in range(min(3, len(s['Messages']))):
-                top_user = s['Messages'][
-                    sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
+                top_user = s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
                 if top_user['Count'] >= 10:
                     flooders.append(top_user)
 
@@ -21,13 +20,13 @@ def create_report_text(chat_id):
                 top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
 
             if s['Banned'] or s['Deleted']:
-                report = f"<code>Hello, World!</code> 🌍\n"
                 report += f"""
 <b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
 """
         if len(flooders) >= 3:
+            report += f"<code>Hello, World!</code> 🌍"
             report += f"\n<b>Топ</b> 🗣{top_users}"
         return report
     else:

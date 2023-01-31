@@ -1,4 +1,4 @@
-""" Stan quote generator. """
+""" Stan's commands and reactions. """
 import random
 from .config import bot, types
 from .filters import is_white, is_nongrata

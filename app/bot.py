@@ -69,19 +69,19 @@ def send_rules(message):
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(message, f'<b>Правило {args[-1]}</b>\n<i>{rules.fetch_rule(args[-1])}</i>', reply_markup=markup)
     else:
-        send_or_reply(message, '⤵️', reply_markup=markup)
+        send_or_reply(message, '...', reply_markup=markup)
 
 
 @bot.message_handler(commands=['faq', 'чзв'])
 def send_faq(message):
     markup = types.InlineKeyboardMarkup([[FAQ]], 1)
-    send_or_reply(message, '⤵️', reply_markup=markup)
+    send_or_reply(message, '...', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lib', 'library', 'books', 'книги', 'библиотека'])
 def send_lib(message):
     markup = types.InlineKeyboardMarkup([[LIB]], 1)
-    send_or_reply(message, '⤵️', reply_markup=markup)
+    send_or_reply(message, '...', reply_markup=markup)
 
 
 @bot.message_handler(commands=['lutz', 'лутц'])
@@ -167,7 +167,7 @@ def google_it(message: types.Message):
 
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('🔍 Google Поиск', url=get_query), row_width=1)
-    send_or_reply(message, f'<i>Ищем «{query}» в Гугле...</i>', reply_markup=markup)
+    send_or_reply(message, f'<i>Ищем «{query}»...</i>', reply_markup=markup)
 
 
 """
