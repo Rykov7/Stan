@@ -216,7 +216,7 @@ def default_query(inline_query):
         if phrase.casefold().startswith(q) or ' ' + q in phrase.casefold():
             zen.append(types.InlineQueryResultArticle(
                 f"{id_p}", f'The Zen of Python #{id_p + 1}', types.InputTextMessageContent(
-                    f"<i>{phrase}</i>"), description=phrase))
+                    f"{phrase}"), description=phrase))
 
     bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
