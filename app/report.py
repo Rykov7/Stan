@@ -19,15 +19,16 @@ def create_report_text(chat_id):
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
                 top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
 
+            if len(flooders) >= 3:
+                report += f"<code>Hello, World!</code> 🌍"
+                report += f"\n<b>Топ</b> 🗣{top_users}"
+
             if s['Banned'] or s['Deleted']:
                 report += f"""
 <b>Заблокировано</b> ⛔
 ├ <b>Пользователей: </b>{s['Banned']}
 └ <b>Сообщений: </b>{s['Deleted']}
 """
-        if len(flooders) >= 3:
-            report += f"<code>Hello, World!</code> 🌍"
-            report += f"\n<b>Топ</b> 🗣{top_users}"
         return report
     else:
         return f'Невозможно получить статистику.\n{DATA}{chat_id}.db не существует, возможно запрос в приватном чате. '
