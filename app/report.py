@@ -4,13 +4,13 @@ from .config import DATA
 
 
 def create_report_text(chat_id):
-    report = ''
     top_users = ''
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):
         with shelve.open(f'{DATA}{chat_id}') as s:
             for n in range(min(3, len(s['Messages']))):
-                top_user = s['Messages'][sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
+                top_user = s['Messages'][
+                    sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
                 if top_user['Count'] >= 10:
                     flooders.append(top_user)
 
@@ -19,10 +19,10 @@ def create_report_text(chat_id):
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
                 top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
 
+            if len(flooders) >= 3 or s['Banned'] or s['Deleted']:
+                report = f"<code>Hello, World!</code> 🌍\n"
             if len(flooders) >= 3:
-                report += f"<code>Hello, World!</code> 🌍"
-                report += f"\n<b>Топ</b> 🗣{top_users}"
-
+                report += f"\n<b>Топ</b> 🗣{top_users}\n"
             if s['Banned'] or s['Deleted']:
                 report += f"""
 <b>Заблокировано</b> ⛔
