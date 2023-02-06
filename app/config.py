@@ -6,12 +6,14 @@ from telebot import TeleBot, logger, types
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y.%m.%d %H:%M:%S')
+logger.setLevel(logging.INFO)
+
 logging.critical('STAN STARTED!')
 
-logger.setLevel(logging.INFO)
 load_dotenv()
 
 TOKEN = os.environ.get('LUTZPYBOT', 'Token not in ENVIRON')
+YOOPAY = os.environ.get('YOOKASSA')
 bot = TeleBot(TOKEN, 'HTML', disable_web_page_preview=True, allow_sending_without_reply=True,
               colorful_logs=True)
 
