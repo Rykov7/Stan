@@ -1,12 +1,10 @@
 import shelve
 from flask import request, abort
-import threading
 
 from . import stan
-from . import report
 from . import rules
 
-from .helpers import represent_as_get, detect_args
+from .helpers import represent_as_get, detect_args, update_stats
 from .filters import *
 from .config import *
 
@@ -227,19 +225,8 @@ def default_query(inline_query):
                      chat_types=['supergroup', 'group'])
 def handle_msg(message: types.Message):
     """ Count messages, Stan. """
-    with shelve.open(f'{DATA}{message.chat.id}', writeback=True) as s:
-        if 'Messages' not in s:
-            report.reset_report_stats(message.chat.id)
-
-        if message.from_user.id not in s['Messages']:
-            s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 1}
-            logging.warning(f'CNTR {message.chat.id}: {message.from_user.first_name} ({message.from_user.id})')
-        else:
-            s['Messages'][message.from_user.id]['Count'] += 1
-
-    quote = stan.speak(50)
-    if quote:
-        threading.Thread(target=stan.send_quote, args=(len(quote) * 0.13, message, quote)).start()
+    update_stats(message)
+    stan.act(message)
 
 
 """

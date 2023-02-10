@@ -1,5 +1,6 @@
 """ Stan's commands and reactions. """
 import random
+import threading
 from time import sleep
 from .config import bot, types
 from .filters import is_white, is_nongrata
@@ -18,6 +19,12 @@ def send_quote(after_sec, message, quote):
     bot.send_chat_action(message.chat.id, action='typing')
     sleep(after_sec)  # Typing time
     bot.send_message(message.chat.id, quote)
+
+
+def act(message):
+    quote = speak(50)
+    if quote:
+        threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
 
 @bot.message_handler(func=is_white, commands=['add'])
