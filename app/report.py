@@ -4,6 +4,7 @@ from .config import DATA
 
 
 def create_report_text(chat_id):
+    report = ''
     top_users = ''
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):

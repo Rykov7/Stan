@@ -26,7 +26,8 @@ PYTHONCHATRU = -1001338616632  # pythonchatru
 
 URL_RX = re.compile(r'\w+\.\w+/\w+')
 ALLOWED_WORDS = ['paste', 'nekobin', 'github', 'google', 'nometa', 'python', 'django', 'flask', 'fastapi', 'wiki',
-                 'stackoverflow', 'habr', 'medium', 'youtu', 'stepik', 'telegra', '#rtfm', 'support']
+                 'stackoverflow', 'habr', 'medium', 'youtu', 'stepik', 'telegra', '#rtfm', 'support',
+                 'jetbrains', ]
 
 WHITEUN = set(os.environ.get('whitelist', '<<<ERR_USRS').split(','))
 WHITEIDS = {int(i) for i in os.environ.get('whiteids', '<<<ERR_IDS').split(',')}
