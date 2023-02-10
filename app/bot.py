@@ -1,9 +1,6 @@
 import shelve
-
 from flask import request, abort
-
 import threading
-from time import sleep
 
 from . import stan
 from . import report
@@ -226,15 +223,6 @@ def default_query(inline_query):
 """
 
 
-def send_quote(after_sec, message, quote):
-    """ Pretend Reading, pretend Typing, send. """
-    if message.text:
-        sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
-    bot.send_chat_action(message.chat.id, action='typing')
-    sleep(after_sec)  # Typing time
-    bot.send_message(message.chat.id, quote)
-
-
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'animation', 'video', 'audio', 'document'],
                      chat_types=['supergroup', 'group'])
 def handle_msg(message: types.Message):
@@ -251,7 +239,7 @@ def handle_msg(message: types.Message):
 
     quote = stan.speak(50)
     if quote:
-        threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
+        threading.Thread(target=stan.send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
 
 """

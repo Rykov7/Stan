@@ -1,5 +1,6 @@
 """ Stan's commands and reactions. """
 import random
+from time import sleep
 from .config import bot, types
 from .filters import is_white, is_nongrata
 
@@ -8,6 +9,15 @@ def speak(chance_of):
     number = random.randint(0, chance_of)
     if number == 0:
         return random.choice([i.rstrip() for i in open('Stan.txt', 'r', encoding='utf8') if i])
+
+
+def send_quote(after_sec, message, quote):
+    """ Pretend Reading, pretend Typing, send. """
+    if message.text:
+        sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
+    bot.send_chat_action(message.chat.id, action='typing')
+    sleep(after_sec)  # Typing time
+    bot.send_message(message.chat.id, quote)
 
 
 @bot.message_handler(func=is_white, commands=['add'])
