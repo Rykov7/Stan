@@ -87,7 +87,7 @@ def send_bdmtss_audio(message):
     bot.send_voice(message.chat.id, 'AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ')
 
 
-@bot.message_handler(commands=['tr'])
+@bot.message_handler(commands=['tr', 'тр'])
 def translate_layout(message):
     if message.reply_to_message and message.reply_to_message.text:
         if message.reply_to_message.text[0] in RUS:
@@ -150,7 +150,7 @@ GUI приложение <i>не должно</i> быть твоим первы
     send_or_reply(message, answer)
 
 
-@bot.message_handler(commands=['g', 'г'])
+@bot.message_handler(commands=['g'])
 def google_it(message: types.Message):
     """ Google it! """
     query = f'<i>{detect_args(message)}</i>'
