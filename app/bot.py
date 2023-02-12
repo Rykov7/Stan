@@ -8,9 +8,7 @@ from .helpers import represent_as_get, detect_args, update_stats
 from .filters import *
 from .config import *
 
-"""
-            [ ANTISPAM ]
-"""
+"""                [ ANTISPAM ]             """
 
 
 @bot.edited_message_handler(func=in_spam_list)
@@ -43,9 +41,7 @@ def delete_message(message: types.Message):
         s['Deleted'] += 1
 
 
-"""
-            [ COMMANDS ]
-"""
+"""                [ COMMANDS ]             """
 
 
 @bot.message_handler(commands=['start', 'links', 'ссылки'])
@@ -165,9 +161,7 @@ def google_it(message: types.Message):
     send_or_reply(message, f'<i>Ищем «{query}»...</i>', reply_markup=markup)
 
 
-"""
-                   [ ADMIN PANEL ]
-"""
+"""                [ ADMIN PANEL ]              """
 
 
 @bot.message_handler(func=is_admin, commands=['ddel'])
@@ -197,9 +191,7 @@ def unban_user(message: types.Message):
         logging.warning(f'[UNBAN (M)] {user_id}')
 
 
-"""
-            [ INLINE ]
-"""
+"""                [ INLINE ]               """
 
 
 @bot.inline_handler(lambda query: True)
@@ -216,9 +208,7 @@ def default_query(inline_query):
     bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
 
-"""
-            [ COUNTER ]
-"""
+"""                [ COUNTER ]              """
 
 
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'animation', 'video', 'audio', 'document'],
@@ -229,9 +219,7 @@ def handle_msg(message: types.Message):
     stan.act(message)
 
 
-"""
-            [ WEBHOOK ]
-"""
+"""                [ WEBHOOK ]              """
 
 
 @app.route(f"/bot{TOKEN}/", methods=['POST'])
