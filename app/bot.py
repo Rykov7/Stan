@@ -150,7 +150,7 @@ GUI приложение <i>не должно</i> быть твоим первы
     send_or_reply(message, answer)
 
 
-@bot.message_handler(commands=['g'])
+@bot.message_handler(commands=['g', 'г'])
 def google_it(message: types.Message):
     """ Google it! """
     query = f'<i>{detect_args(message)}</i>'
