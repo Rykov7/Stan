@@ -82,7 +82,7 @@ def send_lutz(message):
                       caption="вот, не позорься")
 
 
-@bot.message_handler(commands=['bdmtss'])
+@bot.message_handler(commands=['bdmtss', 'бдмтсс'])
 def send_bdmtss_audio(message):
     bot.send_voice(message.chat.id, 'AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ')
 
@@ -96,7 +96,7 @@ def translate_layout(message):
             bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
 
 
-@bot.message_handler(commands=['quote'])
+@bot.message_handler(commands=['quote', 'цитата'])
 def stan_speak(message):
     bot.send_message(message.chat.id, stan.speak(0))
 
@@ -108,7 +108,7 @@ def send_tsya(message: types.Message):
     send_or_reply(message, '<i>-тся</i> и <i>-ться</i> в глаголах', reply_markup=markup)
 
 
-@bot.message_handler(commands=['nometa'])
+@bot.message_handler(commands=['nometa', 'номета'])
 def send_nometa(message: types.Message):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('❓ nometa.xyz', url='https://nometa.xyz/ru.html'), row_width=1)
@@ -127,7 +127,7 @@ def send_neprivet(message: types.Message):
     send_or_reply(message, 'Пожалуйста, не пишите просто «Привет» в чате.', reply_markup=markup)
 
 
-@bot.message_handler(commands=['nojob'])
+@bot.message_handler(commands=['nojob', 'ноджоб'])
 def send_nojob(message):
     logging.warning('Sent no job')
     answer = """Мы здесь не для того, чтобы за тебя решать задачи.
@@ -136,21 +136,21 @@ def send_nojob(message):
     send_or_reply(message, answer)
 
 
-@bot.message_handler(commands=['nobot'])
+@bot.message_handler(commands=['nobot', 'нобот'])
 def nobot(message: types.Message):
     answer = """<b>Внимание</b>:
 Телеграм бот <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
     send_or_reply(message, answer)
 
 
-@bot.message_handler(commands=['nogui'])
+@bot.message_handler(commands=['nogui', 'ногуи'])
 def nogui(message: types.Message):
     answer = """<b>Внимание</b>:
 GUI приложение <i>не должно</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
     send_or_reply(message, answer)
 
 
-@bot.message_handler(commands=['g'])
+@bot.message_handler(commands=['g', 'г'])
 def google_it(message: types.Message):
     """ Google it! """
     query = f'<i>{detect_args(message)}</i>'
