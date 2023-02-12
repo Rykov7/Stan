@@ -18,17 +18,17 @@ def create_report_text(chat_id):
             for i, flooder in enumerate(flooders):
                 user = flooder["User"]
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
-                top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> ({flooder["Count"]})'
+                top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> [{flooder["Count"]}]'
 
             if len(flooders) >= 3 or s['Banned'] or s['Deleted']:
-                report = f"<code>Hello, World!</code> 🌍\n"
+                report = f"<code>Hello, World!</code>\n"
             if len(flooders) >= 3:
-                report += f"\n<b>Топ</b> 🗣{top_users}\n"
+                report += f"\n<b>Топ</b> 🐍{top_users}\n"
             if s['Banned'] or s['Deleted']:
                 report += f"""
-<b>Заблокировано</b> ⛔
-├ <b>Пользователей: </b>{s['Banned']}
-└ <b>Сообщений: </b>{s['Deleted']}
+<b>Заблокировано</b>
+├ Пользователей: {s['Banned']}
+└ Сообщений: {s['Deleted']}
 """
         return report
     else:

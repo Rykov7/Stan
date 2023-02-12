@@ -53,7 +53,7 @@ Continuous log reading on Linux:
 ```# journalctl --unit=lutz.service -f```
 
 
-### Hot to interact with Lutz bot?
+### How to interact with Lutz bot?
 Bot can receive commands and behave depending on chat situation.
 
 Standard command pack for bot father includes:
