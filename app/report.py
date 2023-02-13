@@ -12,13 +12,13 @@ def create_report_text(chat_id):
             for n in range(min(3, len(s['Messages']))):
                 top_user = s['Messages'][
                     sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
-                if top_user['Count'] >= 10:
+                if top_user['Count'] >= 5:
                     flooders.append(top_user)
 
             for i, flooder in enumerate(flooders):
                 user = flooder["User"]
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
-                top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> [{flooder["Count"]}]'
+                top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> [<code>{flooder["Count"]}</code>]'
 
             if len(flooders) >= 3 or s['Banned'] or s['Deleted']:
                 report = f"<code>Hello, World!</code>\n"
