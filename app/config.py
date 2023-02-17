@@ -29,8 +29,9 @@ ALLOWED_WORDS = ['paste', 'nekobin', 'github', 'google', 'nometa', 'python', 'dj
                  'stackoverflow', 'habr', 'medium', 'youtu', 'stepik', 'telegra', '#rtfm', 'support',
                  'jetbrains', ]
 
-WHITEUN = set(os.environ.get('whitelist', '<<<ERR_USRS').split(','))
-WHITEIDS = {int(i) for i in os.environ.get('whiteids', '<<<ERR_IDS').split(',')}
+WHITEUN = set(os.environ.get('whitelist').split(','))
+WHITEIDS = {int(i) for i in os.environ.get('whiteids').split(',')}
+ROLLBACK = {int(i) for i in os.environ.get('rollback').split(',')}
 
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""

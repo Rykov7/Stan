@@ -1,6 +1,6 @@
 import shelve
 import os
-from .config import DATA
+from .config import DATA, ROLLBACK
 
 
 def create_report_text(chat_id):
@@ -9,6 +9,10 @@ def create_report_text(chat_id):
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):
         with shelve.open(f'{DATA}{chat_id}') as s:
+            for user_id in ROLLBACK:
+                if user_id in s['Messages'] and s['Messages'][user_id]['Count'] > 10:
+                    s['Messages'][user_id]['Count'] //= 2
+
             for n in range(min(3, len(s['Messages']))):
                 top_user = s['Messages'][
                     sorted(s['Messages'], key=lambda a: s['Messages'][a]['Count'], reverse=True)[n]]
