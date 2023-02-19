@@ -11,7 +11,7 @@ def create_report_text(chat_id):
         with shelve.open(f'{DATA}{chat_id}') as s:
             for user_id in ROLLBACK:
                 if user_id in s['Messages'] and s['Messages'][user_id]['Count'] > 10:
-                    s['Messages'][user_id]['Count'] //= 2
+                    s['Messages'][user_id]['Count'] //= 3
 
             for n in range(min(3, len(s['Messages']))):
                 top_user = s['Messages'][
@@ -22,7 +22,7 @@ def create_report_text(chat_id):
             for i, flooder in enumerate(flooders):
                 user = flooder["User"]
                 name = f"{user.first_name} {user.last_name}" if user.last_name else user.first_name
-                top_users += f'\n  {i + 1}. <a href="tg://user?id={user.id}">{name}</a> [<code>{flooder["Count"]}</code>]'
+                top_users += f'\n  {i + 1}. {name} [<code>{flooder["Count"]}</code>]'
 
             if len(flooders) >= 3 or s['Banned'] or s['Deleted']:
                 report = f"<code>Hello, World!</code>\n"
@@ -31,8 +31,8 @@ def create_report_text(chat_id):
             if s['Banned'] or s['Deleted']:
                 report += f"""
 <b>Заблокировано</b>
-├ Пользователей: {s['Banned']}
-└ Сообщений: {s['Deleted']}
+├ Пользователей: <code>{s['Banned']}</code>
+└ Сообщений: <code>{s['Deleted']}</code>
 """
         return report
     else:
