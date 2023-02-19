@@ -3,7 +3,7 @@ from .config import *
 
 def in_spam_list(message: types.Message) -> bool:
     """ Check for mentioning unwanted persons in text. """
-    if message.from_user.username not in WHITEUN and message.from_user.id not in WHITEIDS:
+    if message.from_user.id not in WHITEIDS:
         for url in SPAM:
             if url in message.text.casefold():
                 return True
@@ -25,7 +25,7 @@ def in_not_allowed(word_list, msg):
 
 def in_delete_list(type_message: types.Message) -> bool:
     """ Check for URLs in message and delete. """
-    if type_message.from_user.username not in WHITEUN and type_message.from_user.id not in WHITEIDS:
+    if type_message.from_user.id not in WHITEIDS:
         if URL_RX.search(type_message.text) and in_not_allowed(ALLOWED_WORDS, type_message.text):
             logging.info(f'[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - {type_message.text}')
             return True
@@ -49,7 +49,7 @@ def is_admin(message: types.Message) -> bool:
 
 
 def is_white(message: types.Message) -> bool:
-    return message.from_user.username in WHITEUN or message.from_user.id in WHITEIDS
+    return message.from_user.id in WHITEIDS
 
 
 def send_or_reply(m: types.Message, answer, **kwargs):

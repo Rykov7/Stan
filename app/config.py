@@ -29,7 +29,6 @@ ALLOWED_WORDS = ['paste', 'nekobin', 'github', 'google', 'nometa', 'python', 'dj
                  'stackoverflow', 'habr', 'medium', 'youtu', 'stepik', 'telegra', '#rtfm', 'support',
                  'jetbrains', ]
 
-WHITEUN = set(os.environ.get('whitelist').split(','))
 WHITEIDS = {int(i) for i in os.environ.get('whiteids').split(',')}
 ROLLBACK = {int(i) for i in os.environ.get('rollback').split(',')}
 
