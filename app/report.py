@@ -8,7 +8,7 @@ def create_report_text(chat_id):
     top_users = ''
     flooders = []
     if os.path.exists(f'{DATA}{chat_id}.db'):
-        with shelve.open(f'{DATA}{chat_id}') as s:
+        with shelve.open(f'{DATA}{chat_id}', writeback=True) as s:
             for user_id in ROLLBACK:
                 if user_id in s['Messages'] and s['Messages'][user_id]['Count'] > 10:
                     s['Messages'][user_id]['Count'] //= 3
