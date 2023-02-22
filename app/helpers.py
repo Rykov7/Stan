@@ -16,19 +16,24 @@ def detect_args(message: types.Message):
         if len(message.text.split()) == 1:
             return message.reply_to_message.text
         else:
-            return ' '.join(message.text.split()[1:])
+            return " ".join(message.text.split()[1:])
     else:
         if len(message.text.split()) > 1:
-            return ' '.join(message.text.split()[1:])
+            return " ".join(message.text.split()[1:])
 
 
 def update_stats(message: types.Message):
-    with shelve.open(f'{DATA}{message.chat.id}', writeback=True) as s:
-        if 'Messages' not in s:
+    with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as s:
+        if "Messages" not in s:
             report.reset_report_stats(message.chat.id)
 
-        if message.from_user.id not in s['Messages']:
-            s['Messages'][message.from_user.id] = {'User': message.from_user, 'Count': 1}
-            logging.warning(f'CNTR {message.chat.id}: {message.from_user.first_name} ({message.from_user.id})')
+        if message.from_user.id not in s["Messages"]:
+            s["Messages"][message.from_user.id] = {
+                "User": message.from_user,
+                "Count": 1,
+            }
+            logging.warning(
+                f"CNTR {message.chat.id}: {message.from_user.first_name} ({message.from_user.id})"
+            )
         else:
-            s['Messages'][message.from_user.id]['Count'] += 1
+            s["Messages"][message.from_user.id]["Count"] += 1
