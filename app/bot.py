@@ -57,8 +57,8 @@ def start(message: types.Message):
     send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
 
-@bot.message_handler(commands=["rules", "rule", "r", "правила", "правило", "п"])
-def send_rules(message):
+@bot.message_handler(commands=["rules", "rule", f"r", "правила", "правило", "п"])
+def send_rules(message: types.Message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
@@ -72,19 +72,19 @@ def send_rules(message):
 
 
 @bot.message_handler(commands=["faq", "чзв"])
-def send_faq(message):
+def send_faq(message: types.Message):
     markup = types.InlineKeyboardMarkup([[FAQ]], 1)
     send_or_reply(message, "...", reply_markup=markup)
 
 
 @bot.message_handler(commands=["lib", "library", "books", "книги", "библиотека"])
-def send_lib(message):
+def send_lib(message: types.Message):
     markup = types.InlineKeyboardMarkup([[LIB]], 1)
     send_or_reply(message, "...", reply_markup=markup)
 
 
 @bot.message_handler(commands=["lutz", "лутц"])
-def send_lutz(message):
+def send_lutz(message: types.Message):
     bot.send_document(
         message.chat.id,
         document="BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA",
@@ -93,7 +93,7 @@ def send_lutz(message):
 
 
 @bot.message_handler(commands=["bdmtss", "бдмтсс"])
-def send_bdmtss_audio(message):
+def send_bdmtss_audio(message: types.Message):
     bot.send_voice(
         message.chat.id,
         "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ",
@@ -101,7 +101,7 @@ def send_bdmtss_audio(message):
 
 
 @bot.message_handler(commands=["tr", "тр"])
-def translate_layout(message):
+def translate_layout(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         if message.reply_to_message.text[0] in RUS:
             bot.send_message(
@@ -114,8 +114,8 @@ def translate_layout(message):
 
 
 @bot.message_handler(commands=["quote", "цитата"])
-def stan_speak(message):
-    bot.send_message(message.chat.id, stan.speak(0))
+def stan_speak(message: types.Message):
+    bot.send_message(message.chat.id, stan.speak(0, message.chat.id))
 
 
 @bot.message_handler(commands=["tsya", "тся", "ться"])

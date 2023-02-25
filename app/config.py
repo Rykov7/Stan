@@ -23,6 +23,7 @@ bot = TeleBot(
     allow_sending_without_reply=True,
     colorful_logs=True,
 )
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
@@ -70,7 +71,7 @@ FAQ = types.InlineKeyboardButton(
 )
 LIB = types.InlineKeyboardButton("📚 Книги", url="https://telegra.ph/what-to-read-10-06")
 
-SPAM = ["me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/"]
+SPAM = ["me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/", 'П0 ВСЕМ В0ПР0С0М']
 NON_GRATA = ["дудар", "хауди", "dudar"]
 BAN_WORDS = ["GREEN"]
 
