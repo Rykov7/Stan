@@ -23,7 +23,6 @@ bot = TeleBot(
     allow_sending_without_reply=True,
     colorful_logs=True,
 )
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
