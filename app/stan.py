@@ -36,15 +36,16 @@ def act(message: types.Message):
 @bot.message_handler(func=is_white, commands=["add"])
 def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        if message.reply_to_message.text not in [i[0] for i in session.query(Quote.text).all()]:
+        if message.reply_to_message.text not in [i[0] for i in session.query(Quote.text).filter(
+                Quote.chat_id == message.chat.id).all()]:
             session.add(Quote(chat_id=message.chat.id, text=message.reply_to_message.text.replace("\n", " ")))
             session.commit()
             bot.send_message(
-                    message.chat.id,
-                    "✅ <b>Добавил</b>\n  └ <i>"
-                    + message.reply_to_message.text.replace("\n", " ")
-                    + "</i>",
-                )
+                message.chat.id,
+                "✅ <b>Добавил</b>\n  └ <i>"
+                + message.reply_to_message.text.replace("\n", " ")
+                + "</i>",
+            )
         else:
             bot.send_message(
                 message.chat.id,
@@ -52,25 +53,24 @@ def add_stan_quote(message: types.Message):
             )
 
 
-# @bot.message_handler(func=is_white, commands=["remove"])
-# def remove_stan_quote(message):
-#     if message.reply_to_message and message.reply_to_message.text:
-#         if message.reply_to_message.text in (
-#             i.rstrip() for i in open("Stan.txt", "r", encoding="utf8")
-#         ):
-#             quotes = list(open("Stan.txt", "r", encoding="utf8"))
-#             with open("Stan.txt", "w", encoding="utf8") as stan_quotes:
-#                 quotes.remove(message.reply_to_message.text + "\n")
-#                 stan_quotes.writelines(quotes)
-#             bot.send_message(
-#                 message.chat.id,
-#                 f"✅ <b>Удалил</b>\n  └ <i>{message.reply_to_message.text}</i>",
-#             )
-#         else:
-#             bot.send_message(
-#                 message.chat.id,
-#                 f"⛔️ <b>Нет такого</b>\n  └ <i>{message.reply_to_message.text}</i>",
-#             )
+@bot.message_handler(func=is_white, commands=["remove"])
+def remove_stan_quote(message: types.Message):
+    if message.reply_to_message and message.reply_to_message.text:
+        quote = session.query(Quote).filter_by(text=message.reply_to_message.text,
+                                               chat_id=message.chat.id).first()
+        if quote:
+            session.delete(quote)
+            session.commit()
+
+            bot.send_message(
+                message.chat.id,
+                f"✅ <b>Удалил</b>\n  └ <i>{message.reply_to_message.text}</i>",
+            )
+        else:
+            bot.send_message(
+                message.chat.id,
+                f"⛔️ <b>Нет такого</b>\n  └ <i>{message.reply_to_message.text}</i>",
+            )
 
 
 @bot.message_handler(func=is_nongrata)
