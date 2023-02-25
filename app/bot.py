@@ -7,6 +7,8 @@ from . import rules
 from .helpers import represent_as_get, detect_args, update_stats
 from .filters import *
 from .config import *
+from .database import session
+from .models import Chat
 
 """                [ ANTISPAM ]             """
 
@@ -39,10 +41,11 @@ def catch_videos(message: types.Message):
 @bot.edited_message_handler(func=in_delete_list)
 @bot.message_handler(func=in_delete_list)
 def delete_message(message: types.Message):
-    """Delete unwanted message."""
-    bot.delete_message(message.chat.id, message.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as s:
-        s["Deleted"] += 1
+    if session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]:
+        """Delete unwanted message."""
+        bot.delete_message(message.chat.id, message.id)
+        with shelve.open(f"{DATA}{message.chat.id}") as s:
+            s["Deleted"] += 1
 
 
 """                [ COMMANDS ]             """
