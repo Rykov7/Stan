@@ -10,11 +10,14 @@ logging.basicConfig(
 )
 logger.setLevel(logging.INFO)
 
-logging.critical("STAN STARTED!")
+logging.critical("STAN STARTED.")
 
 load_dotenv()
 
-TOKEN = os.environ.get("LUTZPYBOT", "Token not in ENVIRON")
+TOKEN = os.environ.get("LUTZPYBOT")
+if not TOKEN:
+    raise LookupError("LUTZPYBOT (token) has not been found in .env")
+
 YOOPAY = os.environ.get("YOOKASSA")
 bot = TeleBot(
     TOKEN,
