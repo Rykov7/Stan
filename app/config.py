@@ -34,7 +34,7 @@ DATA = "data/chat"
 ADMIN_ID = 280887861  # Rykov7
 PYTHONCHATRU = -1001338616632  # pythonchatru
 
-URL_RX = re.compile(r"\w+\.\w+/\w+")
+URL_RX = re.compile(r"\w+\.\w+/(\+)?\w+")
 ALLOWED_WORDS = [
     "paste",
     "nekobin",
@@ -50,8 +50,9 @@ ALLOWED_WORDS = [
     "habr",
     "medium",
     "youtu",
+    "rutube",
     "stepik",
-    "telegra",
+    "gra.ph",
     "#rtfm",
     "support",
     "jetbrains",
@@ -73,7 +74,8 @@ FAQ = types.InlineKeyboardButton(
 )
 LIB = types.InlineKeyboardButton("📚 Книги", url="https://telegra.ph/what-to-read-10-06")
 
-SPAM = ["me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/", 'П0 ВСЕМ В0ПР0С0М']
+SPAM = ["me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/", 'раб0т',
+        '0плат', ]
 NON_GRATA = ["дудар", "хауди", "dudar"]
 BAN_WORDS = ["GREEN"]
 
