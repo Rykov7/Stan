@@ -47,6 +47,7 @@ ALLOWED_WORDS = [
     "fastapi",
     "wiki",
     "stackoverflow",
+    "rykov7"
     "habr",
     "medium",
     "youtu",
