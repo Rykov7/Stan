@@ -17,7 +17,7 @@ from .models import Chat
 @bot.message_handler(func=in_spam_list)
 def moderate_messages(message: types.Message):
     """Ban user and delete their message."""
-    logging.warning(
+    logging.info(
         f"[BAN] {message.from_user.id} {message.from_user.username} - {message.text}"
     )
     bot.delete_message(message.chat.id, message.id)
@@ -29,7 +29,7 @@ def moderate_messages(message: types.Message):
 @bot.message_handler(func=in_caption_spam_list, content_types=["video"])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
-    logging.warning(
+    logging.info(
         f"[BAN] {message.from_user.id} {message.from_user.first_name} - {message.video.file_name}"
     )
     bot.delete_message(message.chat.id, message.id)
@@ -54,8 +54,7 @@ def delete_message(message: types.Message):
 @bot.message_handler(commands=["start", "links", "ссылки"])
 def start(message: types.Message):
     """What to begin with."""
-    log_msg = f"[START] {message.from_user.id} {message.from_user.first_name}"
-    logging.warning(log_msg)
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
     send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
@@ -64,6 +63,7 @@ def start(message: types.Message):
 def send_rules(message: types.Message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(
             message,
@@ -76,18 +76,21 @@ def send_rules(message: types.Message):
 
 @bot.message_handler(commands=["faq", "чзв"])
 def send_faq(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup([[FAQ]], 1)
     send_or_reply(message, "...", reply_markup=markup)
 
 
 @bot.message_handler(commands=["lib", "library", "books", "книги", "библиотека"])
 def send_lib(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup([[LIB]], 1)
     send_or_reply(message, "...", reply_markup=markup)
 
 
 @bot.message_handler(commands=["lutz", "лутц"])
 def send_lutz(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     bot.send_document(
         message.chat.id,
         document="BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA",
@@ -97,6 +100,7 @@ def send_lutz(message: types.Message):
 
 @bot.message_handler(commands=["bdmtss", "бдмтсс"])
 def send_bdmtss_audio(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     bot.send_voice(
         message.chat.id,
         "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ",
@@ -105,6 +109,7 @@ def send_bdmtss_audio(message: types.Message):
 
 @bot.message_handler(commands=["tr", "тр"])
 def translate_layout(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     if message.reply_to_message and message.reply_to_message.text:
         if message.reply_to_message.text[0] in RUS:
             bot.send_message(
@@ -124,6 +129,7 @@ def stan_speak(message: types.Message):
 
 @bot.message_handler(commands=["tsya", "тся", "ться"])
 def send_tsya(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup()
     markup.add(
         types.InlineKeyboardButton("🧑🏼‍🎓 Читать правило", url="https://tsya.ru/"),
@@ -134,6 +140,7 @@ def send_tsya(message: types.Message):
 
 @bot.message_handler(commands=["nometa", "номета"])
 def send_nometa(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup()
     markup.add(
         types.InlineKeyboardButton("❓ nometa.xyz", url="https://nometa.xyz/ru.html"),
@@ -153,6 +160,7 @@ def send_nometa(message: types.Message):
 
 @bot.message_handler(commands=["neprivet", "непривет"])
 def send_neprivet(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     markup = types.InlineKeyboardMarkup()
     markup.add(
         types.InlineKeyboardButton("👋 Непривет", url="https://neprivet.com/"),
@@ -165,7 +173,6 @@ def send_neprivet(message: types.Message):
 
 @bot.message_handler(commands=["nojob", "ноджоб"])
 def send_nojob(message):
-    logging.warning("Sent no job")
     answer = """Мы здесь не для того, чтобы за тебя решать задачи.
 
 Здесь помогают по конкретным вопросам в <u>ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и \
@@ -194,6 +201,7 @@ GUI-фреймворками. Существует много ресурсов �
 @bot.message_handler(commands=["g", "г"])
 def google_it(message: types.Message):
     """Google it!"""
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     query = f"<i>{detect_args(message)}</i>"
     get_query = "https://www.google.com/search?q=" + represent_as_get(message)
 
@@ -210,8 +218,8 @@ def delete_user(message: types.Message):
     if message.reply_to_message:
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
-        logging.warning(
-            f"[DEL (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - \
+        logging.info(
+            f"[DELETE (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - \
             {message.reply_to_message.text}"
         )
 
@@ -222,7 +230,7 @@ def ban_user(message: types.Message):
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
-        logging.warning(
+        logging.info(
             f"[BAN (M)] {message.reply_to_message.from_user.id} {message.reply_to_message.from_user.first_name} - \
             {message.reply_to_message.text}"
         )
@@ -233,7 +241,7 @@ def unban_user(message: types.Message):
     if message.text.split()[-1].isdigit():
         user_id = int(message.text.split()[-1])
         bot.unban_chat_member(PYTHONCHATRU, user_id)
-        logging.warning(f"[UNBAN (M)] {user_id}")
+        logging.info(f"[UNBAN (M)] {user_id}")
 
 
 """                [ INLINE ]               """

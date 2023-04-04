@@ -32,8 +32,8 @@ def update_stats(message: types.Message):
                 "User": message.from_user,
                 "Count": 1,
             }
-            logging.warning(
-                f"{message.chat.id}: {message.from_user.first_name} ({message.from_user.id})"
+            logging.info(
+                f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}"
             )
         else:
             s["Messages"][message.from_user.id]["Count"] += 1

@@ -23,21 +23,21 @@ def in_not_allowed(word_list, msg):
     return True
 
 
-def in_delete_list(type_message: types.Message) -> bool:
+def in_delete_list(message: types.Message) -> bool:
     """Check for URLs in message and delete."""
-    if type_message.from_user.id not in WHITEIDS:
-        if URL_RX.search(type_message.text) and in_not_allowed(
-            ALLOWED_WORDS, type_message.text
+    if message.from_user.id not in WHITEIDS:
+        if URL_RX.search(message.text) and in_not_allowed(
+            ALLOWED_WORDS, message.text
         ):
             logging.info(
-                f"[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - {type_message.text}"
+                f"[DELETE] [{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}"
             )
             return True
-        if type_message.entities:
-            for entity in type_message.entities:
+        if message.entities:
+            for entity in message.entities:
                 if entity.url and in_not_allowed(ALLOWED_WORDS, entity.url):
                     logging.info(
-                        f"[DEL] {type_message.from_user.id} {type_message.from_user.first_name} - Entity ({entity.url})"
+                        f"[DELETE] [{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: (entity) {entity.url}"
                     )
                     return True
 
