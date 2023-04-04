@@ -6,11 +6,11 @@ from telebot import TeleBot, logger, types
 from dotenv import load_dotenv
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y.%m.%d %H:%M:%S"
+    level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
 )
 logger.setLevel(logging.INFO)
 
-logging.critical("STAN STARTED.")
+logging.critical("[START] Stan")
 
 load_dotenv()
 

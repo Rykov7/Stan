@@ -33,7 +33,7 @@ def update_stats(message: types.Message):
                 "Count": 1,
             }
             logging.warning(
-                f"CNTR {message.chat.id}: {message.from_user.first_name} ({message.from_user.id})"
+                f"{message.chat.id}: {message.from_user.first_name} ({message.from_user.id})"
             )
         else:
             s["Messages"][message.from_user.id]["Count"] += 1
