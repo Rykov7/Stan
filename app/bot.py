@@ -118,6 +118,7 @@ def translate_layout(message: types.Message):
 
 @bot.message_handler(commands=["quote", "цитата"])
 def stan_speak(message: types.Message):
+    logging.info(f"[{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}")
     bot.send_message(message.chat.id, stan.speak(0, message.chat.id))
 
 
