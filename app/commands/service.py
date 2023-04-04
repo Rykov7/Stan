@@ -4,7 +4,6 @@ import logging
 from datetime import datetime as dt
 from ..config import bot, ADMIN_ID, types
 from .. import reminder
-from .. import reloader
 from .. import report
 from ..filters import is_admin
 from .get import me, my_ip
@@ -67,11 +66,3 @@ def send_stats(message: types.Message):
     logging.warning("reset_stats")
     report.reset_report_stats(message.chat.id)
     bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
-
-
-@bot.message_handler(func=is_admin, commands=["reload"])
-def send_stats(message):
-    logging.warning("Reloading...")
-    reloader.reload_modules()
-    logging.warning("Reloaded!!!")
-    bot.send_message(message.chat.id, "Reloaded successfully")

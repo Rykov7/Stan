@@ -60,7 +60,7 @@ def start(message: types.Message):
     send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
 
-@bot.message_handler(commands=["rules", "rule", f"r", "правила", "правило", "п"])
+@bot.message_handler(commands=["rules", "rule", "r", "правила", "правило", "п"])
 def send_rules(message: types.Message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
