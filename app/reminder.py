@@ -46,9 +46,10 @@ def stat_report(chat_to_repeat):
 
 def print_get_jobs():
     all_jobs = get_jobs()
-    text = f"├ <b>Jobs:</b> {str(len(all_jobs))}\
-\n├ {dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-    text += "<i>" + str(all_jobs) + "</i>"
+    text = f"<b>{len(all_jobs)} jobs</b>\
+\n..:: {dt.now().strftime('%d-%m-%Y %H:%M:%S')} ::..\n"
+    for i in all_jobs:
+        text += f"\n · {i!r}"
     return text
 
 
