@@ -7,18 +7,16 @@ from . import rules
 from .helpers import represent_as_get, detect_args, update_stats
 from .filters import *
 from .config import *
-from .database import session
-from .models import Chat
 
 """                [ ANTISPAM ]             """
 
 
-@bot.edited_message_handler(func=in_spam_list)
-@bot.message_handler(func=in_spam_list)
+@bot.edited_message_handler(func=in_spam_list, chat_types=["supergroup", "group"])
+@bot.message_handler(func=in_spam_list, chat_types=["supergroup", "group"])
 def moderate_messages(message: types.Message):
     """Ban user and delete their message."""
     logging.info(
-        f"[BAN] {message.from_user.id} {message.from_user.username} - {message.text}"
+        f"[BAN] [{message.from_user.id}] {message.from_user.username}: {message.text}"
     )
     bot.delete_message(message.chat.id, message.id)
     bot.ban_chat_member(message.chat.id, message.from_user.id)
@@ -26,7 +24,7 @@ def moderate_messages(message: types.Message):
         s["Banned"] += 1
 
 
-@bot.message_handler(func=in_caption_spam_list, content_types=["video"])
+@bot.message_handler(func=in_caption_spam_list, content_types=["video"], chat_types=["supergroup", "group"])
 def catch_videos(message: types.Message):
     """Catch offensive videos"""
     logging.info(
@@ -38,14 +36,13 @@ def catch_videos(message: types.Message):
         s["Banned"] += 1
 
 
-@bot.edited_message_handler(func=in_delete_list)
-@bot.message_handler(func=in_delete_list)
+@bot.edited_message_handler(func=in_delete_list, chat_types=["supergroup", "group"])
+@bot.message_handler(func=in_delete_list, chat_types=["supergroup", "group"])
 def delete_message(message: types.Message):
-    if session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]:
-        """Delete unwanted message."""
-        bot.delete_message(message.chat.id, message.id)
-        with shelve.open(f"{DATA}{message.chat.id}") as s:
-            s["Deleted"] += 1
+    """Delete unwanted message."""
+    bot.delete_message(message.chat.id, message.id)
+    with shelve.open(f"{DATA}{message.chat.id}") as s:
+        s["Deleted"] += 1
 
 
 """                [ COMMANDS ]             """

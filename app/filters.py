@@ -1,9 +1,12 @@
+from .database import session
+from .models import Chat
 from .config import *
 
 
 def in_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted persons in text."""
-    if message.from_user.id not in WHITEIDS:
+    antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
+    if message.from_user.id not in WHITEIDS and antispam_is_enabled:
         for url in SPAM:
             if url in message.text.casefold():
                 return True
@@ -25,7 +28,8 @@ def in_not_allowed(word_list, msg):
 
 def in_delete_list(message: types.Message) -> bool:
     """Check for URLs in message and delete."""
-    if message.from_user.id not in WHITEIDS:
+    antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
+    if message.from_user.id not in WHITEIDS and antispam_is_enabled:
         if URL_RX.search(message.text) and in_not_allowed(
             ALLOWED_WORDS, message.text
         ):

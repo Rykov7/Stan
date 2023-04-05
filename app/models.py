@@ -21,7 +21,7 @@ class Chat(Base):
     title = Column(String)
 
     # Settings
-    quotes = relationship('Quote', backref='chat')
+    quotes = relationship('Quote', backref='chat', cascade='all, delete')
     antispam = Column(Boolean)
     report = Column(Boolean)
     reminder = Column(Boolean)

@@ -2,6 +2,8 @@
 
 import logging
 from datetime import datetime as dt
+from ..models import Chat
+from ..database import session
 from ..config import bot, ADMIN_ID, types
 from .. import reminder
 from .. import report
@@ -66,3 +68,29 @@ def send_stats(message: types.Message):
     logging.warning("reset_stats")
     report.reset_report_stats(message.chat.id)
     bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
+
+
+@bot.message_handler(commands=["enable_stan"], chat_types=["supergroup", "group"])
+def enable_stan(message: types.Message):
+    """Add group to database."""
+
+    logging.info(
+        f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
+    )
+    if not session.query(Chat.id).filter(Chat.id == message.chat.id).first():
+        logging.info('[TRUE] chat.id == message.chat.id')
+        session.add(Chat(chat_id=message.chat.id, title=message.chat.title, antispam=1, report=0, reminder=1))
+        session.commit()
+        bot.send_message(message.chat.id, f"""Группа "{message.chat.title}"
+Добавлена в БД
+
+Текущие настройки:
+  Антиспам: {session.query(Chat.antispam).filter(Chat.chat_id == message.chat.id).first()[0]}
+  Ежедневные отчёты: {session.query(Chat.report).filter(Chat.chat_id == message.chat.id).first()[0]}
+  Праздники: {session.query(Chat.reminder).filter(Chat.chat_id == message.chat.id).first()[0]}""")
+
+@bot.message_handler(commands=["get_quotes"], chat_types=["supergroup", "group"])
+def get_quotes(message: types.Message):
+    logging.info('[TRUE] getting quotes...')
+    quotes = session.query(Chat.quotes).filter(Chat.id == message.chat.id).all()
+    bot.send_message(message.chat.id, f"{quotes}")
