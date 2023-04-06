@@ -139,6 +139,7 @@ def set_antispam_report_reminder(message: types.Message):
             session.query(Chat).filter(Chat.chat_id == message.chat.id).update(
                 {"antispam": antispam, "report": rep, "reminder": rem}
             )
+            session.commit()
 
             bot.send_message(
                 message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info"""
