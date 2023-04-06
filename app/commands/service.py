@@ -1,6 +1,7 @@
 """ Service commands for Admin purposes. """
 
 import logging
+from telebot import logger
 from datetime import datetime as dt
 from ..models import Chat, Quote
 from ..database import session
@@ -148,14 +149,13 @@ def set_antispam_report_reminder(message: types.Message):
     func=is_white, commands=["get_quotes"], chat_types=["supergroup", "group"]
 )
 def get_quotes(message: types.Message):
-    logging.info("[TRUE] getting quotes...")
+    logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
-
     if quotes:
-        text = f"Количество цитат: {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n"
-        text += "Последние добавленные</b>\n\n"
+        text = f"Количество цитат: {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n\
+Последние добавленные\n\n"
         text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
-        bot.send_message(message.chat.id, f"<i>{text}</i>")
+        bot.send_message(message.chat.id, f"{text}")
     else:
         bot.send_message(
             message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info"
@@ -182,3 +182,14 @@ ID: {message.chat.id}
         )
     else:
         bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
+
+
+@bot.message_handler(func=is_white, commands=["set_logging_level"], chat_types=["supergroup", "group"])
+def set_logging_level(message: types.Message):
+    args = message.text.split()
+    if args[-1] == '10':
+        logger.setLevel(10)  # DEBUG
+        logging.info("[LEVEL] Установлен уровень DEBUG")
+    else:
+        logger.setLevel(20)  # INFO
+        logging.info("[LEVEL] Установлен уровень INFO")

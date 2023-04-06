@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 logger.setLevel(logging.INFO)
 
-logging.critical("[START] Stan")
+logging.warning("[START] Stan")
 
 load_dotenv()
 
