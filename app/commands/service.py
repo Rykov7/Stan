@@ -112,7 +112,10 @@ def disable_stan(message: types.Message):
         chat = session.query(Chat).filter_by(chat_id=message.chat.id).first()
         session.delete(chat)
         session.commit()
-        bot.send_message(message.chat.id, f"""Чат {message.chat.title} удалён""")
+        bot.send_message(
+            message.chat.id,
+            f"Группа {message.chat.title} и все связанные с ней цитаты удалёны!",
+        )
     else:
         bot.send_message(message.chat.id, "Отказ. Этой группы нет в БД.")
 
@@ -149,7 +152,8 @@ def get_quotes(message: types.Message):
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
 
     if quotes:
-        text = "<b>Последние цитаты были</b>\n\n"
+        text = f"Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}"
+        text += "<b>Последние цитаты были</b>\n\n"
         text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
         bot.send_message(message.chat.id, f"{text}")
     else:
@@ -177,4 +181,4 @@ ID: {message.chat.id}
   Праздники: {session.query(Chat.reminder).filter(Chat.chat_id == message.chat.id).first()[0]}""",
         )
     else:
-        bot.send_message(message.chat.id, f"Чат не включен.")
+        bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
