@@ -2,12 +2,12 @@
 
 import logging
 from datetime import datetime as dt
-from ..models import Chat
+from ..models import Chat, Quote
 from ..database import session
 from ..config import bot, ADMIN_ID, types
 from .. import reminder
 from .. import report
-from ..filters import is_admin
+from ..filters import is_admin, is_white
 from .get import me, my_ip
 
 
@@ -70,27 +70,111 @@ def send_stats(message: types.Message):
     bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
 
 
-@bot.message_handler(commands=["enable_stan"], chat_types=["supergroup", "group"])
+@bot.message_handler(
+    func=is_white, commands=["enable_stan"], chat_types=["supergroup", "group"]
+)
 def enable_stan(message: types.Message):
     """Add group to database."""
 
     logging.info(
         f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
     )
-    if not session.query(Chat.id).filter(Chat.id == message.chat.id).first():
-        logging.info('[TRUE] chat.id == message.chat.id')
-        session.add(Chat(chat_id=message.chat.id, title=message.chat.title, antispam=1, report=0, reminder=1))
+    if not session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
+        logging.info("[TRUE] chat.id == message.chat.id")
+        session.add(
+            Chat(
+                chat_id=message.chat.id,
+                title=message.chat.title,
+                antispam=1,
+                report=0,
+                reminder=1,
+            )
+        )
         session.commit()
-        bot.send_message(message.chat.id, f"""Группа "{message.chat.title}"
-Добавлена в БД
+        bot.send_message(
+            message.chat.id,
+            f"""Группа "{message.chat.title} добавлена в БД.
+/get_group_settings - узнать текущие настройки""",
+        )
+    else:
+        bot.send_message(message.chat.id, "Отказ. Группа уже включена")
+
+
+@bot.message_handler(
+    func=is_admin, commands=["disable_stan"], chat_types=["supergroup", "group"]
+)
+def disable_stan(message: types.Message):
+    logging.info(
+        f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
+    )
+    if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
+        logging.info("[TRUE] chat.id == message.chat.id")
+        chat = session.query(Chat).filter_by(chat_id=message.chat.id).first()
+        session.delete(chat)
+        session.commit()
+        bot.send_message(message.chat.id, f"""Чат {message.chat.title} удалён""")
+    else:
+        bot.send_message(message.chat.id, "Отказ. Этой группы нет в БД.")
+
+
+@bot.message_handler(
+    func=is_white,
+    commands=["set_antispam_report_reminder"],
+    chat_types=["supergroup", "group"],
+)
+def set_antispam_report_reminder(message: types.Message):
+    args = message.text.split()
+    if len(args) == 4:
+        try:
+            antispam = int(args[1])
+            rep = int(args[2])
+            rem = int(args[3])
+        except ValueError:
+            logging.info(f"[ERROR] Неверные аргументы {message.text}")
+        else:
+            session.query(Chat).filter(Chat.chat_id == message.chat.id).update(
+                {"antispam": antispam, "report": rep, "reminder": rem}
+            )
+
+            bot.send_message(
+                message.chat.id, f"""Настройки обновлены. Проверить: /get_settings"""
+            )
+
+
+@bot.message_handler(
+    func=is_white, commands=["get_quotes"], chat_types=["supergroup", "group"]
+)
+def get_quotes(message: types.Message):
+    logging.info("[TRUE] getting quotes...")
+    quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
+
+    if quotes:
+        text = "<b>Последние цитаты были</b>\n\n"
+        text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
+        bot.send_message(message.chat.id, f"{text}")
+    else:
+        bot.send_message(
+            message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info"
+        )
+
+
+@bot.message_handler(
+    func=is_white, commands=["get_group_info"], chat_types=["supergroup", "group"]
+)
+def get_group_info(message: types.Message):
+    if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
+        bot.send_message(
+            message.chat.id,
+            f"""Группа: {message.chat.title}
+ID: {message.chat.id} 
+
+Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}
+Показать последние цитаты: /get_quotes
 
 Текущие настройки:
   Антиспам: {session.query(Chat.antispam).filter(Chat.chat_id == message.chat.id).first()[0]}
   Ежедневные отчёты: {session.query(Chat.report).filter(Chat.chat_id == message.chat.id).first()[0]}
-  Праздники: {session.query(Chat.reminder).filter(Chat.chat_id == message.chat.id).first()[0]}""")
-
-@bot.message_handler(commands=["get_quotes"], chat_types=["supergroup", "group"])
-def get_quotes(message: types.Message):
-    logging.info('[TRUE] getting quotes...')
-    quotes = session.query(Chat.quotes).filter(Chat.id == message.chat.id).all()
-    bot.send_message(message.chat.id, f"{quotes}")
+  Праздники: {session.query(Chat.reminder).filter(Chat.chat_id == message.chat.id).first()[0]}""",
+        )
+    else:
+        bot.send_message(message.chat.id, f"Чат не включен.")
