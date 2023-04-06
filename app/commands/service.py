@@ -152,7 +152,7 @@ def get_quotes(message: types.Message):
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
 
     if quotes:
-        text = f"Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}"
+        text = f"Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n"
         text += "<b>Последние цитаты были</b>\n\n"
         text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
         bot.send_message(message.chat.id, f"{text}")
