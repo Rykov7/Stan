@@ -94,7 +94,7 @@ def enable_stan(message: types.Message):
         bot.send_message(
             message.chat.id,
             f"""Группа "{message.chat.title} добавлена в БД.
-/get_group_settings - узнать текущие настройки""",
+/get_group_info - узнать текущие настройки""",
         )
     else:
         bot.send_message(message.chat.id, "Отказ. Группа уже включена")
@@ -140,7 +140,7 @@ def set_antispam_report_reminder(message: types.Message):
             )
 
             bot.send_message(
-                message.chat.id, f"""Настройки обновлены. Проверить: /get_settings"""
+                message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info"""
             )
 
 
