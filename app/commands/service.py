@@ -152,10 +152,10 @@ def get_quotes(message: types.Message):
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
 
     if quotes:
-        text = f"Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n"
-        text += "<b>Последние цитаты были</b>\n\n"
+        text = f"Количество цитат: {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n"
+        text += "Последние добавленные</b>\n\n"
         text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
-        bot.send_message(message.chat.id, f"{text}")
+        bot.send_message(message.chat.id, f"<i>{text}</i>")
     else:
         bot.send_message(
             message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info"
@@ -173,7 +173,7 @@ def get_group_info(message: types.Message):
 ID: {message.chat.id} 
 
 Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}
-Показать последние цитаты: /get_quotes
+Последние добавленные: /get_quotes
 
 Текущие настройки:
   Антиспам: {session.query(Chat.antispam).filter(Chat.chat_id == message.chat.id).first()[0]}
