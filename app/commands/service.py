@@ -167,19 +167,20 @@ def get_quotes(message: types.Message):
     func=is_white, commands=["get_group_info"], chat_types=["supergroup", "group"]
 )
 def get_group_info(message: types.Message):
-    if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
+    group = session.query(Chat).filter(Chat.chat_id == message.chat.id).first()
+    if group:
         bot.send_message(
             message.chat.id,
-            f"""Группа: {message.chat.title}
-ID: {message.chat.id} 
+            f"""Группа: {group.title}
+ID группы: {group.chat_id} 
 
 Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}
 Последние добавленные: /get_quotes
 
 Текущие настройки:
-  Антиспам: {session.query(Chat.antispam).filter(Chat.chat_id == message.chat.id).first()[0]}
-  Ежедневные отчёты: {session.query(Chat.report).filter(Chat.chat_id == message.chat.id).first()[0]}
-  Праздники: {session.query(Chat.reminder).filter(Chat.chat_id == message.chat.id).first()[0]}""",
+  Антиспам: {group.antispam}
+  Ежедневные отчёты: {group.report}
+  Праздники: {group.reminder}""",
         )
     else:
         bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
