@@ -28,7 +28,7 @@ bot = TeleBot(
     allow_sending_without_reply=True,
     colorful_logs=True,
 )
-
+LOG_TEXT = "[%s] %s: %s"
 app = Flask(__name__)
 
 DATA = "data/chat"

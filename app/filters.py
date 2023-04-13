@@ -9,13 +9,19 @@ def in_spam_list(message: types.Message) -> bool:
     if message.from_user.id not in WHITEIDS and antispam_is_enabled:
         for url in SPAM:
             if url in message.text.casefold():
+                logging.info(
+                    "!BAN!" + LOG_TEXT % (
+                    message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
+
                 return True
 
 
-def in_caption_spam_list(type_message: types.Message) -> bool:
+def in_caption_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted words in caption."""
     for phrase in BAN_WORDS:
-        if type_message.caption and phrase in type_message.caption:
+        if message.caption and phrase in message.caption:
+            logging.info("!BAN!" + LOG_TEXT % (
+                message.chat.title, message.from_user.id, message.from_user.first_name, message.video.file_name))
             return True
 
 

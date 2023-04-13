@@ -81,7 +81,6 @@ def enable_stan(message: types.Message):
         f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
     )
     if not session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
-        logging.info("[TRUE] chat.id == message.chat.id")
         session.add(
             Chat(
                 chat_id=message.chat.id,
@@ -109,7 +108,6 @@ def disable_stan(message: types.Message):
         f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
     )
     if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
-        logging.info("[TRUE] chat.id == message.chat.id")
         chat = session.query(Chat).filter_by(chat_id=message.chat.id).first()
         session.delete(chat)
         session.commit()
