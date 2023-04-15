@@ -45,7 +45,7 @@ def delete_message(message: types.Message):
 @bot.message_handler(commands=["start", "links", "ссылки"])
 def start(message: types.Message):
     """What to begin with."""
-    logging.info(LOG_TEXT % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
+    logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
     markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
     send_or_reply(message, "Начни с прочтения", reply_markup=markup)
 
@@ -68,7 +68,7 @@ def send_rules(message: types.Message):
 @bot.message_handler(commands=["faq", "чзв"])
 def send_faq(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -83,7 +83,7 @@ def send_faq(message: types.Message):
 @bot.message_handler(commands=["lib", "library", "books", "книги", "библиотека"])
 def send_lib(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -98,7 +98,7 @@ def send_lib(message: types.Message):
 @bot.message_handler(commands=["lutz", "лутц"])
 def send_lutz(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -116,7 +116,7 @@ def send_lutz(message: types.Message):
 @bot.message_handler(commands=["bdmtss", "бдмтсс"])
 def send_bdmtss_audio(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -133,7 +133,7 @@ def send_bdmtss_audio(message: types.Message):
 @bot.message_handler(commands=["tr", "тр"])
 def translate_layout(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -155,7 +155,7 @@ def translate_layout(message: types.Message):
 @bot.message_handler(commands=["quote", "цитата"])
 def stan_speak(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -169,7 +169,7 @@ def stan_speak(message: types.Message):
 @bot.message_handler(commands=["tsya", "тся", "ться"])
 def send_tsya(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -188,7 +188,7 @@ def send_tsya(message: types.Message):
 @bot.message_handler(commands=["nometa", "номета"])
 def send_nometa(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -216,7 +216,7 @@ def send_nometa(message: types.Message):
 @bot.message_handler(commands=["neprivet", "непривет"])
 def send_neprivet(message: types.Message):
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -265,7 +265,7 @@ GUI-фреймворками. Существует много ресурсов �
 def google_it(message: types.Message):
     """Google it!"""
     logging.info(
-        LOG_TEXT
+        LOG_COMM
         % (
             message.chat.title,
             message.from_user.id,
@@ -291,7 +291,7 @@ def delete_user(message: types.Message):
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         logging.info(
             "!DEL! (M)"
-            + LOG_TEXT
+            + LOG_COMM
             % (
                 message.chat.title,
                 message.reply_to_message.from_user.id,
@@ -309,7 +309,7 @@ def ban_user(message: types.Message):
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
         logging.info(
             f"!BAN! (M)"
-            + LOG_TEXT
+            + LOG_COMM
             % (
                 message.chat.title,
                 message.reply_to_message.from_user.id,

@@ -29,6 +29,7 @@ bot = TeleBot(
     colorful_logs=True,
 )
 LOG_TEXT = "[%s] %s: %s"
+LOG_COMM = "[%s] [%s] %s: %s"
 app = Flask(__name__)
 
 DATA = "data/chat"
