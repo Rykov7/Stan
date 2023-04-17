@@ -10,7 +10,7 @@ def in_spam_list(message: types.Message) -> bool:
         for url in SPAM:
             if url in message.text.casefold():
                 logging.info(
-                    "!BAN!" + LOG_TEXT % (
+                    "!BAN!" + LOG_COMM % (
                     message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
 
                 return True
@@ -20,7 +20,7 @@ def in_caption_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted words in caption."""
     for phrase in BAN_WORDS:
         if message.caption and phrase in message.caption:
-            logging.info("!BAN!" + LOG_TEXT % (
+            logging.info("!BAN!" + LOG_COMM % (
                 message.chat.title, message.from_user.id, message.from_user.first_name, message.video.file_name))
             return True
 
@@ -40,14 +40,14 @@ def in_delete_list(message: types.Message) -> bool:
             ALLOWED_WORDS, message.text
         ):
             logging.info(
-                f"[DELETE] [{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}"
+                f"[DELETE] [{message.chat.title}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}"
             )
             return True
         if message.entities:
             for entity in message.entities:
                 if entity.url and in_not_allowed(ALLOWED_WORDS, entity.url):
                     logging.info(
-                        f"[DELETE] [{message.chat.id}] [{message.from_user.id}] {message.from_user.first_name}: (entity) {entity.url}"
+                        f"[DELETE] [{message.chat.title}] [{message.from_user.id}] {message.from_user.first_name}: [entity] {message.text}"
                     )
                     return True
 
