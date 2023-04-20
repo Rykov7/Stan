@@ -290,12 +290,12 @@ def delete_user(message: types.Message):
         bot.delete_message(message.chat.id, message.id)
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         logging.info(
-            "!DEL! (M)"
+            "!DEL!M "
             + LOG_COMM
             % (
                 message.chat.title,
                 message.reply_to_message.from_user.id,
-                message.from_user.first_name,
+                message.reply_to_message.from_user.first_name,
                 message.reply_to_message.text,
             )
         )
@@ -308,12 +308,12 @@ def ban_user(message: types.Message):
         bot.delete_message(message.chat.id, message.reply_to_message.id)
         bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
         logging.info(
-            f"!BAN! (M)"
+            f"!BAN!M "
             + LOG_COMM
             % (
                 message.chat.title,
                 message.reply_to_message.from_user.id,
-                message.from_user.first_name,
+                message.reply_to_message.from_user.first_name,
                 message.reply_to_message.text,
             )
         )
