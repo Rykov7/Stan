@@ -134,7 +134,7 @@ def set_antispam_report_reminder(message: types.Message):
         except ValueError:
             logging.info(f"[ERROR] Неверные аргументы {message.text}")
         else:
-            session.query(Chat).filter(Chat.chat_id == message.chat.id).update(
+            session.query(Chat).filter_by(chat_id=message.chat.id).update(
                 {"antispam": antispam, "report": rep, "reminder": rem}
             )
             session.commit()

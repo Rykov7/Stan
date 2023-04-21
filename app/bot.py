@@ -54,7 +54,7 @@ def start(message: types.Message):
 def send_rules(message: types.Message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
-    logging.info(LOG_TEXT % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
+    logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         send_or_reply(
             message,
