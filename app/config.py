@@ -56,6 +56,7 @@ ALLOWED_WORDS = [
     "youtu",
     "rutube",
     "stepik",
+    "digitalocean",
     "gra.ph",
     "#rtfm",
     "support",
