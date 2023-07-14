@@ -39,18 +39,18 @@ def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         if message.reply_to_message.text not in [i[0] for i in session.query(Quote.text).filter(
                 Quote.chat_id == message.chat.id).all()]:
-            session.add(Quote(chat_id=message.chat.id, text=message.reply_to_message.text.replace("\n", " ")))
+            session.add(Quote(chat_id=message.chat.id, text=html.escape(message.reply_to_message.text.replace("\n", " "))))
             session.commit()
             bot.send_message(
                 message.chat.id,
                 "✅ <b>Добавил</b>\n  └ <i>"
-                + message.reply_to_message.text.replace("\n", " ")
+                + html.escape(message.reply_to_message.text.replace("\n", " "))
                 + "</i>",
             )
         else:
             bot.send_message(
                 message.chat.id,
-                f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{message.reply_to_message.text}</i>",
+                f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{html.escape(message.reply_to_message.text)}</i>",
             )
 
 
