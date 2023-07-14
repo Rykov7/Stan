@@ -23,7 +23,7 @@ def send_quote(after_sec, message, quote):
         )  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action="typing")
     sleep(after_sec)  # Typing time
-    bot.send_message(message.chat.id, html.escape(quote))
+    bot.send_message(message.chat.id, quote)
 
 
 def act(message: types.Message):
@@ -37,40 +37,43 @@ def act(message: types.Message):
 @bot.message_handler(func=is_white, commands=["add"])
 def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        if message.reply_to_message.text not in [i[0] for i in session.query(Quote.text).filter(
+        quote = html.escape(message.reply_to_message.text)
+        if quote not in [i[0] for i in session.query(Quote.text).filter(
                 Quote.chat_id == message.chat.id).all()]:
-            session.add(Quote(chat_id=message.chat.id, text=html.escape(message.reply_to_message.text.replace("\n", " "))))
+            session.add(Quote(chat_id=message.chat.id, text=quote.replace("\n", " ")))
             session.commit()
             bot.send_message(
                 message.chat.id,
                 "✅ <b>Добавил</b>\n  └ <i>"
-                + html.escape(message.reply_to_message.text.replace("\n", " "))
+                + quote.replace("\n", " ")
                 + "</i>",
             )
         else:
             bot.send_message(
                 message.chat.id,
-                f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{html.escape(message.reply_to_message.text)}</i>",
+                f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{quote}</i>",
             )
 
 
 @bot.message_handler(func=is_white, commands=["remove"])
 def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        quote = session.query(Quote).filter_by(text=message.reply_to_message.text,
+
+        quote = html.escape(message.reply_to_message.text)
+        already_exist = session.query(Quote).filter_by(text=quote,
                                                chat_id=message.chat.id).first()
-        if quote:
-            session.delete(quote)
+        if already_exist:
+            session.delete(already_exist)
             session.commit()
 
             bot.send_message(
                 message.chat.id,
-                f"✅ <b>Удалил</b>\n  └ <i>{message.reply_to_message.text}</i>",
+                f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",
             )
         else:
             bot.send_message(
                 message.chat.id,
-                f"⛔️ <b>Нет такого</b>\n  └ <i>{message.reply_to_message.text}</i>",
+                f"⛔️ <b>Нет такого</b>\n  └ <i>{quote}</i>",
             )
 
 
