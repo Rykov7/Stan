@@ -1,4 +1,5 @@
 """ Stan's commands and reactions. """
+import html
 import random
 import threading
 from time import sleep
@@ -22,7 +23,7 @@ def send_quote(after_sec, message, quote):
         )  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action="typing")
     sleep(after_sec)  # Typing time
-    bot.send_message(message.chat.id, quote)
+    bot.send_message(message.chat.id, html.escape(quote))
 
 
 def act(message: types.Message):
