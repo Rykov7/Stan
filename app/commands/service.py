@@ -3,8 +3,7 @@
 import logging
 from telebot import logger
 from datetime import datetime as dt
-from ..models import Chat, Quote, User
-from ..database import session
+from ..models import Chat, Quote, User, session
 from ..config import bot, ADMIN_ID, types
 from .. import reminder
 from .. import report

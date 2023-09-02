@@ -1,4 +1,4 @@
-from .database import session
+from .models import session
 from .models import Chat
 from .config import *
 

@@ -5,7 +5,7 @@ import threading
 from time import sleep
 from .config import bot, types
 from .filters import is_white, is_nongrata
-from .database import session
+from .models import session
 from .models import Quote
 
 
