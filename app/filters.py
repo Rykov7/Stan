@@ -8,11 +8,8 @@ from .config import *
 def in_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted persons in text."""
     antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
-    logging.critical(str(antispam_is_enabled))
     if message.from_user.id not in WHITEIDS and antispam_is_enabled:
-        logging.critical('if message.from_user.id not in WHITEIDS and antispam_is_enabled: TRUE')
         for text in SPAM:
-            logging.critical(str(text.casefold()) + ' in ' + str(message.text.casefold()))
             if text.casefold() in message.text.casefold():
                 logging.info(
                     "!BAN!" + LOG_COMM % (
