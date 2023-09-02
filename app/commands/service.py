@@ -3,7 +3,7 @@
 import logging
 from telebot import logger
 from datetime import datetime as dt
-from ..models import Chat, Quote
+from ..models import Chat, Quote, User
 from ..database import session
 from ..config import bot, ADMIN_ID, types
 from .. import reminder
@@ -193,3 +193,24 @@ def set_logging_level(message: types.Message):
     else:
         logger.setLevel(20)  # INFO
         logging.info("[LEVEL] Установлен уровень INFO")
+
+
+@bot.message_handler(func=is_admin, commands="promote", chat_types=["supergroup", "group"])
+def promote_user(message: types.Message):
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+
+        user_db = session.query(User).filter_by(tg_id=user.id)
+        if not user_db:
+            permission = 1
+            session.add(tg_id=user.id,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        username=user.username,
+                        permissions=permission)
+        else:
+            permission = user_db.permission * 2
+            user_db.update(permissions=permission)
+        session.commit()
+
+        logger.info(f'[{user.first_name} {user.last_name}] повышен до {permission}.')
