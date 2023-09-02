@@ -1,9 +1,18 @@
+import os
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship, declarative_base, sessionmaker
 
-from .database import session
+from sqlalchemy import create_engine
 
 Base = declarative_base()
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+engine = create_engine('sqlite:///' + os.path.join(basedir, 'db/db.sqlite'))
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
 
 class Permission:
     USE_COMMANDS = 1     # Пользоваться обычными командами.
