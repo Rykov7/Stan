@@ -194,7 +194,7 @@ def set_logging_level(message: types.Message):
         logging.info("[LEVEL] Установлен уровень INFO")
 
 
-@bot.message_handler(func=is_admin, commands="promote", chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_admin, commands=["promote"], chat_types=["supergroup", "group"])
 def promote_user(message: types.Message):
     if message.reply_to_message:
         user = message.reply_to_message.from_user
