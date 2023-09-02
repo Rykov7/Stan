@@ -8,7 +8,7 @@ def in_spam_list(message: types.Message) -> bool:
     antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
     if message.from_user.id not in WHITEIDS and antispam_is_enabled:
         for text in SPAM:
-            if text in message.text.casefold():
+            if text.casefold() in message.text.casefold():
                 logging.info(
                     "!BAN!" + LOG_COMM % (
                     message.chat.title, message.from_user.id, message.from_user.first_name, message.text))

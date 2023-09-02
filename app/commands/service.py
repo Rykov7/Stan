@@ -120,7 +120,7 @@ def disable_stan(message: types.Message):
 
 @bot.message_handler(
     func=is_white,
-    commands=["set_antispam_report_reminder"],
+    commands=["set_antispam_report_reminder", "set_rules"],
     chat_types=["supergroup", "group"],
 )
 def set_antispam_report_reminder(message: types.Message):
