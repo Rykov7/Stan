@@ -36,7 +36,7 @@ def create_report_text(chat_id):
             if len(flooders) >= 3 or s["Banned"] or s["Deleted"]:
                 report = f"Hello, World!\n"
             if len(flooders) >= 3:
-                report += f"\n{top_users}\n"
+                report += f"{top_users}\n"
             if s["Banned"] or s["Deleted"]:
                 report += f"""
 <b>Удалено</b>
