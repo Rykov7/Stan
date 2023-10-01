@@ -48,6 +48,7 @@ def add_stan_quote(message: types.Message):
                 + quote.replace("\n", " ")
                 + "</i>",
             )
+            bot.delete_message(message.chat.id, message.id)
         else:
             bot.send_message(
                 message.chat.id,
@@ -70,6 +71,7 @@ def remove_stan_quote(message: types.Message):
                 message.chat.id,
                 f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",
             )
+            bot.delete_message(message.chat.id, message.id)
         else:
             bot.send_message(
                 message.chat.id,

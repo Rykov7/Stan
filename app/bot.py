@@ -78,6 +78,7 @@ def send_faq(message: types.Message):
     )
     markup = types.InlineKeyboardMarkup([[FAQ]], 1)
     send_or_reply(message, "...", reply_markup=markup)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["lib", "library", "books", "книги", "библиотека"])
@@ -93,6 +94,7 @@ def send_lib(message: types.Message):
     )
     markup = types.InlineKeyboardMarkup([[LIB]], 1)
     send_or_reply(message, "...", reply_markup=markup)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["lutz", "лутц"])
@@ -111,6 +113,7 @@ def send_lutz(message: types.Message):
         document="BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA",
         caption="вот, не позорься",
     )
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["bdmtss", "бдмтсс"])
@@ -128,6 +131,7 @@ def send_bdmtss_audio(message: types.Message):
         message.chat.id,
         "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ",
     )
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["tr", "тр"])
@@ -164,6 +168,7 @@ def stan_speak(message: types.Message):
         )
     )
     bot.send_message(message.chat.id, stan.speak(0, message.chat.id))
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["tsya", "тся", "ться"])
@@ -183,6 +188,7 @@ def send_tsya(message: types.Message):
         row_width=1,
     )
     send_or_reply(message, "<i>-тся</i> и <i>-ться</i> в глаголах", reply_markup=markup)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["nometa", "номета"])
@@ -211,6 +217,7 @@ def send_nometa(message: types.Message):
 Просто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь.""",
         reply_markup=markup,
     )
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["neprivet", "непривет"])
@@ -232,6 +239,7 @@ def send_neprivet(message: types.Message):
     send_or_reply(
         message, "Пожалуйста, не пишите просто «Привет» в чате.", reply_markup=markup
     )
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["nojob", "ноджоб"])
@@ -241,6 +249,7 @@ def send_nojob(message):
 Здесь помогают по конкретным вопросам в <u>ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и \
 объяснить где и почему застрял... всё просто. 🤷🏼️"""
     send_or_reply(message, answer)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["nobot", "нобот"])
@@ -250,6 +259,7 @@ def nobot(message: types.Message):
 <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и \
 <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
     send_or_reply(message, answer)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["nogui", "ногуи"])
@@ -259,6 +269,7 @@ GUI приложение <i>не должно</i> быть твоим первы
 <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо \
 GUI-фреймворками. Существует много ресурсов для этого в интернете."""
     send_or_reply(message, answer)
+    bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["g", "г"])
