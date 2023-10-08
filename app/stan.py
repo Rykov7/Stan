@@ -23,15 +23,13 @@ def send_quote(after_sec, message, quote):
         )  # Reading time is quarter of the same text writing time
     bot.send_chat_action(message.chat.id, action="typing")
     sleep(after_sec)  # Typing time
-    bot.send_message(message.chat.id, quote)
+    bot.send_message(message.chat.id, html.escape(quote))
 
 
 def act(message: types.Message):
     quote = speak(50, message.chat.id)
     if quote:
-        threading.Thread(
-            target=send_quote, args=(len(quote) * 0.13, message, quote)
-        ).start()
+        threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
 
 
 @bot.message_handler(func=is_white, commands=["add"])
