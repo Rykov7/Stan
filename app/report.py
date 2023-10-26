@@ -32,15 +32,15 @@ def create_report_text(chat_id):
                     if user.last_name
                     else user.first_name
                 )
-                top_users += f'\n{i + 1}. {name} [<code>{flooder["Count"]}</code>]'
+                top_users += f'\n{i + 1}. {html.escape(name)} [{flooder["Count"]}]'
 
             if len(flooders) >= 3 or s["Banned"] or s["Deleted"]:
                 report = f"Hello, World!\n"
             if len(flooders) >= 3:
-                report += f"{html.escape(top_users)}\n"
+                report += f"{top_users}\n"
             if s["Banned"]:
                 report += f"""
-<b> Криптоидов забанено:</b> <code>{s['Banned']}</code>
+<b> Криптойдов забанено:</b> {s['Banned']}
   └ [ {s['Banned']*'🐒'} ] 
 """
         return report
