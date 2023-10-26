@@ -1,3 +1,4 @@
+import html
 import shelve
 import os
 from .config import DATA, ROLLBACK
@@ -36,12 +37,11 @@ def create_report_text(chat_id):
             if len(flooders) >= 3 or s["Banned"] or s["Deleted"]:
                 report = f"Hello, World!\n"
             if len(flooders) >= 3:
-                report += f"{top_users}\n"
-            if s["Banned"] or s["Deleted"]:
+                report += f"{html.escape(top_users)}\n"
+            if s["Banned"]:
                 report += f"""
-<b>Ликвидировано</b>
-  ├ Нарушителей: <code>{s['Banned']}</code>
-  └ Сообщений: <code>{s['Deleted']}</code>
+<b> Криптоидов забанено:</b> <code>{s['Banned']}</code>
+  └ [ {s['Banned']*'🐒'} ] 
 """
         return report
     else:
