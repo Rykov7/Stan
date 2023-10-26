@@ -40,7 +40,7 @@ def create_report_text(chat_id):
                 report += f"{top_users}\n"
             if s["Banned"]:
                 report += f"""
-<b> Спамеров в топке:</b> {s['Banned']}
+<b> Криптотрейдеров:</b> {s['Banned']}
   └ [ {s['Banned']*'🐒'} ] 
 """
         return report
