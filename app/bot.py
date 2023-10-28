@@ -47,6 +47,7 @@ async def start(message: types.Message):
     logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
     markup = types.InlineKeyboardMarkup([[RULES], [FAQ], [LIB]], 1)
     await send_or_reply(message, "Начни с прочтения", reply_markup=markup)
+    await bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["rules", "rule", "r", "правила", "правило", "п"])
@@ -62,6 +63,7 @@ async def send_rules(message: types.Message):
         )
     else:
         await send_or_reply(message, "Читай...", reply_markup=markup)
+    await bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(commands=["faq", "чзв"])
