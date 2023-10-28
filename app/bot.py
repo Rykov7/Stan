@@ -61,7 +61,7 @@ async def send_rules(message: types.Message):
             reply_markup=markup,
         )
     else:
-        await send_or_reply(message, "...", reply_markup=markup)
+        await send_or_reply(message, "Читай...", reply_markup=markup)
 
 
 @bot.message_handler(commands=["faq", "чзв"])
@@ -76,7 +76,7 @@ async def send_faq(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup([[FAQ]], 1)
-    await send_or_reply(message, "...", reply_markup=markup)
+    await send_or_reply(message, "Читай...", reply_markup=markup)
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -92,7 +92,7 @@ async def send_lib(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup([[LIB]], 1)
-    await send_or_reply(message, "...", reply_markup=markup)
+    await send_or_reply(message, "Читай...", reply_markup=markup)
     await bot.delete_message(message.chat.id, message.id)
 
 
