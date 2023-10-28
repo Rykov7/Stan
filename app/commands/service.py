@@ -44,36 +44,30 @@ def remind_manually(message):
 
 
 @bot.message_handler(func=is_admin, commands=["jobs"])
-def list_jobs(message):
+async def list_jobs(message):
     """List all the jobs in schedule."""
-    bot.send_message(ADMIN_ID, reminder.print_get_jobs())
+    await bot.send_message(ADMIN_ID, reminder.print_get_jobs())
 
 
 @bot.message_handler(func=is_admin, commands=["stats"])
-def send_stats(message: types.Message):
+async def send_stats(message: types.Message):
     if len(message.text.split()) == 1:
         rep = report.create_report_text(message.chat.id)
         if rep:
-            bot.send_message(message.chat.id, rep)
+            await bot.send_message(message.chat.id, rep)
     else:
-        bot.send_message(
-            message.chat.id, report.create_report_text(message.text.split()[-1])
-        )
+        await bot.send_message(message.chat.id, report.create_report_text(message.text.split()[-1]))
 
 
-@bot.message_handler(
-    func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"]
-)
-def send_stats(message: types.Message):
+@bot.message_handler(func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"])
+async def send_stats(message: types.Message):
     logging.warning("reset_stats")
     report.reset_report_stats(message.chat.id)
-    bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
+    await bot.send_message(message.chat.id, report.reset_report_stats(message.chat.id))
 
 
-@bot.message_handler(
-    func=is_white, commands=["enable_stan"], chat_types=["supergroup", "group"]
-)
-def enable_stan(message: types.Message):
+@bot.message_handler(func=is_white, commands=["enable_stan"], chat_types=["supergroup", "group"])
+async def enable_stan(message: types.Message):
     """Add group to database."""
 
     logging.info(
@@ -90,32 +84,28 @@ def enable_stan(message: types.Message):
             )
         )
         session.commit()
-        bot.send_message(
+        await bot.send_message(
             message.chat.id,
             f"""Группа "{message.chat.title} добавлена в БД.
 /get_group_info - узнать текущие настройки""",
         )
     else:
-        bot.send_message(message.chat.id, "Отказ. Группа уже включена")
+        await bot.send_message(message.chat.id, "Отказ. Группа уже включена")
 
 
-@bot.message_handler(
-    func=is_admin, commands=["disable_stan"], chat_types=["supergroup", "group"]
-)
-def disable_stan(message: types.Message):
-    logging.info(
-        f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}"
-    )
+@bot.message_handler(func=is_admin, commands=["disable_stan"], chat_types=["supergroup", "group"])
+async def disable_stan(message: types.Message):
+    logging.info(f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}")
     if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
         chat = session.query(Chat).filter_by(chat_id=message.chat.id).first()
         session.delete(chat)
         session.commit()
-        bot.send_message(
+        await bot.send_message(
             message.chat.id,
             f"Группа {message.chat.title} и все связанные с ней цитаты удалёны!",
         )
     else:
-        bot.send_message(message.chat.id, "Отказ. Этой группы нет в БД.")
+        await bot.send_message(message.chat.id, "Отказ. Этой группы нет в БД.")
 
 
 @bot.message_handler(
@@ -123,7 +113,7 @@ def disable_stan(message: types.Message):
     commands=["set_antispam_report_reminder", "set_rules"],
     chat_types=["supergroup", "group"],
 )
-def set_antispam_report_reminder(message: types.Message):
+async def set_antispam_report_reminder(message: types.Message):
     args = message.text.split()
     if len(args) == 4:
         try:
@@ -137,36 +127,31 @@ def set_antispam_report_reminder(message: types.Message):
                 {"antispam": antispam, "report": rep, "reminder": rem}
             )
             session.commit()
-
-            bot.send_message(
-                message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info"""
-            )
+            await bot.send_message(message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info""")
 
 
 @bot.message_handler(
     func=is_white, commands=["get_quotes"], chat_types=["supergroup", "group"]
 )
-def get_quotes(message: types.Message):
+async def get_quotes(message: types.Message):
     logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
     if quotes:
         text = f"Количество цитат: {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}\n\
 Последние добавленные\n\n"
         text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
-        bot.send_message(message.chat.id, f"{text}")
+        await bot.send_message(message.chat.id, f"{text}")
     else:
-        bot.send_message(
+        await bot.send_message(
             message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info"
         )
 
 
-@bot.message_handler(
-    func=is_white, commands=["get_group_info"], chat_types=["supergroup", "group"]
-)
-def get_group_info(message: types.Message):
+@bot.message_handler(func=is_white, commands=["get_group_info"], chat_types=["supergroup", "group"])
+async def get_group_info(message: types.Message):
     group = session.query(Chat).filter(Chat.chat_id == message.chat.id).first()
     if group:
-        bot.send_message(
+        await bot.send_message(
             message.chat.id,
             f"""Группа: {group.title}
 ID группы: {group.chat_id} 
@@ -180,11 +165,11 @@ ID группы: {group.chat_id}
   Праздники: {group.reminder}""",
         )
     else:
-        bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
+        await bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
 
 
 @bot.message_handler(func=is_white, commands=["set_logging_level"], chat_types=["supergroup", "group"])
-def set_logging_level(message: types.Message):
+async def set_logging_level(message: types.Message):
     args = message.text.split()
     if args[-1] == '10':
         logger.setLevel(10)  # DEBUG
@@ -192,24 +177,3 @@ def set_logging_level(message: types.Message):
     else:
         logger.setLevel(20)  # INFO
         logging.info("[LEVEL] Установлен уровень INFO")
-
-
-# @bot.message_handler(func=is_admin, commands=["promote"], chat_types=["supergroup", "group"])
-# def promote_user(message: types.Message):
-#     if message.reply_to_message:
-#         user = message.reply_to_message.from_user
-#
-#         user_db = session.query(User).filter_by(tg_id=user.id)
-#         if not user_db:
-#             permission = 1
-#             session.add(tg_id=user.id,
-#                         first_name=user.first_name,
-#                         last_name=user.last_name,
-#                         username=user.username,
-#                         permissions=permission)
-#         else:
-#             permission = user_db.permission * 2
-#             user_db.update(permissions=permission)
-#         session.commit()
-#
-#         logger.info(f'[{user.first_name} {user.last_name}] повышен до {permission}.')

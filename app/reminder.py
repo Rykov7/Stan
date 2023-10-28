@@ -16,7 +16,7 @@ def scheduler():
 
 
 @repeat(every().day.at("07:00"), PYTHONCHATRU, None)
-def remind(chat_to_repeat, today):
+async def remind(chat_to_repeat, today):
     """Remind holiday."""
     if not today:
         today = dt.today()
@@ -33,14 +33,14 @@ def remind(chat_to_repeat, today):
             if date.year != 1000:
                 age = today.year - date.year
                 notification += f"\n\n🥳 <i>{age}-ая годовщина</i>"
-            bot.send_message(chat_to_repeat, notification)
+            await bot.send_message(chat_to_repeat, notification)
 
 
 @repeat(every().day.at("06:00"), PYTHONCHATRU)
-def stat_report(chat_to_repeat):
+async def stat_report(chat_to_repeat):
     rep = report.create_report_text(PYTHONCHATRU)
     if rep:
-        bot.send_message(chat_to_repeat, rep)
+        await bot.send_message(chat_to_repeat, rep)
     report.reset_report_stats(PYTHONCHATRU)
 
 

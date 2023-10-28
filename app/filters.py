@@ -68,8 +68,8 @@ def is_white(message: types.Message) -> bool:
     return message.from_user.id in WHITEIDS
 
 
-def send_or_reply(m: types.Message, answer, **kwargs):
+async def send_or_reply(m: types.Message, answer, **kwargs):
     if m.reply_to_message:
-        bot.reply_to(m.reply_to_message, answer, **kwargs)
+        await bot.reply_to(m.reply_to_message, answer, **kwargs)
     else:
-        bot.send_message(m.chat.id, answer, **kwargs)
+        await bot.send_message(m.chat.id, answer, **kwargs)
