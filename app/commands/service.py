@@ -12,29 +12,29 @@ from .get import me, my_ip
 
 
 @bot.message_handler(commands=["me"])
-def command_me(message):
+async def command_me(message):
     """Send info about user and chat id [Service]."""
-    bot.send_message(message.chat.id, me(message))
+    await bot.send_message(message.chat.id, me(message))
 
 
 @bot.message_handler(func=is_admin, commands=["ip"])
-def get_ip(message):
-    bot.send_message(message.chat.id, my_ip())
+async def get_ip(message):
+    await bot.send_message(message.chat.id, my_ip())
 
 
 @bot.message_handler(commands=["remind"])
-def remind_manually(message):
+async def remind_manually(message):
     """Remind holidays manually."""
     args = message.text.split()
     if len(args) > 1:
         try:
             today = dt.strptime(args[1], "%m-%d-%Y")
         except ValueError as ve:
-            bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}")
+            await bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}")
         else:
-            reminder.remind(message.chat.id, today)
+            await reminder.remind(message.chat.id, today)
     else:
-        bot.send_message(
+        await bot.send_message(
             message.chat.id,
             f"<b>Формат даты: MM-DD-YYYY</b>\n\n"
             f"Примеры:\n"

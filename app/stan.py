@@ -59,22 +59,15 @@ async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
 
         quote = html.escape(message.reply_to_message.text)
-        already_exist = session.query(Quote).filter_by(text=quote,
-                                               chat_id=message.chat.id).first()
+        already_exist = session.query(Quote).filter_by(text=quote, chat_id=message.chat.id).first()
         if already_exist:
             session.delete(already_exist)
             session.commit()
 
-            await bot.send_message(
-                message.chat.id,
-                f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",
-            )
+            await bot.send_message(message.chat.id, f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",)
             await bot.delete_message(message.chat.id, message.id)
         else:
-            await bot.send_message(
-                message.chat.id,
-                f"⛔️ <b>Нет такого</b>\n  └ <i>{quote}</i>",
-            )
+            await bot.send_message(message.chat.id, f"⛔️ <b>Нет такого</b>\n  └ <i>{quote}</i>",)
 
 
 @bot.message_handler(func=is_nongrata)
