@@ -1,5 +1,5 @@
-# Lutz Bot
-Multipurpose Telegram Bot for Python group
+# Stan
+Multipurpose Asynchronous Telegram Bot for Python group
 
 ### What does this project do?
  * Send links on command (chat rules, FAQs, libraries etc.)
@@ -13,19 +13,39 @@ Multipurpose Telegram Bot for Python group
 
 ### Why is this project useful?
 You can use this project as a pre-coded customizable bot.
-Original (and currently working example) bot Telegram username: @LutzPyBot
+Original (and currently working example) bot's Telegram username: @LutzPyBot
 
 ### How to deploy it?
- 1. Clone repository on your linux server into `lutzpybot` user's home directory.
+ 1. Clone repository on your linux server into `Stan` user's home directory.
  2. Create virtual environment, activate virtual environment, install required packages from `requirements.txt`.
- 3. Create `.env` file in `lutzbot` directory with 3 variables: `LUTZPYBOT` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
- 4. Install `gunicorn` package additionally with `pip install gunicorn`
+ 3. Create `.env` file in `Stan` directory with 3 variables: `LUTZPYBOT` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
+ 4. Install `gunicorn` package with `pip install gunicorn`
  5. Set webhook using Python interactive shell with `bot.set_webhook()` or manually according [Telegram Bot API Documentation](https://core.telegram.org/bots/api#setwebhook).
- 6. Configure nginx as a reverse proxy.
- 7. Configure the bot as a daemon.
+ 6. Configure nginx as a reverse proxy. Example of Nginx config:
+    ```
+    server {
+            server_name rykov7.ru;
+    
+            root /home/inferno/Stan;
+            index index.html index.htm index.nginx-debian.html;
+    
+            location / {
+                    # First attempt to serve request as file, then
+                    # as directory, then fall back to displaying a 404.
+                    try_files $uri $uri/ =404;
+            }
+    
+            # Stan Telegram Bot
+            location /[your_bot_token_must_be_here]/ {
+                    include proxy_params;
+                    proxy_pass http://127.0.0.1:8813;
+            }
+            }
+    ```
+Then install certbot SSL certificate for this config.
 
-### How to configure bot as a daemon?
-1. Create daemon unit file in `/etc/systemd/system/lutz.service` with the content (replace `inferno` with your username):
+ 7. Configure the bot as a daemon:
+ * Create daemon unit file in `/etc/systemd/system/stan.service` with the next content (replace `inferno` with your username):
 ```
 [Unit]
 Description=@Lutz Telegram Bot
@@ -36,21 +56,21 @@ User=inferno
 Group=inferno
 WorkingDirectory=/home/inferno/lutzpybot
 Environment="PATH=/home/inferno/lutzpybot/venv/bin"
-ExecStart=/bin/bash -c 'source /home/inferno/lutzpybot/venv/bin/activate; gunicorn --bind unix:/tmp/lutz.sock wsgi:app' #Restart=on-failure
+ExecStart=/home/inferno/Stan/.venv/bin/gunicorn -k uvicorn.workers.UvicornWorker --bind 127.0.0.1:8813 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
 ```
-2. Enable and start with `systemctl enable lutz.service`, `systemctl start lutz.service`.
+*  Enable and start with `systemctl enable lutz.service`, `systemctl start lutz.service`.
+
 
 ### Where can I get more help, if I need it?
-Bot is easily understandable reading in-code comments of the handler functions, additionally read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for library help.
+You can read [PyTelegramBotAPI documentation](url=https://github.com/eternnoir/pyTelegramBotAPI) for more usage examples.
 
 
-### How do I read logs of running Lutz bot daemon?
+### How do I read logs of running Stan bot?
 Continuous log reading on Linux:
-
-```# journalctl --unit=lutz.service -f```
+```# journalctl --unit=stan.service -f```
 
 
 ### How to interact with Lutz bot?
