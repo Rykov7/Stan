@@ -3,7 +3,7 @@ import re
 import logging
 
 import telebot.types
-from flask import Flask
+from fastapi import FastAPI
 from telebot import TeleBot, logger, types
 from dotenv import load_dotenv
 
@@ -29,7 +29,7 @@ bot = TeleBot(
 )
 LOG_TEXT = "[%s] %s: %s"
 LOG_COMM = "[%s] [%s] %s: %s"
-app = Flask(__name__)
+app = FastAPI(docs=None, redoc_url=None)
 
 DATA = "data/chat"
 

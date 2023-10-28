@@ -1,5 +1,4 @@
 import shelve
-from flask import request, abort
 
 from . import stan
 from . import rules
@@ -384,13 +383,11 @@ def handle_msg(message: types.Message):
 """                [ WEBHOOK ]              """
 
 
-@app.route(f"/bot{TOKEN}/", methods=["POST"])
-def webhook():
+@app.post(f"/bot{TOKEN}/")
+def webhook(update: dict):
     """Parse POST requests from Telegram."""
-    if request.headers.get("content-type") == "application/json":
-        json_string = request.get_data().decode("utf-8")
-        update = types.Update.de_json(json_string)
+    if update:
+        update = telebot.types.Update.de_json(update)
         bot.process_new_updates([update])
-        return ""
     else:
-        abort(403)
+        return
