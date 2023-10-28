@@ -3,6 +3,9 @@ import html
 import random
 import threading
 from time import sleep
+
+from sqlalchemy import delete
+
 from .config import bot, types
 from .filters import is_white, is_nongrata
 from .models import session
@@ -36,22 +39,13 @@ def act(message: types.Message):
 async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = html.escape(message.reply_to_message.text)
-        if quote not in [i[0] for i in session.query(Quote.text).filter(
-                Quote.chat_id == message.chat.id).all()]:
+        if quote not in [i[0] for i in session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()]:
             session.add(Quote(chat_id=message.chat.id, text=quote.replace("\n", " ")))
             session.commit()
-            await bot.send_message(
-                message.chat.id,
-                "✅ <b>Добавил</b>\n  └ <i>"
-                + quote.replace("\n", " ")
-                + "</i>",
-            )
+            await bot.send_message(message.chat.id, "✅ <b>Добавил</b>\n  └ <i>" + quote.replace("\n", " ") + "</i>",)
             await bot.delete_message(message.chat.id, message.id)
         else:
-            await bot.send_message(
-                message.chat.id,
-                f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{quote}</i>",
-            )
+            await bot.send_message(message.chat.id, f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{quote}</i>",)
 
 
 @bot.message_handler(func=is_white, commands=["remove"])
@@ -59,9 +53,9 @@ async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
 
         quote = html.escape(message.reply_to_message.text)
-        already_exist = session.query(Quote).filter_by(text=quote, chat_id=message.chat.id).first()
+        already_exist = session.query(Quote.text).filter_by(text=quote, chat_id=message.chat.id).first()
         if already_exist:
-            session.delete(already_exist)
+            session.execute(delete(Quote).filter_by(text=quote, chat_id=message.chat.id))
             session.commit()
 
             await bot.send_message(message.chat.id, f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",)
