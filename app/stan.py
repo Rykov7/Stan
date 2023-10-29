@@ -1,8 +1,7 @@
 """ Stan's commands and reactions. """
+import asyncio
 import html
 import random
-import threading
-from time import sleep
 
 from sqlalchemy import delete
 
@@ -21,18 +20,16 @@ def speak(chance_of, group_id):
 async def send_quote(after_sec, message, quote):
     """Pretend Reading, pretend Typing, send."""
     if message.text:
-        sleep(
-            len(message.text) * 0.13 / 4
-        )  # Reading time is quarter of the same text writing time
+        await asyncio.sleep(len(message.text) * 0.13 / 4)  # Reading time is quarter of the same text writing time
     await bot.send_chat_action(message.chat.id, action="typing")
-    sleep(after_sec)  # Typing time
+    await asyncio.sleep(after_sec)  # Typing time
     await bot.send_message(message.chat.id, html.escape(quote))
 
 
-def act(message: types.Message):
+async def act(message: types.Message):
     quote = speak(50, message.chat.id)
     if quote:
-        threading.Thread(target=send_quote, args=(len(quote) * 0.13, message, quote)).start()
+        await send_quote(len(quote) * 0.13, message, quote )
 
 
 @bot.message_handler(func=is_white, commands=["add"])

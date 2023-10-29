@@ -372,10 +372,10 @@ async def default_query(inline_query):
     ],
     chat_types=["supergroup", "group"],
 )
-def handle_msg(message: types.Message):
+async def handle_msg(message: types.Message):
     """Count messages, Stan."""
     update_stats(message)
-    stan.act(message)
+    await stan.act(message)
 
 
 """                [ WEBHOOK ]              """
