@@ -32,8 +32,7 @@ def remind(chat_to_repeat, today):
             date = "09-12-1000"  # instead of 09-13-1000 in non-leap-year
         date = dt.strptime(date, "%m-%d-%Y")
         if today.month == date.month and today.day == date.day:
-            notification = f"🎉 Сегодня <b><u>{holiday.upper()}</u></b>!\
-                                    \n\n{description}."
+            notification = f"🎉 Сегодня <b>{holiday.upper()}</b>!\n\n{description}"
             if date.year != 1000:
                 age = today.year - date.year
                 notification += f"\n\n🥳 <i>{age}-ая годовщина</i>"
