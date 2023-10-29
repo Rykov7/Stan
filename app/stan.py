@@ -35,7 +35,7 @@ async def act(message: types.Message):
 @bot.message_handler(func=is_white, commands=["add"])
 async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        quote = html.escape(message.reply_to_message.text)
+        quote = message.reply_to_message.text
         if quote not in [i[0] for i in session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()]:
             session.add(Quote(chat_id=message.chat.id, text=quote.replace("\n", " ")))
             session.commit()
@@ -49,7 +49,7 @@ async def add_stan_quote(message: types.Message):
 async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
 
-        quote = html.escape(message.reply_to_message.text)
+        quote = message.reply_to_message.text
         already_exist = session.query(Quote.text).filter_by(text=quote, chat_id=message.chat.id).first()
         if already_exist:
             session.execute(delete(Quote).filter_by(text=quote, chat_id=message.chat.id))

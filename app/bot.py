@@ -360,18 +360,8 @@ async def default_query(inline_query):
 """                [ COUNTER ]              """
 
 
-@bot.message_handler(
-    content_types=[
-        "text",
-        "sticker",
-        "photo",
-        "animation",
-        "video",
-        "audio",
-        "document",
-    ],
-    chat_types=["supergroup", "group"],
-)
+@bot.message_handler(content_types=["text", "sticker", "photo", "animation", "video", "audio", "document", ],
+                     chat_types=["supergroup", "group"])
 async def handle_msg(message: types.Message):
     """Count messages, Stan."""
     update_stats(message)
