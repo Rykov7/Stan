@@ -39,10 +39,11 @@ async def add_stan_quote(message: types.Message):
         if quote not in [i[0] for i in session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()]:
             session.add(Quote(chat_id=message.chat.id, text=quote.replace("\n", " ")))
             session.commit()
-            await bot.send_message(message.chat.id, "✅ <b>Добавил</b>\n  └ <i>" + quote.replace("\n", " ") + "</i>",)
+            await bot.send_message(message.chat.id, "➕\n  └ " + quote.replace("\n", " "),
+                                   parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
         else:
-            await bot.send_message(message.chat.id, f"⛔️ <b>Не добавил</b>, есть токое\n  └ <i>{quote}</i>",)
+            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое\n  └ {quote}", parse_mode='Markdown')
 
 
 @bot.message_handler(func=is_white, commands=["remove"])
@@ -55,10 +56,10 @@ async def remove_stan_quote(message: types.Message):
             session.execute(delete(Quote).filter_by(text=quote, chat_id=message.chat.id))
             session.commit()
 
-            await bot.send_message(message.chat.id, f"✅ <b>Удалил</b>\n  └ <i>{quote}</i>",)
+            await bot.send_message(message.chat.id, f"➖ \n  └ {quote}", parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
         else:
-            await bot.send_message(message.chat.id, f"⛔️ <b>Нет такого</b>\n  └ <i>{quote}</i>",)
+            await bot.send_message(message.chat.id, f"⛔️ Нет такого\n  └ {quote}", parse_mode='Markdown')
 
 
 @bot.message_handler(func=is_nongrata)
