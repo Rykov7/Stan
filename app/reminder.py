@@ -1,22 +1,26 @@
 """ Schedule holidays. """
-
 from schedule import repeat, every, get_jobs, run_pending
 import time
 from threading import Thread
 from datetime import datetime as dt
 import csv
-from .config import PYTHONCHATRU, bot
+from .config import PYTHONCHATRU, TOKEN
 from . import report
+from telebot import TeleBot
+
+# We need synchronous instance of bot here as we use synchronous library 'schedule' in a separate thread.
+bot = TeleBot(TOKEN, "HTML", disable_web_page_preview=True, allow_sending_without_reply=True)
 
 
 def scheduler():
+    """Main loop of schedule library."""
     while True:
         run_pending()
-        time.sleep(300)
+        time.sleep(60)
 
 
 @repeat(every().day.at("07:00"), PYTHONCHATRU, None)
-async def remind(chat_to_repeat, today):
+def remind(chat_to_repeat, today):
     """Remind holiday."""
     if not today:
         today = dt.today()
@@ -33,18 +37,20 @@ async def remind(chat_to_repeat, today):
             if date.year != 1000:
                 age = today.year - date.year
                 notification += f"\n\n🥳 <i>{age}-ая годовщина</i>"
-            await bot.send_message(chat_to_repeat, notification)
+            bot.send_message(chat_to_repeat, notification)
 
 
 @repeat(every().day.at("06:00"), PYTHONCHATRU)
-async def stat_report(chat_to_repeat):
+def stat_report(chat_to_repeat):
+    """Everyday group statistic info."""
     rep = report.create_report_text(PYTHONCHATRU)
     if rep:
-        await bot.send_message(chat_to_repeat, rep)
+        bot.send_message(chat_to_repeat, rep)
     report.reset_report_stats(PYTHONCHATRU)
 
 
 def print_get_jobs():
+    """Get jobs from schedule and prepare a formatted info text."""
     all_jobs = get_jobs()
     text = f"<b>{len(all_jobs)} jobs</b>\
 \n..:: {dt.now().strftime('%d-%m-%Y %H:%M:%S')} ::..\n"
