@@ -1,4 +1,5 @@
 import html
+import random
 import shelve
 import os
 from .config import DATA, ROLLBACK
@@ -8,6 +9,8 @@ def create_report_text(chat_id):
     report = ""
     top_users = ""
     flooders = []
+    spammer_icons = ('🐷', '🐒', '🐔')
+    current_spammer_face = random.choice(spammer_icons)
     if os.path.exists(f"{DATA}{chat_id}.db"):
         with shelve.open(f"{DATA}{chat_id}", writeback=True) as s:
             for user_id in ROLLBACK:
@@ -41,7 +44,7 @@ def create_report_text(chat_id):
             if s["Banned"]:
                 report += f"""
 <b> Криптоидов поймано:</b> {s['Banned']}
-  └ [ {s['Banned']*'🐒'} ] 
+  └ [ {s['Banned']*current_spammer_face} ] 
 """
         return report
     else:
