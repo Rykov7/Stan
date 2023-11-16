@@ -19,7 +19,7 @@ Original (and currently working example) bot's Telegram username: @LutzPyBot
  1. Clone repository on your linux server into `Stan` user's home directory.
  2. Create virtual environment, activate virtual environment, install required packages from `requirements.txt`.
  3. Create `.env` file in `Stan` directory with 3 variables: `LUTZPYBOT` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
- 4. Install `gunicorn` package with `pip install gunicorn`
+ 4. Install `gunicorn` and `uvicorn` package with `pip install gunicorn uvicorn`
  5. Set webhook using Python interactive shell with `bot.set_webhook()` or manually according [Telegram Bot API Documentation](https://core.telegram.org/bots/api#setwebhook).
  6. Configure nginx as a reverse proxy. Example of Nginx config:
     ```
@@ -48,20 +48,20 @@ Then install certbot SSL certificate for this config.
  * Create daemon unit file in `/etc/systemd/system/stan.service` with the next content (replace `inferno` with your username):
 ```
 [Unit]
-Description=@Lutz Telegram Bot
+Description=@Stan Telegram Bot
 After=network.target
 
 [Service]
 User=inferno
 Group=inferno
-WorkingDirectory=/home/inferno/lutzpybot
-Environment="PATH=/home/inferno/lutzpybot/venv/bin"
+WorkingDirectory=/home/inferno/Stan
+Environment="PATH=/home/inferno/Stan/venv/bin"
 ExecStart=/home/inferno/Stan/.venv/bin/gunicorn -k uvicorn.workers.UvicornWorker --bind 127.0.0.1:8813 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
 ```
-*  Enable and start with `systemctl enable lutz.service`, `systemctl start lutz.service`.
+*  Enable and start with `systemctl enable stan.service`, `systemctl start stan.service`.
 
 
 ### Where can I get more help, if I need it?
