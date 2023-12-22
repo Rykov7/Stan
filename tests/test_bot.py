@@ -1,8 +1,11 @@
 import logging
 from unittest import IsolatedAsyncioTestCase, main
+import os
 
 from telebot import asyncio_helper, types, logger
 
+# Надо сделать до импорта бота, иначе упадет по токену
+os.environ["LUTZPYBOT"] = "00000:AAAAAAAAAAAA"
 from src import helpers
 
 # нужно не дать делать реальные запросы в тестах, конкретно тут -за Правилами чата
