@@ -8,6 +8,7 @@ from telebot import asyncio_helper, types, logger
 os.environ["LUTZPYBOT"] = "00000:AAAAAAAAAAAA"
 os.environ["whiteids"] = "100,200,300"
 os.environ["rollback"] = "1,2,3"
+os.environ["use_reminder"] = "FALSE"
 
 from src import helpers
 
@@ -45,6 +46,7 @@ def get_update(text, reply_to=None):
                         chosen_inline_result, callback_query, shipping_query, pre_checkout_query, poll, poll_answer,
                         my_chat_member, chat_member, chat_join_request)
 
+
 # сюда будут складываться результаты, перед началом теста очищается
 RESULTS = []
 
@@ -54,14 +56,19 @@ async def custom_sender(token, url, method='get', params=None, files=None, **kwa
     result = {"message_id": 1, "date": 1, "chat": {"id": 1, "type": "private"}}
     return result
 
+
 # Чтобы перехватить запросы к телеге
 asyncio_helper._process_request = custom_sender
 
 
 class TestBot(IsolatedAsyncioTestCase):
+
     def setUp(self) -> None:
         self.bot = bot
         RESULTS.clear()
+
+
+
 
     async def test_start(self):
         await self.bot.process_new_updates([get_update('/start')])
