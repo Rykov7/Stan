@@ -4,8 +4,11 @@ import os
 
 from telebot import asyncio_helper, types, logger
 
-# Надо сделать до импорта бота, иначе упадет по токену
+# Надо сделать до импорта бота, иначе упадет, так ка нет енва
 os.environ["LUTZPYBOT"] = "00000:AAAAAAAAAAAA"
+os.environ["whiteids"] = "100,200,300"
+os.environ["rollback"] = "1,2,3"
+
 from src import helpers
 
 # нужно не дать делать реальные запросы в тестах, конкретно тут -за Правилами чата
