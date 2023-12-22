@@ -1,11 +1,23 @@
+import logging
+import logging.handlers
 import shelve
 
-from . import stan
-from . import rules
+from telebot import types
 
+from .constants import DATA, LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN
+from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_admin
 from .helpers import represent_as_get, detect_args, update_stats
-from .filters import *
-from .config import *
+from .admin_commands import bot
+from .rules import fetch_rule
+from .stan import act, speak
+
+
+async def send_or_reply(message: types.Message, answer, **kwargs):
+    if message.reply_to_message:
+        await bot.reply_to(message.reply_to_message, answer, **kwargs)
+    else:
+        await bot.send_message(message.chat.id, answer, **kwargs)
+
 
 """                [ ANTISPAM ]             """
 
@@ -16,8 +28,8 @@ async def moderate_messages(message: types.Message):
     """Ban user and delete their message."""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as s:
-        s["Banned"] += 1
+    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
+        shelve_db["Banned"] += 1
 
 
 @bot.message_handler(func=in_caption_spam_list, content_types=["video"], chat_types=["supergroup", "group"])
@@ -25,8 +37,8 @@ async def catch_videos(message: types.Message):
     """Catch offensive videos"""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as s:
-        s["Banned"] += 1
+    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
+        shelve_db["Banned"] += 1
 
 
 @bot.edited_message_handler(func=in_delete_list, chat_types=["supergroup", "group"])
@@ -34,8 +46,8 @@ async def catch_videos(message: types.Message):
 async def delete_message(message: types.Message):
     """Delete unwanted message."""
     await bot.delete_message(message.chat.id, message.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as s:
-        s["Deleted"] += 1
+    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
+        shelve_db["Deleted"] += 1
 
 
 """                [ COMMANDS ]             """
@@ -58,7 +70,7 @@ async def send_rules(message: types.Message):
     if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
         await send_or_reply(
             message,
-            f"<b>Правило {args[-1]}</b>\n<i>{rules.fetch_rule(args[-1])}</i>",
+            f"<b>Правило {args[-1]}</b>\n<i>{fetch_rule(args[-1])}</i>",
             reply_markup=markup,
         )
     else:
@@ -164,7 +176,7 @@ async def stan_speak(message: types.Message):
             message.text,
         )
     )
-    await bot.send_message(message.chat.id, stan.speak(0, message.chat.id), parse_mode='Markdown')
+    await bot.send_message(message.chat.id, speak(0, message.chat.id), parse_mode='Markdown')
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -180,10 +192,7 @@ async def send_tsya(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton("🧑🏼‍🎓 Читать правило", url="https://tsya.ru/"),
-        row_width=1,
-    )
+    markup.add(types.InlineKeyboardButton("🧑🏼‍🎓 Читать правило", url="https://tsya.ru/"), row_width=1)
     await send_or_reply(message, "<i>-тся</i> и <i>-ться</i> в глаголах", reply_markup=markup)
     await bot.delete_message(message.chat.id, message.id)
 
@@ -200,10 +209,7 @@ async def send_nometa(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton("❓ nometa.xyz", url="https://nometa.xyz/ru.html"),
-        row_width=1,
-    )
+    markup.add(types.InlineKeyboardButton("❓ nometa.xyz", url="https://nometa.xyz/ru.html"),  row_width=1)
     await send_or_reply(
         message,
         """Не задавай мета-вопросов вроде:
@@ -229,13 +235,8 @@ async def send_neprivet(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton("👋 Непривет", url="https://neprivet.com/"),
-        row_width=1,
-    )
-    await send_or_reply(
-        message, "Пожалуйста, не пишите просто «Привет» в чате.", reply_markup=markup
-    )
+    markup.add(types.InlineKeyboardButton("👋 Непривет", url="https://neprivet.com/"), row_width=1)
+    await send_or_reply(message, "Пожалуйста, не пишите просто «Привет» в чате.", reply_markup=markup)
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -282,8 +283,7 @@ async def google_it(message: types.Message):
         )
     )
     query = f"<i>{detect_args(message)}</i>"
-    get_query = "https://www.google.com/search?q=" + represent_as_get(message)
-
+    get_query = f"https://www.google.com/search?q={represent_as_get(message)}"
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("🔍 Google Поиск", url=get_query), row_width=1)
     await send_or_reply(message, f"<i>Ищем «{query}»...</i>", reply_markup=markup)
@@ -360,22 +360,9 @@ async def default_query(inline_query):
 """                [ COUNTER ]              """
 
 
-@bot.message_handler(content_types=["text", "sticker", "photo", "animation", "video", "audio", "document", ],
+@bot.message_handler(content_types=["text", "sticker", "photo", "animation", "video", "audio", "document"],
                      chat_types=["supergroup", "group"])
 async def handle_msg(message: types.Message):
     """Count messages, Stan."""
     update_stats(message)
-    await stan.act(message)
-
-
-"""                [ WEBHOOK ]              """
-
-
-@app.post(f"/bot{TOKEN}/")
-async def webhook(update: dict):
-    """Parse POST requests from Telegram."""
-    if update:
-        update = telebot.types.Update.de_json(update)
-        await bot.process_new_updates([update])
-    else:
-        return
+    await act(message)

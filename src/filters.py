@@ -1,20 +1,23 @@
 import logging.handlers
 
-from .models import session
+from telebot import types
+
+from .config import WHITEIDS
+from .constants import BAN_WORDS, LOG_COMM, SPAM, ALLOWED_WORDS, URL_RX, NON_GRATA, ADMIN_ID
 from .models import Chat
-from .config import *
+from .models import session
 
 
 def in_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted persons in text."""
     antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
-    if message.from_user.id not in WHITEIDS and antispam_is_enabled:
+    from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
+    if from_user_id not in WHITEIDS and antispam_is_enabled:
         for text in SPAM:
             if text.casefold() in message.text.casefold():
-                logging.info(
-                    "!BAN!" + LOG_COMM % (
-                    message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
+                logging.info("!BAN!" + LOG_COMM % (title, from_user_id, from_user_name, message.text))
                 return True
+    return False
 
 
 def in_caption_spam_list(message: types.Message) -> bool:
@@ -24,6 +27,7 @@ def in_caption_spam_list(message: types.Message) -> bool:
             logging.info("!BAN!" + LOG_COMM % (
                 message.chat.title, message.from_user.id, message.from_user.first_name, message.video.file_name))
             return True
+    return False
 
 
 def in_not_allowed(word_list, msg):
@@ -36,21 +40,17 @@ def in_not_allowed(word_list, msg):
 def in_delete_list(message: types.Message) -> bool:
     """Check for URLs in message and delete."""
     antispam_is_enabled = session.query(Chat.antispam).filter_by(chat_id=message.chat.id).first()[0]
-    if message.from_user.id not in WHITEIDS and antispam_is_enabled:
-        if URL_RX.search(message.text) and in_not_allowed(
-            ALLOWED_WORDS, message.text
-        ):
-            logging.info(
-                f"[DELETE] [{message.chat.title}] [{message.from_user.id}] {message.from_user.first_name}: {message.text}"
-            )
+    from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
+    if from_user_id not in WHITEIDS and antispam_is_enabled:
+        if URL_RX.search(message.text) and in_not_allowed(ALLOWED_WORDS, message.text):
+            logging.info(f"[DELETE] [{title}] [{from_user_id}] {from_user_name}: {message.text}")
             return True
         if message.entities:
             for entity in message.entities:
                 if entity.url and in_not_allowed(ALLOWED_WORDS, entity.url):
-                    logging.info(
-                        f"[DELETE] [{message.chat.title}] [{message.from_user.id}] {message.from_user.first_name}: [entity] {message.text}"
-                    )
+                    logging.info(f"[DELETE] [{title}] [{from_user_id}] {from_user_name}: [entity] {message.text}")
                     return True
+    return False
 
 
 def is_nongrata(type_message: types.Message) -> bool:
@@ -58,6 +58,7 @@ def is_nongrata(type_message: types.Message) -> bool:
     for phrase in NON_GRATA:
         if phrase in type_message.text.casefold():
             return True
+    return False
 
 
 def is_admin(message: types.Message) -> bool:
@@ -66,10 +67,3 @@ def is_admin(message: types.Message) -> bool:
 
 def is_white(message: types.Message) -> bool:
     return message.from_user.id in WHITEIDS
-
-
-async def send_or_reply(m: types.Message, answer, **kwargs):
-    if m.reply_to_message:
-        await bot.reply_to(m.reply_to_message, answer, **kwargs)
-    else:
-        await bot.send_message(m.chat.id, answer, **kwargs)

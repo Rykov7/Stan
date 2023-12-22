@@ -1,25 +1,27 @@
-import os
+from pathlib import Path
+
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
+from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, declarative_base, sessionmaker
 
-from sqlalchemy import create_engine
-
 Base = declarative_base()
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-engine = create_engine('sqlite:///' + os.path.join(basedir, 'db/db.sqlite'))
+root = Path(__file__).parent.parent
+data_folder = root / "data"
+db_path = data_folder / "db.sqlite"
+engine = create_engine(f'sqlite:///{db_path}')
+
 Base.metadata.create_all(engine)
-
 Session = sessionmaker(bind=engine)
 session = Session()
 
 
 class Permission:
-    USE_COMMANDS = 1     # Пользоваться обычными командами.
-    SEND_LINKS = 2      # Может отправлять ссылки без удаления.
-    MODIFY_QUOTES = 4    # Может добавлять и удалять цитаты.
+    USE_COMMANDS = 1  # Пользоваться обычными командами.
+    SEND_LINKS = 2  # Может отправлять ссылки без удаления.
+    MODIFY_QUOTES = 4  # Может добавлять и удалять цитаты.
     MODERATE = 8
-    ADMIN = 16       # Может банить юзеров и удалять сообщения.
+    ADMIN = 16  # Может банить юзеров и удалять сообщения.
 
 
 class Quote(Base):

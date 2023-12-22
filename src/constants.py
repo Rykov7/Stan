@@ -1,40 +1,15 @@
-import os
 import re
-import logging
 
-import telebot.types
-from fastapi import FastAPI
-from telebot.async_telebot import AsyncTeleBot
-from telebot import logger, types
-from dotenv import load_dotenv
+from telebot import types
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-logger.setLevel(logging.ERROR)
 
-logging.warning("[START] Stan")
-
-load_dotenv()
-
-TOKEN = os.environ.get("LUTZPYBOT")
-if not TOKEN:
-    raise LookupError("LUTZPYBOT (token) has not been found in .env")
-
-bot = AsyncTeleBot(
-    TOKEN,
-    "HTML",
-    disable_web_page_preview=True,
-    allow_sending_without_reply=True,
-    colorful_logs=True,
-)
 LOG_TEXT = "[%s] %s: %s"
 LOG_COMM = "[%s] [%s] %s: %s"
-app = FastAPI(docs=None, redoc_url=None)
-
+LOGGING_LEVEL_DEBUG = 10
+LOGGING_LEVEL_INFO = 20
 DATA = "data/chat"
-
 ADMIN_ID = 280887861  # Rykov7
 PYTHONCHATRU = -1001338616632  # pythonchatru
-
 URL_RX = re.compile(r"\w+\.\w+/(\+)?\w+")
 ALLOWED_WORDS = [
     "paste",
@@ -61,20 +36,13 @@ ALLOWED_WORDS = [
     "jetbrains",
 ]
 
-WHITEIDS = {int(i) for i in os.environ.get("whiteids").split(",")}
-ROLLBACK = {int(i) for i in os.environ.get("rollback").split(",")}
-
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)
 
-RULES = types.InlineKeyboardButton(
-    "🟡 Правила чата", url="https://telegra.ph/pythonchatru-07-07"
-)
-FAQ = types.InlineKeyboardButton(
-    "🔵 Частые вопросы", url="https://telegra.ph/faq-10-07-4"
-)
+RULES = types.InlineKeyboardButton("🟡 Правила чата", url="https://telegra.ph/pythonchatru-07-07")
+FAQ = types.InlineKeyboardButton("🔵 Частые вопросы", url="https://telegra.ph/faq-10-07-4")
 LIB = types.InlineKeyboardButton("📚 Книги", url="https://telegra.ph/what-to-read-10-06")
 
 SPAM = {"me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/", 'раб0т',
@@ -88,6 +56,7 @@ SPAM = {"me.sv/", "tg.sv/", "goo.by/", "go.sv/", "intim.video/", "uclck.ru/", '�
         'P2P', 'Идет набор', 'в лс', 'нaбop', 'комaндy', 'kpuпт', 'бupж', '💰', 'пишитe', '💸',
         '$ в неделю', 'обучаю с нуля', 'доходы для всех', 'по трейдингу', 'фальшивые рубли', '‼️',
         'зароботку', 'Набuраю', 'цuфр', 'Обучу вас', 'прuб', 'остались курсы', 'Crypt', 'kр', 'рu'}
+
 NON_GRATA = {"дудар", "хауди", "dudar"}
 BAN_WORDS = {"GREEN"}
 
