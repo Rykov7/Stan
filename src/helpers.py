@@ -1,14 +1,54 @@
 """ Send User's info. """
-import logging
-import shelve
-from pathlib import Path
+
 from urllib import parse
+from urllib.error import URLError
 from urllib.request import urlopen
 
 from telebot import types
 
-from .constants import DATA
-from .report import reset_report_stats
+from .constants import SPAM, RUS, BAN_WORDS, NON_GRATA, ADMIN_ID
+
+
+def is_url_reachable(url: str) -> bool:
+    try:
+        return urlopen(url).status == 200
+    except URLError:
+        return False
+
+
+def is_spam(message_text: str) -> bool:
+    if is_mixed(message_text):
+        return True
+    return any(text.casefold() in message_text.casefold() for text in SPAM)
+
+
+def is_mixed(text: str) -> bool:
+    for word in text.split():
+        if not all(e in RUS for e in word.strip().lower()):
+            return True
+    return False
+
+
+def is_in_not_allowed(word_list: list, msg: str) -> bool:
+    for word in word_list:
+        if word in msg.casefold():
+            return False
+    return True
+
+
+def is_ban_words_in_caption(caption: str) -> bool:
+    return any(ban_word in caption for ban_word in BAN_WORDS)
+
+
+def is_nongrata(type_message: types.Message) -> bool:
+    for phrase in NON_GRATA:
+        if phrase in type_message.text.casefold():
+            return True
+    return False
+
+
+def is_admin(message: types.Message) -> bool:
+    return message.from_user.id == ADMIN_ID
 
 
 def my_ip():
@@ -47,16 +87,3 @@ def detect_args(message: types.Message):
     else:
         if len(message.text.split()) > 1:
             return " ".join(message.text.split()[1:])
-
-
-def update_stats(message: types.Message):
-    if not Path(f"{DATA}{message.chat.id}").exists():
-        reset_report_stats(message.chat.id)
-    with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as shelve_db:
-        if "Messages" not in shelve_db:
-            reset_report_stats(message.chat.id)
-        if message.from_user.id not in shelve_db["Messages"]:
-            shelve_db["Messages"][message.from_user.id] = {"User": message.from_user, "Count": 1}
-            logging.info(f"[{message.chat.title[:10]}] [{message.from_user.id}] {message.from_user.first_name}")
-        else:
-            shelve_db["Messages"][message.from_user.id]["Count"] += 1

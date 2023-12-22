@@ -1,7 +1,11 @@
 import html
+import logging
 import os
 import random
 import shelve
+from pathlib import Path
+
+from telebot import types
 
 from .config import ROLLBACK
 from .constants import DATA
@@ -63,3 +67,16 @@ def reset_report_stats(chat_id):
 {shelve_db['Messages']=}
 {shelve_db['Banned']=}
 {shelve_db['Deleted']=}"""
+
+
+def update_stats(message: types.Message):
+    if not Path(f"{DATA}{message.chat.id}").exists():
+        reset_report_stats(message.chat.id)
+    with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as shelve_db:
+        if "Messages" not in shelve_db:
+            reset_report_stats(message.chat.id)
+        if message.from_user.id not in shelve_db["Messages"]:
+            shelve_db["Messages"][message.from_user.id] = {"User": message.from_user, "Count": 1}
+            logging.info(f"[{message.chat.title[:10]}] [{message.from_user.id}] {message.from_user.first_name}")
+        else:
+            shelve_db["Messages"][message.from_user.id]["Count"] += 1

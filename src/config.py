@@ -1,8 +1,6 @@
 import logging
 import os
-from urllib.error import URLError
-from urllib.request import urlopen
-
+from .helpers import is_url_reachable
 from dotenv import load_dotenv
 from telebot import logger
 
@@ -17,10 +15,8 @@ ROLLBACK = {int(i) for i in os.environ.get("rollback").split(",")}
 USE_REMINDER = os.environ.get("use_reminder", "TRUE") == "TRUE"
 
 RULES_URL = os.environ.get("rules_url", "https://telegra.ph/pythonchatru-07-07")
-try:
-    assert urlopen(RULES_URL).status == 200
-except (URLError, AssertionError):
+if not is_url_reachable(RULES_URL):
     raise LookupError(f"LUTZPYBOT rules url({RULES_URL}) is not reachable")
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-logger.setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+logger.setLevel(logging.INFO)

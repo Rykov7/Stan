@@ -5,11 +5,12 @@ import shelve
 from telebot import types
 
 from .constants import DATA, LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN
-from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_admin
-from .helpers import represent_as_get, detect_args, update_stats
+from .filters import in_spam_list, in_caption_spam_list, in_delete_list
+from .helpers import represent_as_get, detect_args, is_admin
 from .admin_commands import bot
 from .rules import fetch_rule
 from .stan import act, speak
+from .report import update_stats
 
 
 async def send_or_reply(message: types.Message, answer, **kwargs):

@@ -4,8 +4,8 @@ from datetime import datetime as dt
 from telebot import types, logger
 
 from .constants import ADMIN_ID, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_INFO
-from .filters import is_white, is_admin
-from .helpers import me, my_ip
+from .filters import is_white_id
+from .helpers import me, my_ip, is_admin
 from .models import Chat, Quote, session
 from .reminder import remind, print_get_jobs, create_report_text
 from .report import reset_report_stats
@@ -67,7 +67,7 @@ async def send_stats(message: types.Message):
     await bot.send_message(message.chat.id, reset_report_stats(message.chat.id))
 
 
-@bot.message_handler(func=is_white, commands=["enable_stan"], chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_white_id, commands=["enable_stan"], chat_types=["supergroup", "group"])
 async def enable_stan(message: types.Message):
     """Add group to database."""
     logging.info(f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}")
@@ -96,7 +96,7 @@ async def disable_stan(message: types.Message):
 
 
 @bot.message_handler(
-    func=is_white,
+    func=is_white_id,
     commands=["set_antispam_report_reminder", "set_rules"],
     chat_types=["supergroup", "group"],
 )
@@ -117,7 +117,7 @@ async def set_antispam_report_reminder(message: types.Message):
             await bot.send_message(message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info""")
 
 
-@bot.message_handler(func=is_white, commands=["get_quotes"], chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_white_id, commands=["get_quotes"], chat_types=["supergroup", "group"])
 async def get_quotes(message: types.Message):
     logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
     quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
@@ -130,7 +130,7 @@ async def get_quotes(message: types.Message):
         await bot.send_message(message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info")
 
 
-@bot.message_handler(func=is_white, commands=["get_group_info"], chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_white_id, commands=["get_group_info"], chat_types=["supergroup", "group"])
 async def get_group_info(message: types.Message):
     group = session.query(Chat).filter(Chat.chat_id == message.chat.id).first()
     if group:
@@ -151,7 +151,7 @@ ID группы: {group.chat_id}
         await bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
 
 
-@bot.message_handler(func=is_white, commands=["set_logging_level"], chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_white_id, commands=["set_logging_level"], chat_types=["supergroup", "group"])
 async def set_logging_level(message: types.Message):
     args = message.text.split()
     if args[-1] == '10':

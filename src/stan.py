@@ -6,9 +6,9 @@ import random
 from sqlalchemy import delete
 from telebot import types
 
-from .filters import is_white, is_nongrata
-from .models import Quote
-from .models import session
+from .filters import is_white_id
+from .helpers import is_nongrata
+from .models import Quote, session
 from .robot import bot
 
 TYPING_TIMEOUT = 0.13 / 4  # Reading time is quarter of the same text writing time
@@ -35,7 +35,7 @@ async def act(message: types.Message):
         await send_quote(len(quote) * 0.13, message, quote)
 
 
-@bot.message_handler(func=is_white, commands=["add"])
+@bot.message_handler(func=is_white_id, commands=["add"])
 async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = message.reply_to_message.text
@@ -48,7 +48,7 @@ async def add_stan_quote(message: types.Message):
             await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое\n  └ {quote}", parse_mode='Markdown')
 
 
-@bot.message_handler(func=is_white, commands=["remove"])
+@bot.message_handler(func=is_white_id, commands=["remove"])
 async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = message.reply_to_message.text
