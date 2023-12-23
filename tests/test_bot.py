@@ -87,8 +87,11 @@ class TestBot(IsolatedAsyncioTestCase):
         RESULTS.clear()
 
     async def test_start(self):
-        await self.bot.process_new_updates([get_update('/start')])
-        self.assertEqual(RESULTS[0][0]['text'], "Начни с прочтения")
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/start')])
+            self.assertEqual(RESULTS[0][0]['text'], "Начни с прочтения")
 
     async def test_non_grata(self):
         await self.bot.process_new_updates([get_update('как вам дударь?')])
@@ -99,96 +102,134 @@ class TestBot(IsolatedAsyncioTestCase):
         self.assertEqual(RESULTS[0][0]['text'], "у нас тут таких не любят")
 
     async def test_rules(self):
-        await self.bot.process_new_updates([get_update('/rules')])
-        self.assertEqual(RESULTS[0][0]['text'], "Читай...")
-        self.assertTrue("https://telegra.ph/pythonchatru-07-07" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/rules')])
+            self.assertEqual(RESULTS[0][0]['text'], "Читай...")
+            self.assertTrue("https://telegra.ph/pythonchatru-07-07" in RESULTS[0][0]['reply_markup'])
 
     async def test_faq(self):
-        await self.bot.process_new_updates([get_update('/faq')])
-        self.assertEqual(RESULTS[0][0]['text'], "Читай...")
-        self.assertTrue("https://telegra.ph/faq-10-07-4" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/faq')])
+            self.assertEqual(RESULTS[0][0]['text'], "Читай...")
+            self.assertTrue("https://telegra.ph/faq-10-07-4" in RESULTS[0][0]['reply_markup'])
 
     async def test_lib(self):
-        await self.bot.process_new_updates([get_update('/lib')])
-        self.assertEqual(RESULTS[0][0]['text'], "Читай...")
-        self.assertTrue("https://telegra.ph/what-to-read-10-06" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/lib')])
+            self.assertEqual(RESULTS[0][0]['text'], "Читай...")
+            self.assertTrue("https://telegra.ph/what-to-read-10-06" in RESULTS[0][0]['reply_markup'])
 
     async def test_tr(self):
-        await self.bot.process_new_updates([get_update('/tr', reply_to="ghbdtn")])
-        self.assertEqual(RESULTS[0][0]['text'], "привет")
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/tr', reply_to="ghbdtn")])
+            self.assertEqual(RESULTS[0][0]['text'], "привет")
 
     async def test_tr2(self):
-        await self.bot.process_new_updates([get_update('/tr', reply_to="руддщ")])
-        self.assertEqual(RESULTS[0][0]['text'], "hello")
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/tr', reply_to="руддщ")])
+            self.assertEqual(RESULTS[0][0]['text'], "hello")
 
     async def test_tsya(self):
-        await self.bot.process_new_updates([get_update('/tsya')])
-        self.assertEqual(RESULTS[0][0]['text'], "<i>-тся</i> и <i>-ться</i> в глаголах")
-        self.assertTrue("https://tsya.ru/" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/tsya')])
+            self.assertEqual(RESULTS[0][0]['text'], "<i>-тся</i> и <i>-ться</i> в глаголах")
+            self.assertTrue("https://tsya.ru/" in RESULTS[0][0]['reply_markup'])
 
     async def test_nometa(self):
         text = """Не задавай мета-вопросов вроде:\n<i>  «Можно задать вопрос?»\n  «Кто-нибудь пользовался .. ?»\n  «Привет, мне нужна помощь по .. !»</i>\n\nПросто спроси сразу! И чем лучше объяснишь проблему, тем вероятнее получишь помощь."""
-        await self.bot.process_new_updates([get_update('/nometa', reply_to="кто тут питонист?")])
-        self.assertEqual(RESULTS[0][0]['text'], text)
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/nometa', reply_to="кто тут питонист?")])
+            self.assertEqual(RESULTS[0][0]['text'], text)
 
     async def test_neprivet(self):
-        await self.bot.process_new_updates([get_update('/neprivet', reply_to="привет всем")])
-        self.assertEqual(RESULTS[0][0]['text'], "Пожалуйста, не пишите просто «Привет» в чате.")
-        self.assertTrue("https://neprivet.com/" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/neprivet', reply_to="привет всем")])
+            self.assertEqual(RESULTS[0][0]['text'], "Пожалуйста, не пишите просто «Привет» в чате.")
+            self.assertTrue("https://neprivet.com/" in RESULTS[0][0]['reply_markup'])
 
     async def test_lutz(self):
-        await self.bot.process_new_updates([get_update('/lutz', reply_to="привет всем")])
-        self.assertEqual(RESULTS[0][0]['caption'], "вот, не позорься")
-        self.assertEqual(RESULTS[0][0]['document'], LUTZ_ID)
-        self.assertEqual(RESULTS[0][1], "sendDocument")
-        self.assertEqual(RESULTS[1][1], "deleteMessage")
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/lutz', reply_to="привет всем")])
+            self.assertEqual(RESULTS[0][0]['caption'], "вот, не позорься")
+            self.assertEqual(RESULTS[0][0]['document'], LUTZ_ID)
+            self.assertEqual(RESULTS[0][1], "sendDocument")
+            self.assertEqual(RESULTS[1][1], "deleteMessage")
 
     async def test_bdmtss(self):
-        await self.bot.process_new_updates([get_update('/bdmtss', reply_to="привет всем")])
-        self.assertEqual(RESULTS[0][0]['voice'], BDMTSS_ID)
-        self.assertEqual(RESULTS[0][1], "sendVoice")
-        self.assertEqual(RESULTS[1][1], "deleteMessage")
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/bdmtss', reply_to="привет всем")])
+            self.assertEqual(RESULTS[0][0]['voice'], BDMTSS_ID)
+            self.assertEqual(RESULTS[0][1], "sendVoice")
+            self.assertEqual(RESULTS[1][1], "deleteMessage")
 
     async def test_google(self):
-        await self.bot.process_new_updates([get_update('/g', reply_to="python")])
-        self.assertEqual(RESULTS[0][0]['text'], "<i>Ищем «<i>python</i>»...</i>")
-        self.assertTrue("https://www.google.com/search?q=python" in RESULTS[0][0]['reply_markup'])
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/g', reply_to="python")])
+            self.assertEqual(RESULTS[0][0]['text'], "<i>Ищем «<i>python</i>»...</i>")
+            self.assertTrue("https://www.google.com/search?q=python" in RESULTS[0][0]['reply_markup'])
 
     async def test_nojob(self):
         text = """Мы здесь не для того, чтобы за тебя решать задачи.\n\nЗдесь помогают по конкретным вопросам в <u>ТВОЁМ</u> коде, поэтому тебе нужно показать код, который ты написал сам и объяснить где и почему застрял... всё просто. 🤷🏼️"""
-        await self.bot.process_new_updates([get_update('/nojob', reply_to="есть работа")])
-        self.assertEqual(RESULTS[0][0]['text'], text)
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/nojob', reply_to="есть работа")])
+            self.assertEqual(RESULTS[0][0]['text'], text)
 
     async def test_nobot(self):
         text = """<b>Внимание</b>:\nТелеграм бот <i>не должен</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>основы веб-технологий</code>, <code>асинхронное программирование</code> и <code>отладку</code> до начала работы с Телеграм ботами. Существует много ресурсов для этого в интернете."""
-        await self.bot.process_new_updates([get_update('/nobot', reply_to="как бота написать?")])
-        self.assertEqual(RESULTS[0][0]['text'], text)
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/nobot', reply_to="как бота написать?")])
+            self.assertEqual(RESULTS[0][0]['text'], text)
 
     async def test_nogui(self):
         text = """<b>Внимание</b>:\nGUI приложение <i>не должно</i> быть твоим первым проектом на Python. Пожалуйста, изучи <code>основы Python</code>, <code>работу с модулями</code>, <code>циклы событий</code> и <code>отладку</code> до начала работы с какими-либо GUI-фреймворками. Существует много ресурсов для этого в интернете."""
-        await self.bot.process_new_updates([get_update('/nogui', reply_to="как gui написать?")])
-        self.assertEqual(RESULTS[0][0]['text'], text)
+        # Нужно пропустить проверку на спам
+        with patch("src.filters.is_antispam_enabled") as mocked:
+            mocked.return_value = False
+            await self.bot.process_new_updates([get_update('/nogui', reply_to="как gui написать?")])
+            self.assertEqual(RESULTS[0][0]['text'], text)
 
     async def test_spam_text(self):
         # Нужно подставить антиспам вкл.
         with patch("src.filters.is_antispam_enabled") as mocked:
-            # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
-            with patch("src.commands.increment") as _mocked_shelve:
-                mocked.return_value = True
-                await self.bot.process_new_updates([get_update('пишите мне в ЛС, Писать в ЛС')])
-                self.assertEqual(RESULTS[0][1], "deleteMessage")
-                self.assertEqual(RESULTS[1][1], "banChatMember")
-                self.assertEqual(RESULTS[1][0], {'chat_id': 11, 'user_id': 10, 'until_date': None})
+            mocked.return_value = True
+            await self.bot.process_new_updates([get_update('пишите мне в ЛС, Писать в ЛС')])
+            self.assertEqual(RESULTS[0][1], "deleteMessage")
+            self.assertEqual(RESULTS[1][1], "banChatMember")
+            self.assertEqual(RESULTS[1][0], {'chat_id': 11, 'user_id': 10, 'until_date': None})
 
     async def test_wrong_url(self):
         # Нужно подставить антиспам вкл.
         with patch("src.filters.is_antispam_enabled") as mocked:
-            # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
-            with patch("src.commands.increment") as _mocked_shelve:
-                mocked.return_value = True
-                await self.bot.process_new_updates([get_update('тут подробнее https://zvuk.com/artist/61375')])
-                self.assertEqual(RESULTS[0][1], "deleteMessage")
-                self.assertEqual(RESULTS[0][0], {'chat_id': 11, 'message_id': 1})
+            mocked.return_value = True
+            await self.bot.process_new_updates([get_update('тут подробнее https://zvuk.com/artist/61375')])
+            self.assertEqual(RESULTS[0][1], "deleteMessage")
+            self.assertEqual(RESULTS[0][0], {'chat_id': 11, 'message_id': 1})
 
     async def test_update_stats(self):
         # Нужно подставить антиспам вкл.
@@ -205,15 +246,10 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_admin_can_delete(self):
         # Нужно подставить антиспам вкл.
         with patch("src.filters.is_antispam_enabled") as mocked:
-            # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
-            with patch("src.commands.increment") as _mocked_shelve:
-                # Подменяем обновление статистики, нам важно что оно просто было вызвано
-                with patch("src.commands.update_stats") as update_stats:
-                    mocked.return_value = True
-                    update_stats.side_effect = lambda x: None
-                    await self.bot.process_new_updates([get_update('/ddel', reply_to="shit text", user_id=ADMIN_ID)])
-                    self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
-                    self.assertEqual(RESULTS[1], ({'chat_id': 11, 'message_id': 2}, 'deleteMessage'))
+            mocked.return_value = True
+            await self.bot.process_new_updates([get_update('/ddel', reply_to="shit text", user_id=ADMIN_ID)])
+            self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
+            self.assertEqual(RESULTS[1], ({'chat_id': 11, 'message_id': 2}, 'deleteMessage'))
 
     async def test_user_cant(self):
         for command in ('/ddel', '/bban', '/unban_id', '/unban_id 1', '/add', '/remove'):
@@ -265,9 +301,9 @@ class TestBot(IsolatedAsyncioTestCase):
             # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
             with patch("src.commands.increment") as _mocked_shelve:
                 # Подменяем обновление статистики, нам важно что оно просто было вызвано
-                with patch("src.commands.update_stats") as update_stats:
+                with patch("src.stan.add_quote") as aq:
                     mocked.return_value = []
-                    update_stats.side_effect = lambda x: None
+                    aq.side_effect = lambda *a: None
                     await self.bot.process_new_updates([get_update('/add', reply_to="good text", user_id=100)])
                     self.assertEqual(RESULTS[0][1], 'sendMessage')
                     self.assertEqual(RESULTS[0][0]['text'], '➕\n  └ good text')
