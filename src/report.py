@@ -14,7 +14,7 @@ def increment(chat_id: int, banned: bool = True):
     Увеличивает счетчик банов или удаленных
     """
     category = "Banned" if banned else "Deleted"
-    with shelve.open(f"{DATA}{chat_id}") as shelve_db:
+    with shelve.open(f"{DATA}{chat_id}", writeback=True) as shelve_db:
         shelve_db[category] += 1
 
 
