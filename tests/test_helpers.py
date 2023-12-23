@@ -26,6 +26,11 @@ class TestSpam(TestCase):
     def test_is_mixed(self):
         self.assertTrue(is_mixed("привeт"))  # e английская
         self.assertFalse(is_mixed("привет ребята!"))
+        self.assertFalse(is_mixed("hi guys"))
+        self.assertFalse(is_mixed("hi guys! #%^&%^$ @Вася привет g! п@"))
+        self.assertFalse(is_mixed("тут подробнее https://hack.comp.com"))
+        self.assertTrue(is_mixed("hi guys! #%^&%^$ ghb привет g! пQ"))
+
 
 
 class TestOthers(TestCase):

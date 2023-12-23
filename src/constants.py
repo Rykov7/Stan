@@ -1,7 +1,7 @@
 import re
+import string
 
 from telebot import types
-
 
 LOG_TEXT = "[%s] %s: %s"
 LOG_COMM = "[%s] [%s] %s: %s"
@@ -37,6 +37,8 @@ ALLOWED_WORDS = [
 ]
 
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
+ONLY_RUS_LETTERS = "ёйцукенгшщзхъфывапролджэячсмитьбю"
+RUS_LETTERS_AND_PUNCTUATION = ONLY_RUS_LETTERS + string.punctuation
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)
@@ -78,4 +80,5 @@ ZEN = [
     "If the implementation is easy to explain, it may be a good idea.",
     "Namespaces are one honking great idea — let's do more of those!",
 ]
-
+LUTZ_ID = "BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA"
+BDMTSS_ID = "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ"

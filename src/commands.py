@@ -1,16 +1,16 @@
 import logging
 import logging.handlers
-import shelve
 
 from telebot import types
 
-from .constants import DATA, LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN
+from .admin_commands import bot
+from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
+                        BDMTSS_ID)
 from .filters import in_spam_list, in_caption_spam_list, in_delete_list
 from .helpers import represent_as_get, detect_args, is_admin
-from .admin_commands import bot
+from .report import update_stats, increment
 from .rules import fetch_rule
 from .stan import act, speak
-from .report import update_stats
 
 
 async def send_or_reply(message: types.Message, answer, **kwargs):
@@ -29,8 +29,7 @@ async def moderate_messages(message: types.Message):
     """Ban user and delete their message."""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
-        shelve_db["Banned"] += 1
+    increment(message.chat.id, banned=True)
 
 
 @bot.message_handler(func=in_caption_spam_list, content_types=["video"], chat_types=["supergroup", "group"])
@@ -38,8 +37,7 @@ async def catch_videos(message: types.Message):
     """Catch offensive videos"""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
-        shelve_db["Banned"] += 1
+    increment(message.chat.id, banned=True)
 
 
 @bot.edited_message_handler(func=in_delete_list, chat_types=["supergroup", "group"])
@@ -47,8 +45,7 @@ async def catch_videos(message: types.Message):
 async def delete_message(message: types.Message):
     """Delete unwanted message."""
     await bot.delete_message(message.chat.id, message.id)
-    with shelve.open(f"{DATA}{message.chat.id}") as shelve_db:
-        shelve_db["Deleted"] += 1
+    increment(message.chat.id, banned=False)
 
 
 """                [ COMMANDS ]             """
@@ -122,11 +119,7 @@ async def send_lutz(message: types.Message):
             message.text,
         )
     )
-    await bot.send_document(
-        message.chat.id,
-        document="BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA",
-        caption="вот, не позорься",
-    )
+    await bot.send_document(message.chat.id, document=LUTZ_ID, caption="вот, не позорься")
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -141,10 +134,7 @@ async def send_bdmtss_audio(message: types.Message):
             message.text,
         )
     )
-    await bot.send_voice(
-        message.chat.id,
-        "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ",
-    )
+    await bot.send_voice(message.chat.id, BDMTSS_ID)
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -210,7 +200,7 @@ async def send_nometa(message: types.Message):
         )
     )
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("❓ nometa.xyz", url="https://nometa.xyz/ru.html"),  row_width=1)
+    markup.add(types.InlineKeyboardButton("❓ nometa.xyz", url="https://nometa.xyz/ru.html"), row_width=1)
     await send_or_reply(
         message,
         """Не задавай мета-вопросов вроде:

@@ -1,8 +1,10 @@
 import logging
 import os
-from .helpers import is_url_reachable
+
 from dotenv import load_dotenv
 from telebot import logger
+
+from .helpers import is_url_reachable
 
 load_dotenv()
 
