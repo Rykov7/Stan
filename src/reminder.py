@@ -1,15 +1,23 @@
 """ Schedule holidays. """
-from schedule import repeat, every, get_jobs, run_pending
-import time
-from threading import Thread
-from datetime import datetime as dt
 import csv
-from .config import PYTHONCHATRU, TOKEN
-from . import report
+import logging
+import time
+from datetime import datetime as dt
+from threading import Thread
+
+from schedule import repeat, every, get_jobs, run_pending
 from telebot import TeleBot
 
-# We need synchronous instance of bot here as we use synchronous library 'schedule' in a separate thread.
-bot = TeleBot(TOKEN, "HTML", disable_web_page_preview=True, allow_sending_without_reply=True)
+from .config import TOKEN, USE_REMINDER
+from .constants import PYTHONCHATRU
+from .report import create_report_text, reset_report_stats
+
+if USE_REMINDER:
+    logging.debug("Starts reminder!!!")
+    # We need synchronous instance of bot here as we use synchronous library 'schedule' in a separate thread.
+    bot = TeleBot(TOKEN, "HTML", disable_web_page_preview=True, allow_sending_without_reply=True)
+else:
+    bot = None
 
 
 def scheduler():
@@ -42,10 +50,10 @@ def remind(chat_to_repeat, today):
 @repeat(every().day.at("06:00"), PYTHONCHATRU)
 def stat_report(chat_to_repeat):
     """Everyday group statistic info."""
-    rep = report.create_report_text(PYTHONCHATRU)
+    rep = create_report_text(PYTHONCHATRU)
     if rep:
         bot.send_message(chat_to_repeat, rep)
-    report.reset_report_stats(PYTHONCHATRU)
+    reset_report_stats(PYTHONCHATRU)
 
 
 def print_get_jobs():
@@ -58,4 +66,5 @@ def print_get_jobs():
     return text
 
 
-Thread(target=scheduler).start()
+if USE_REMINDER:
+    Thread(target=scheduler).start()

@@ -1,8 +1,21 @@
 import html
+import logging
+import os
 import random
 import shelve
-import os
-from .config import DATA, ROLLBACK
+from pathlib import Path
+
+from .config import ROLLBACK
+from .constants import DATA, types
+
+
+def increment(chat_id: int, banned: bool = True):
+    """
+    Увеличивает счетчик банов или удаленных
+    """
+    category = "Banned" if banned else "Deleted"
+    with shelve.open(f"{DATA}{chat_id}") as shelve_db:
+        shelve_db[category] += 1
 
 
 def create_report_text(chat_id):
@@ -44,7 +57,7 @@ def create_report_text(chat_id):
             if s["Banned"]:
                 report += f"""
 <b> Криптоидов поймано:</b> {s['Banned']}
-  └ [ {s['Banned']*current_spammer_face} ] 
+  └ [ {s['Banned'] * current_spammer_face} ] 
 """
         return report
     else:
@@ -52,12 +65,25 @@ def create_report_text(chat_id):
 
 
 def reset_report_stats(chat_id):
-    with shelve.open(f"{DATA}{chat_id}") as s:
-        s["Messages"] = {}
-        s["Banned"] = 0
-        s["Deleted"] = 0
+    with shelve.open(f"{DATA}{chat_id}") as shelve_db:
+        shelve_db["Messages"] = {}
+        shelve_db["Banned"] = 0
+        shelve_db["Deleted"] = 0
         return f"""Chat ID: {chat_id}
 
-{s['Messages']=}
-{s['Banned']=}
-{s['Deleted']=}"""
+{shelve_db['Messages']=}
+{shelve_db['Banned']=}
+{shelve_db['Deleted']=}"""
+
+
+def update_stats(message: types.Message):
+    if not Path(f"{DATA}{message.chat.id}").exists():
+        reset_report_stats(message.chat.id)
+    with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as shelve_db:
+        if "Messages" not in shelve_db:
+            reset_report_stats(message.chat.id)
+        if message.from_user.id not in shelve_db["Messages"]:
+            shelve_db["Messages"][message.from_user.id] = {"User": message.from_user, "Count": 1}
+            logging.info(f"[{message.chat.title[:10]}] [{message.from_user.id}] {message.from_user.first_name}")
+        else:
+            shelve_db["Messages"][message.from_user.id]["Count"] += 1

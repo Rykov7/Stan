@@ -1,1 +1,1 @@
-from app.bot import app
+from src.webhook import app
