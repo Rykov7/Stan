@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 from telebot import types
 
-from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, RUS_LETTERS_AND_PUNCTUATION, RULES_TEXT
+from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT
 
 
 def is_url_reachable(url: str) -> bool:
@@ -32,7 +32,7 @@ def is_mixed(text: str) -> bool:
     """
     for word in text.split():
         word = word.strip().lower()
-        if any(e in ONLY_RUS_LETTERS for e in word) and not all(e in RUS_LETTERS_AND_PUNCTUATION for e in word):
+        if any(e in ONLY_RUS_LETTERS for e in word) and any(e in ONLY_ENG_LETTERS for e in word):
             return True
     return False
 
