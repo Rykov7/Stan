@@ -52,12 +52,13 @@ async def list_jobs(_message):
 
 @bot.message_handler(func=is_admin, commands=["stats"])
 async def send_stats(message: types.Message):
-    if len(message.text.split()) == 1:
-        rep = create_report_text(message.chat.id)
-        if rep:
-            await bot.send_message(message.chat.id, rep)
+    """Show group statistics."""
+    chat_id = message.chat.id if len(message.text.split()) == 1 else message.text.split()[-1]
+    report_text = create_report_text(chat_id)
+    if report_text:
+        await bot.send_message(message.chat.id, report_text)
     else:
-        await bot.send_message(message.chat.id, create_report_text(message.text.split()[-1]))
+        logging.info("[STATS] Невозможно отправить отчёт, недостаточно данных.")
 
 
 @bot.message_handler(func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"])
