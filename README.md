@@ -73,7 +73,7 @@ Continuous log reading on Linux:
 ```# journalctl --unit=stan.service -f```
 
 
-### How to interact with Lutz bot?
+### How to interact with Stan?
 Bot can receive commands and behave depending on chat situation.
 
 Standard command pack for bot father includes:
