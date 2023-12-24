@@ -28,8 +28,16 @@ class TestSpam(TestCase):
         self.assertFalse(is_mixed("привет ребята!"))
         self.assertFalse(is_mixed("hi guys"))
         self.assertFalse(is_mixed("hi guys! #%^&%^$ @Вася привет g! п@"))
-        self.assertFalse(is_mixed("тут подробнее https://hack.comp.com"))
+        self.assertFalse(is_mixed("hi guys! #%^&%^$ @Вася привет g! п@"))
+        self.assertFalse(is_mixed("тут *подробнее* https://hack.comp.com"))
         self.assertTrue(is_mixed("hi guys! #%^&%^$ ghb привет g! пQ"))
+        text = """
+        В целом очень интересный чат, где 4 человека
+ считают себя выше мира всего и нападают/насмехаются на всех/над всеми, кто что-то "недо". 
+Один из которых вообще выдаёт какие-то фразы через бота) интересно, потому что сам не может сказать, или потому что раздвоение личности дело такое)
+«Я пуп земли», – твердит гордец надменно,
+Забыв, что он – песчинка во вселенной."""
+        self.assertFalse(is_mixed(text))
 
 
 class TestOthers(TestCase):

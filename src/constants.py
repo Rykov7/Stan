@@ -38,7 +38,7 @@ ALLOWED_WORDS = [
 
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ONLY_RUS_LETTERS = "ёйцукенгшщзхъфывапролджэячсмитьбю"
-RUS_LETTERS_AND_PUNCTUATION = ONLY_RUS_LETTERS + string.punctuation
+ONLY_ENG_LETTERS = string.ascii_lowercase
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)
