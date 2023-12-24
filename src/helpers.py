@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 from telebot import types
 
-from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, RUS_LETTERS_AND_PUNCTUATION
+from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, RUS_LETTERS_AND_PUNCTUATION, RULES_TEXT
 
 
 def is_url_reachable(url: str) -> bool:
@@ -102,3 +102,11 @@ def detect_args(message: types.Message):
     else:
         if len(message.text.split()) > 1:
             return " ".join(message.text.split()[1:])
+
+
+def fetch_rule(index: int) -> str:
+    length = len(RULES_TEXT)
+    if index in range(1, length + 1):
+        return RULES_TEXT[index - 1]
+    else:
+        return "Пока не придумали"

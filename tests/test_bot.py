@@ -236,19 +236,23 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_spam_text(self):
         # Нужно подставить антиспам вкл.
         with patch("src.filters.is_antispam_enabled") as mocked:
-            mocked.return_value = True
-            await self.bot.process_new_updates([get_update('пишите мне в ЛС, Писать в ЛС')])
-            self.assertEqual(RESULTS[0][1], "deleteMessage")
-            self.assertEqual(RESULTS[1][1], "banChatMember")
-            self.assertEqual(RESULTS[1][0], {'chat_id': 11, 'user_id': 10, 'until_date': None})
+            # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
+            with patch("src.commands.increment") as _mocked_shelve:
+                mocked.return_value = True
+                await self.bot.process_new_updates([get_update('пишите мне в ЛС, Писать в ЛС')])
+                self.assertEqual(RESULTS[0][1], "deleteMessage")
+                self.assertEqual(RESULTS[1][1], "banChatMember")
+                self.assertEqual(RESULTS[1][0], {'chat_id': 11, 'user_id': 10, 'until_date': None})
 
     async def test_wrong_url(self):
         # Нужно подставить антиспам вкл.
         with patch("src.filters.is_antispam_enabled") as mocked:
-            mocked.return_value = True
-            await self.bot.process_new_updates([get_update('тут подробнее https://zvuk.com/artist/61375')])
-            self.assertEqual(RESULTS[0][1], "deleteMessage")
-            self.assertEqual(RESULTS[0][0], {'chat_id': 11, 'message_id': 1})
+            # Нужно подменить инкремент, нельзя реально в шелве работать в тестах
+            with patch("src.commands.increment") as _mocked_shelve:
+                mocked.return_value = True
+                await self.bot.process_new_updates([get_update('тут подробнее https://zvuk.com/artist/61375')])
+                self.assertEqual(RESULTS[0][1], "deleteMessage")
+                self.assertEqual(RESULTS[0][0], {'chat_id': 11, 'message_id': 1})
 
     async def test_update_stats(self):
         # Нужно подставить антиспам вкл.
