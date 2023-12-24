@@ -66,7 +66,7 @@ async def tease_nongrata(message: types.Message):
     await bot.reply_to(message, "у нас тут таких не любят")
 
 
-@bot.message_handler(content_types=util.content_type_service)
+@bot.message_handler(content_types=['new_chat_members', 'left_chat_member'])
 async def check_new_members(message: types.Message):
     if message.content_type == "new_chat_members":
         from_user = message.from_user

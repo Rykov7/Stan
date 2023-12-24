@@ -80,5 +80,19 @@ ZEN = [
     "If the implementation is easy to explain, it may be a good idea.",
     "Namespaces are one honking great idea — let's do more of those!",
 ]
+
+RULES_TEXT = (
+    "Админ всегда прав и предупреждает один раз",
+    "Запрещена брань, реклама, голосовые сообщения, флуд, мета-вопросы и тема ChatGPT",
+    "Языки общения: русский или английский",
+    "Придерживайся общепринятых норм беседы: без оскорблений, расизма, CAPS'а, политических, религиозных и взрослых тем.",
+    "Знаки препинания важны, особенно вопросительный знак",
+    "Твой ник должен быть читаемым и понятным",
+    "Мы приветствуем общение по широкому кругу тем, но стоит придерживаться IT и Python, обсуждение прочих тем только в субботу.",
+    "Прежде, чем задать вопрос, поищи ответ в интернете.",
+    "Более пяти строк кода нужно присылать nekobin-ссылкой с расширением .py.",
+    "Не нужно писать в ЛС.",
+)
+
 LUTZ_ID = "BQACAgQAAxkBAAPBYsWJG9Ml0fPrnbU9UyzTQiQSuHkAAjkDAAIstCxSkuRbXAlcqeQpBA"
 BDMTSS_ID = "AwACAgIAAxkBAAIJrWOg2WUvLwrf7ahyJxQHB8_nqllwAAL5JQAC2_IJSbhfQIO5YnVmLAQ"

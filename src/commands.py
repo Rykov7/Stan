@@ -7,9 +7,8 @@ from .admin_commands import bot
 from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
                         BDMTSS_ID)
 from .filters import in_spam_list, in_caption_spam_list, in_delete_list
-from .helpers import represent_as_get, detect_args, is_admin
+from .helpers import represent_as_get, detect_args, is_admin, fetch_rule
 from .report import update_stats, increment
-from .rules import fetch_rule
 from .stan import act, speak
 
 
@@ -65,10 +64,11 @@ async def send_rules(message: types.Message):
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     args = message.text.split()
     logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
-    if len(args) > 1 and args[-1].isdigit() and 0 < int(args[-1]):
+    if len(args) > 1 and args[-1].isdigit():
+        index = int(args[-1])
         await send_or_reply(
             message,
-            f"<b>Правило {args[-1]}</b>\n<i>{fetch_rule(args[-1])}</i>",
+            f"<b>Правило {args[-1]}</b>\n<i>{fetch_rule(index)}</i>",
             reply_markup=markup,
         )
     else:

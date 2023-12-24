@@ -1,7 +1,7 @@
 from unittest import TestCase, main
 from unittest.mock import MagicMock
-from src.constants import SPAM, BAN_WORDS, ADMIN_ID
-from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin
+from src.constants import SPAM, BAN_WORDS, ADMIN_ID, RULES_TEXT
+from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, fetch_rule
 
 CASES = (
     "Оформим резидeнтствo ОАЭ без предoплаты за 5000 дирхам. Пoдробнoсти в лc",
@@ -71,6 +71,15 @@ class TestOthers(TestCase):
             with self.subTest(f"check non-grata({text})"):
                 m = MagicMock(from_user=MagicMock(id=text))
                 self.assertEqual(is_admin(m), expected)
+
+    def test_fetch_rule(self):
+        for index, text in enumerate(RULES_TEXT,1):
+            with self.subTest(f"fetch rule {index}"):
+                self.assertEqual(fetch_rule(index), text)
+
+    def test_fetch_non_existent_rule(self):
+        self.assertEqual(fetch_rule(0), 'Пока не придумали')
+        self.assertEqual(fetch_rule(100), 'Пока не придумали')
 
 
 if __name__ == '__main__':
