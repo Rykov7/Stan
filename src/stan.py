@@ -1,12 +1,13 @@
 """ Stan's commands and reactions. """
 import asyncio
 import html
+import logging
 import random
 
-from telebot import types
+from telebot import types, util
 
 from .filters import is_white_id
-from .helpers import is_nongrata
+from .helpers import is_nongrata, short_user_data
 from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat
 from .robot import bot
 
@@ -63,3 +64,21 @@ async def remove_stan_quote(message: types.Message):
 async def tease_nongrata(message: types.Message):
     """Reply to non grata mentions."""
     await bot.reply_to(message, "у нас тут таких не любят")
+
+
+@bot.message_handler(content_types=util.content_type_service)
+async def check_new_members(message: types.Message):
+    if message.content_type == "new_chat_members":
+        from_user = message.from_user
+        info = short_user_data(from_user)
+        await bot.delete_message(message.chat.id, message.id)
+        # мы не знаем как быстро получим инфу о био, потому сначала удаляем сообщение, потом запрашиваем био/логируем
+        more_data = await bot.get_chat(from_user.id)
+        info['bio'] = more_data.bio
+        info['photo'] = more_data.photo.big_file_id
+        logging.info("[JOIN] User join chat: %s", info)
+    if message.content_type == "left_chat_member":
+        from_user = message.from_user
+        info = short_user_data(from_user)
+        logging.debug("[LEAVE] User left chat: %s", info)
+        await bot.delete_message(message.chat.id, message.id)

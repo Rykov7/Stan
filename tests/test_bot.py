@@ -26,16 +26,7 @@ logger.setLevel(logging.ERROR)
 RESULTS = []
 
 
-def get_update(text, reply_to=None, user_id=10):
-    """Хелпер, генерирующий событие обновления для бота"""
-    params = {'text': text}
-    chat = types.Chat(id=11, type='group')
-    user = types.User(id=user_id, is_bot=False, first_name='Some User')
-    if reply_to:
-        params["reply_to_message"] = types.Message(message_id=2, from_user=user, date=None, chat=chat,
-                                                   content_type='text', options={'text': reply_to}, json_string="")
-    mess = types.Message(message_id=1, from_user=user, date=None, chat=chat, content_type='text', options=params,
-                         json_string='')
+def _all_nones():
     edited_message = None
     channel_post = None
     edited_channel_post = None
@@ -49,15 +40,43 @@ def get_update(text, reply_to=None, user_id=10):
     my_chat_member = None
     chat_member = None
     chat_join_request = None
-    return types.Update(1001234038283, mess, edited_message, channel_post, edited_channel_post, inline_query,
-                        chosen_inline_result, callback_query, shipping_query, pre_checkout_query, poll, poll_answer,
-                        my_chat_member, chat_member, chat_join_request)
+    return (edited_message, channel_post, edited_channel_post, inline_query, chosen_inline_result, callback_query,
+            shipping_query, pre_checkout_query, poll, poll_answer, my_chat_member, chat_member, chat_join_request)
+
+
+def get_update(text, reply_to=None, user_id=10):
+    """Хелпер, генерирующий событие обновления для бота"""
+    params = {'text': text}
+    chat = types.Chat(id=11, type='group')
+    user = types.User(id=user_id, is_bot=False, first_name='Some User')
+    if reply_to:
+        params["reply_to_message"] = types.Message(message_id=2, from_user=user, date=None, chat=chat,
+                                                   content_type='text', options={'text': reply_to}, json_string="")
+    mess = types.Message(message_id=1, from_user=user, date=None, chat=chat, content_type='text', options=params,
+                         json_string='')
+    return types.Update(1001234038283, mess, *_all_nones())
+
+
+def member(leave: bool = False):
+    """Хелпер, генерирующий событие входа и выхода юзера"""
+    type_ = 'left_chat_member' if leave else 'new_chat_members'
+    chat = types.Chat(id=11, type='group')
+    params = {'content_type': type_}
+    user = types.User(id=555, is_bot=False, first_name='Some User')
+    mess = types.Message(message_id=1, from_user=user, date=None, chat=chat, content_type=type_,
+                         options=params, json_string='')
+    return types.Update(100100, mess, *_all_nones())
 
 
 async def custom_sender(token, url, method='get', params=None, files=None, **kwargs):
     """Замена для тестов, чтобы не слать запросы в телегу"""
     RESULTS.append((params, url))
-    result = {"message_id": 1000, "date": 1, "chat": {"id": 1000, "type": "group"}}
+    chat = {"id": 1000, "type": "group", "bio": "bio",
+            "photo": {"big_file_id": "file_id", "small_file_id": "file_id", "small_file_unique_id": "file_id",
+                      "big_file_unique_id": "file_id"}}
+    result = {"message_id": 1000, "date": 1, "chat": chat}
+    if url == "getChat":
+        result = chat
     return result
 
 
@@ -342,6 +361,15 @@ class TestBot(IsolatedAsyncioTestCase):
                 self.assertEqual(RESULTS[0][1], 'sendMessage')
                 self.assertEqual(RESULTS[1][1], 'deleteMessage')
                 self.assertEqual(RESULTS[0][0]['text'], '➖ \n  └ good text')
+
+    async def test_new_user_in_chat(self):
+        await self.bot.process_new_updates([member()])
+        self.assertEqual(RESULTS[0][1], 'deleteMessage')
+        self.assertEqual(RESULTS[1], ({'chat_id': 555}, 'getChat'))
+
+    async def test_user_leave_chat(self):
+        await self.bot.process_new_updates([member(leave=True)])
+        self.assertEqual(RESULTS[0][1], 'deleteMessage')
 
 
 if __name__ == '__main__':

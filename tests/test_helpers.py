@@ -32,7 +32,6 @@ class TestSpam(TestCase):
         self.assertTrue(is_mixed("hi guys! #%^&%^$ ghb привет g! пQ"))
 
 
-
 class TestOthers(TestCase):
     def test_ban(self):
         for word in BAN_WORDS:
