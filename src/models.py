@@ -46,7 +46,6 @@ class Chat(Base):
     antispam = Column(Boolean)
     report = Column(Boolean)
     reminder = Column(Boolean)
-    hidden = Column(Boolean)
 
     def __repr__(self):
         return f'Chat({self.chat_id=}, {self.title=})'
