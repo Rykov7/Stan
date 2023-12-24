@@ -121,7 +121,7 @@ async def set_antispam_report_reminder(message: types.Message):
 @bot.message_handler(func=is_white_id, commands=["get_quotes"], chat_types=["supergroup", "group"])
 async def get_quotes(message: types.Message):
     logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
-    quotes = session.query(Quote.text).filter(Quote.chat_id == message.chat.id).all()
+    quotes = session.query(Quote.text).filter_by(chat_id=message.chat.id).all()
     if quotes:
         length = len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())
         text = f"Количество цитат: {length}\n\Последние добавленные\n\n"
@@ -133,7 +133,7 @@ async def get_quotes(message: types.Message):
 
 @bot.message_handler(func=is_white_id, commands=["get_group_info"], chat_types=["supergroup", "group"])
 async def get_group_info(message: types.Message):
-    group = session.query(Chat).filter(Chat.chat_id == message.chat.id).first()
+    group = session.query(Chat).filter_by(chat_id=message.chat.id).first()
     if group:
         await bot.send_message(
             message.chat.id,
