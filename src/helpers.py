@@ -82,6 +82,13 @@ def me(message: types.Message):
     return msg
 
 
+def short_user_data(from_user: types.User) -> dict:
+    info = {'first_name': from_user.first_name, 'last_name': from_user.last_name, 'username': from_user.username,
+            'full_name': from_user.full_name, 'id': from_user.id, 'code': from_user.language_code,
+            'is_bot': from_user.is_bot, 'is_premium': from_user.is_premium}
+    return info
+
+
 def represent_as_get(message: types.Message):
     return parse.quote_plus(detect_args(message))
 
