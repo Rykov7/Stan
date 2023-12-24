@@ -1,9 +1,10 @@
 import logging
+import shelve
 from datetime import datetime as dt
 
 from telebot import types, logger
 
-from .constants import ADMIN_ID, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_INFO
+from .constants import ADMIN_ID, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_INFO, DATA
 from .filters import is_white_id
 from .helpers import me, my_ip, is_admin
 from .models import Chat, Quote, session
@@ -58,7 +59,9 @@ async def send_stats(message: types.Message):
     if report_text:
         await bot.send_message(message.chat.id, report_text)
     else:
-        logging.info("[STATS] Невозможно отправить отчёт, недостаточно данных.")
+        with shelve.open(f"{DATA}{chat_id}") as shelve_db:
+            shelve_dict = {k: v for k, v in shelve_db.items()}
+            logging.info(f"[STATS {chat_id}] Невозможно отправить отчёт, недостаточно данных. Текущие: {shelve_dict}")
 
 
 @bot.message_handler(func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"])

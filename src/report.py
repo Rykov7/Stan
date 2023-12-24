@@ -77,7 +77,7 @@ def reset_report_stats(chat_id):
 
 
 def update_stats(message: types.Message):
-    if not Path(f"{DATA}{message.chat.id}").exists():
+    if not Path(f"{DATA}{message.chat.id}.db").exists():
         reset_report_stats(message.chat.id)
     with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as shelve_db:
         if "Messages" not in shelve_db:
