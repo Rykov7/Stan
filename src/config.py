@@ -21,4 +21,4 @@ if not is_url_reachable(RULES_URL):
     raise LookupError(f"LUTZPYBOT rules url({RULES_URL}) is not reachable")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)

@@ -10,5 +10,4 @@ bot = AsyncTeleBot(
     "HTML",
     disable_web_page_preview=True,
     allow_sending_without_reply=True,
-    colorful_logs=True,
 )
