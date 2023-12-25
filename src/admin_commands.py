@@ -60,8 +60,9 @@ async def send_stats(message: types.Message):
         await bot.send_message(message.chat.id, report_text)
     else:
         with shelve.open(f"{DATA}{chat_id}") as shelve_db:
-            shelve_dict = {k: v for k, v in shelve_db.items()}
-            logging.info(f"[STATS {chat_id}] Невозможно отправить отчёт, недостаточно данных. Текущие: {shelve_dict}")
+            shelve_messages = {v['User'].first_name: v['Count'] for k, v in shelve_db['Messages'].items()}
+            logging.info(f"[STATS {chat_id}] Невозможно отправить отчёт, недостаточно данных. Счётчик сообщений: {shelve_messages}.\n"
+                         f"Баны: {shelve_db['Banned']=}")
 
 
 @bot.message_handler(func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"])
