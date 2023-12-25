@@ -38,6 +38,10 @@ class TestSpam(TestCase):
 «Я пуп земли», – твердит гордец надменно,
 Забыв, что он – песчинка во вселенной."""
         self.assertFalse(is_mixed(text))
+        self.assertFalse(is_mixed('print("привет")'))
+        self.assertFalse(is_mixed("print('привет')"))
+        self.assertFalse(is_mixed("text='слово'"))
+
 
 
 class TestOthers(TestCase):
