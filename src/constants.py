@@ -36,9 +36,10 @@ ALLOWED_WORDS = [
     "jetbrains",
 ]
 
-RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ONLY_RUS_LETTERS = "ёйцукенгшщзхъфывапролджэячсмитьбю"
 ONLY_ENG_LETTERS = string.ascii_lowercase
+SYMBOLS = """`[];',./~!@#$%^{}|:"<>?«»-+*/№=()&"""
+RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
 ENG_RUS_TABLE = str.maketrans(ENG, RUS)

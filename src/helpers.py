@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 from telebot import types
 
-from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT
+from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS
 
 
 def is_url_reachable(url: str) -> bool:
@@ -30,8 +30,11 @@ def is_mixed(text: str) -> bool:
     Разбивает текст на слова и проверяет на смешанный алфавит, спамеры используют его. Слово допускается только
     полностью на русском или русский + знаки пунктуации
     """
-    for word in text.split():
+    cleaned_text = ''.join(letter if letter not in SYMBOLS else ' ' for letter in text)
+    for word in cleaned_text.split():
         word = word.strip().lower()
+        if not word:
+            continue
         if any(e in ONLY_RUS_LETTERS for e in word) and any(e in ONLY_ENG_LETTERS for e in word):
             return True
     return False
