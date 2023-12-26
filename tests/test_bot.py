@@ -495,9 +495,10 @@ class TestBot(IsolatedAsyncioTestCase):
 
     async def test_invalid_name_user(self):
         await self.bot.process_new_updates([get_update('новый текст', first_name=None)])
-        self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
-        self.assertEqual(RESULTS[1][1], 'sendMessage')
-        self.assertEqual(RESULTS[1][0]['text'], '<b>Правило 6</b>\n<i>Имя должно быть читаемым и понятным</i>')
+        self.assertEqual(RESULTS[0][0]['chat_id'], '11')
+        self.assertEqual(RESULTS[0][0]['text'], '<b>Правило 6</b>\n<i>Имя должно быть читаемым и понятным</i>')
+        self.assertEqual(RESULTS[0][1], 'sendMessage')
+        self.assertEqual(RESULTS[1][1], 'deleteMessage')
 
 
 if __name__ == '__main__':
