@@ -355,8 +355,11 @@ async def default_query(inline_query):
 @bot.message_handler(func=is_invalid_name, chat_types=["supergroup", "group"])
 async def handle_invalid_name(message: types.Message):
     """Send the rule if member name is invalid."""
-    message.text = '\правило 6'
-    await send_rules(message)
+    rule_num = 6
+    markup = types.InlineKeyboardMarkup([[RULES]], 1)
+    logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
+    await send_or_reply(message, f'<b><a href="tg:user?id={message.from_user.id}">{message.from_user.full_name}</a>, правило {rule_num}</b>\n<i>{fetch_rule(rule_num)}</i>', reply_markup=markup)
+    await bot.delete_message(message.chat.id, message.id)
 
 
 @bot.message_handler(func=is_hello_text, chat_types=["supergroup", "group"])
