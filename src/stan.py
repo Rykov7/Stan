@@ -17,7 +17,7 @@ TYPING_TIMEOUT = 0.13 / 4  # Reading time is quarter of the same text writing ti
 def speak(chance_of: int, chat_id: int) -> None | str:
     number = random.randint(0, chance_of)
     if number == 0:
-        return random.choice([i[0] for i in all_chat_quotes(chat_id)])
+        return random.choice(all_chat_quotes(chat_id))
     return None
 
 
@@ -40,7 +40,7 @@ async def act(message: types.Message):
 async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = message.reply_to_message.text
-        if quote not in {i[0] for i in all_chat_quotes(message.chat.id)}:
+        if not is_quote_in_chat(quote, message.chat.id):
             add_quote(message.chat.id, quote.replace("\n", " "))
             await bot.send_message(message.chat.id, "➕\n  └ " + quote.replace("\n", " "), parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)

@@ -1,15 +1,14 @@
 import logging
-import shelve
 from datetime import datetime as dt
 
 from telebot import types, logger
 
-from .constants import ADMIN_ID, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_INFO, DATA
+from .constants import ADMIN_ID, LOGGING_LEVEL_DEBUG, LOGGING_LEVEL_INFO
 from .filters import is_white_id
 from .helpers import me, my_ip, is_admin
-from .models import Chat, Quote, session
+from .models import is_chat_exists, add_chat, delete_chat, update_chat, chat_by_id, all_chat_quotes
 from .reminder import remind, print_get_jobs, create_report_text
-from .report import reset_report_stats
+from .report import reset_report_stats, current_data
 from .robot import bot
 
 
@@ -34,7 +33,7 @@ async def remind_manually(message):
         except ValueError as ve:
             await bot.send_message(message.chat.id, f"Не удалось разобрать дату!\n{ve}")
         else:
-            await remind(message.chat.id, today)
+            remind(message.chat.id, today)
     else:
         await bot.send_message(
             message.chat.id,
@@ -54,15 +53,14 @@ async def list_jobs(_message):
 @bot.message_handler(func=is_admin, commands=["stats"])
 async def send_stats(message: types.Message):
     """Show group statistics."""
-    chat_id = message.chat.id if len(message.text.split()) == 1 else message.text.split()[-1]
+    chat_id = message.chat.id if len(splitted := message.text.split()) == 1 else splitted[-1]
     report_text = create_report_text(chat_id)
     if report_text:
         await bot.send_message(message.chat.id, report_text)
     else:
-        with shelve.open(f"{DATA}{chat_id}") as shelve_db:
-            shelve_messages = {v['User'].first_name: v['Count'] for k, v in shelve_db['Messages'].items()}
-            logging.info(f"[STATS {chat_id}] Невозможно отправить отчёт, недостаточно данных. Счётчик сообщений: {shelve_messages}.\n"
-                         f"Баны: {shelve_db['Banned']=}")
+        shelve_messages, banned = current_data(chat_id)
+        logging.info(f"[STATS {chat_id}] Невозможно отправить отчёт, недостаточно данных. "
+                     f"Счётчик сообщений: {shelve_messages}.\nБаны: {banned}")
 
 
 @bot.message_handler(func=is_admin, commands=["reset_stats"], chat_types=["supergroup", "group"])
@@ -76,12 +74,11 @@ async def send_stats(message: types.Message):
 async def enable_stan(message: types.Message):
     """Add group to database."""
     logging.info(f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}")
-    if not session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
-        session.add(Chat(chat_id=message.chat.id, title=message.chat.title, antispam=1, report=0, reminder=1))
-        session.commit()
+    if not is_chat_exists(message.chat.id):
+        add_chat(message.chat.id, message.chat.title)
         await bot.send_message(
             message.chat.id,
-            f"""Группа "{message.chat.title} добавлена в БД.
+            f"""Группа "{message.chat.title}" добавлена в БД.
 /get_group_info - узнать текущие настройки""",
         )
     else:
@@ -91,11 +88,9 @@ async def enable_stan(message: types.Message):
 @bot.message_handler(func=is_admin, commands=["disable_stan"], chat_types=["supergroup", "group"])
 async def disable_stan(message: types.Message):
     logging.info(f"[{message.chat.title}] [{message.from_user.id}] {message.from_user.username}: {message.text}")
-    if session.query(Chat.id).filter(Chat.chat_id == message.chat.id).first():
-        chat = session.query(Chat).filter_by(chat_id=message.chat.id).first()
-        session.delete(chat)
-        session.commit()
-        await bot.send_message(message.chat.id, f"Группа {message.chat.title} и все связанные с ней цитаты удалёны!")
+    if is_chat_exists(message.chat.id):
+        title = delete_chat(message.chat.id)
+        await bot.send_message(message.chat.id, f"Группа {title} и все связанные с ней цитаты удалены!")
     else:
         await bot.send_message(message.chat.id, "Отказ. Этой группы нет в БД.")
 
@@ -115,36 +110,32 @@ async def set_antispam_report_reminder(message: types.Message):
         except ValueError:
             logging.info(f"[ERROR] Неверные аргументы {message.text}")
         else:
-            session.query(Chat).filter_by(chat_id=message.chat.id).update(
-                {"antispam": antispam, "report": rep, "reminder": rem}
-            )
-            session.commit()
-            await bot.send_message(message.chat.id, f"""Настройки обновлены. Проверить: /get_group_info""")
+            update_chat(message.chat.id, antispam, rep, rem)
+            await bot.send_message(message.chat.id, "Настройки обновлены. Проверить: /get_group_info")
 
 
 @bot.message_handler(func=is_white_id, commands=["get_quotes"], chat_types=["supergroup", "group"])
 async def get_quotes(message: types.Message):
     logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
-    quotes = session.query(Quote.text).filter_by(chat_id=message.chat.id).all()
+    quotes = all_chat_quotes(message.chat.id)
     if quotes:
-        length = len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())
-        text = f"Количество цитат: {length}\n\Последние добавленные\n\n"
-        text += "\n".join(f"· {quote[0]}" for quote in quotes[-10:])
+        text = f"Количество цитат: {len(quotes)}\n\Последние добавленные\n\n"
+        text += "\n".join(f"· {quote}" for quote in quotes[-10:])
         await bot.send_message(message.chat.id, f"{text}")
     else:
-        await bot.send_message(message.chat.id, f"Цитаты отсутствуют. Подробнее: /get_group_info")
+        await bot.send_message(message.chat.id, "Цитаты отсутствуют. Подробнее: /get_group_info")
 
 
 @bot.message_handler(func=is_white_id, commands=["get_group_info"], chat_types=["supergroup", "group"])
 async def get_group_info(message: types.Message):
-    group = session.query(Chat).filter_by(chat_id=message.chat.id).first()
+    group = chat_by_id(message.chat.id)
     if group:
         await bot.send_message(
             message.chat.id,
             f"""Группа: {group.title}
 ID группы: {group.chat_id} 
 
-Количество цитат:  {len(session.query(Quote).filter(Quote.chat_id == message.chat.id).all())}
+Количество цитат:  {len(group.quotes)}
 Последние добавленные: /get_quotes
 
 Текущие настройки:
@@ -153,7 +144,7 @@ ID группы: {group.chat_id}
   Праздники: {group.reminder}""",
         )
     else:
-        await bot.send_message(message.chat.id, f"Группа не включена. Включить: /enable_stan")
+        await bot.send_message(message.chat.id, "Группа не включена. Включить: /enable_stan")
 
 
 @bot.message_handler(func=is_white_id, commands=["set_logging_level"], chat_types=["supergroup", "group"])

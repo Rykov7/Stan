@@ -18,6 +18,13 @@ def increment(chat_id: int, banned: bool = True):
         shelve_db[category] += 1
 
 
+def current_data(chat_id: int) -> tuple:
+    with shelve.open(f"{DATA}{chat_id}") as shelve_db:
+        shelve_messages = {v['User'].first_name: v['Count'] for k, v in shelve_db['Messages'].items()}
+        banned = shelve_db['Banned']
+    return shelve_messages, banned
+
+
 def create_report_text(chat_id):
     report = ""
     top_users = ""
