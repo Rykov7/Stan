@@ -6,7 +6,7 @@ from telebot import types
 from .admin_commands import bot
 from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
                         BDMTSS_ID)
-from .filters import in_spam_list, in_caption_spam_list, in_delete_list
+from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_hello_text, is_empty_name
 from .helpers import represent_as_get, detect_args, is_admin, fetch_rule
 from .report import update_stats, increment
 from .stan import act, speak
@@ -17,6 +17,16 @@ async def send_or_reply(message: types.Message, answer, **kwargs):
         await bot.reply_to(message.reply_to_message, answer, **kwargs)
     else:
         await bot.send_message(message.chat.id, answer, **kwargs)
+
+
+async def _neprivet(message: types.Message, forced_reply: bool = False):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("👋 Непривет", url="https://neprivet.com/"), row_width=1)
+    text = "Пожалуйста, не пишите просто «Привет» в чате."
+    if forced_reply:
+        await bot.reply_to(message, text, reply_markup=markup)
+    else:
+        await send_or_reply(message, text, reply_markup=markup)
 
 
 """                [ ANTISPAM ]             """
@@ -66,11 +76,7 @@ async def send_rules(message: types.Message):
     logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
     if len(args) > 1 and args[-1].isdigit():
         index = int(args[-1])
-        await send_or_reply(
-            message,
-            f"<b>Правило {args[-1]}</b>\n<i>{fetch_rule(index)}</i>",
-            reply_markup=markup,
-        )
+        await send_or_reply(message, f"<b>Правило {index}</b>\n<i>{fetch_rule(index)}</i>", reply_markup=markup)
     else:
         await send_or_reply(message, "Читай...", reply_markup=markup)
     await bot.delete_message(message.chat.id, message.id)
@@ -225,9 +231,7 @@ async def send_neprivet(message: types.Message):
             message.text,
         )
     )
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("👋 Непривет", url="https://neprivet.com/"), row_width=1)
-    await send_or_reply(message, "Пожалуйста, не пишите просто «Привет» в чате.", reply_markup=markup)
+    await _neprivet(message)
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -346,6 +350,19 @@ async def default_query(inline_query):
             )
 
     await bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
+
+
+@bot.message_handler(func=is_empty_name, chat_types=["supergroup", "group"])
+async def handle_hello(message: types.Message):
+    await bot.delete_message(message.chat.id, message.id)
+    nick_rule = 6
+    await bot.send_message(message.chat.id, f"@{message.from_user.username}\n"
+                                            f"Напоминаем правило: {fetch_rule(nick_rule)}")
+
+
+@bot.message_handler(func=is_hello_text, chat_types=["supergroup", "group"])
+async def handle_hello(message: types.Message):
+    await _neprivet(message, forced_reply=True)
 
 
 """                [ COUNTER ]              """

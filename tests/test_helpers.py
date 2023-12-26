@@ -1,12 +1,14 @@
 from unittest import TestCase, main
 from unittest.mock import MagicMock
 from src.constants import SPAM, BAN_WORDS, ADMIN_ID, RULES_TEXT
-from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, fetch_rule
+from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, \
+    fetch_rule, cleaned_text, remove_spaces
 
 CASES = (
     "Оформим резидeнтствo ОАЭ без предoплаты за 5000 дирхам. Пoдробнoсти в лc",
     "Всем привет Я в поисках людей в kpиптo кoмaнду У нас вы пройдете 6ecплaтноe обученue 1-3 дня Можно совмещать с основной paбoтoй",
     "Здравствуйте! Нужны 2 человека от 200 $/день. Можно без опыта Пишите в личные сообщения +",
+    "Здравствуйте!Нужны 2 человека от 200 $/день.Пишите в личные сообщение +"
 )
 
 
@@ -42,7 +44,6 @@ class TestSpam(TestCase):
         self.assertFalse(is_mixed('print("привет")'))
         self.assertFalse(is_mixed("print('привет')"))
         self.assertFalse(is_mixed("text='слово'"))
-
 
 
 class TestOthers(TestCase):
@@ -86,13 +87,33 @@ class TestOthers(TestCase):
                 self.assertEqual(is_admin(m), expected)
 
     def test_fetch_rule(self):
-        for index, text in enumerate(RULES_TEXT,1):
+        for index, text in enumerate(RULES_TEXT, 1):
             with self.subTest(f"fetch rule {index}"):
                 self.assertEqual(fetch_rule(index), text)
 
     def test_fetch_non_existent_rule(self):
         self.assertEqual(fetch_rule(0), 'Пока не придумали')
         self.assertEqual(fetch_rule(100), 'Пока не придумали')
+
+    def test_cleaned_text(self):
+        params = (
+            ('f1   b2  print  text  ', 'f1!, b2# print("text")'),
+            ('text', 'text'),
+            ('    ', '!@#$'),
+        )
+        for expected, text in params:
+            with self.subTest(f"cleaned_text {text}"):
+                self.assertEqual(expected, cleaned_text(text))
+
+    def test_remove_spaces(self):
+        params = (
+            ('f1 b2 print text', 'f1   b2  print  text  '),
+            ('text', 'text'),
+            ('!@#$', '!@#$'),
+        )
+        for expected, text in params:
+            with self.subTest(f"remove_spaces {text}"):
+                self.assertEqual(expected, remove_spaces(text))
 
 
 if __name__ == '__main__':

@@ -3,8 +3,8 @@ import logging.handlers
 from telebot import types
 
 from .config import WHITEIDS
-from .constants import LOG_COMM, ALLOWED_WORDS, URL_RX
-from .helpers import is_spam, is_in_not_allowed, is_ban_words_in_caption
+from .constants import LOG_COMM, ALLOWED_WORDS, URL_RX, HELLO_EXAMPLES
+from .helpers import is_spam, is_in_not_allowed, is_ban_words_in_caption, cleaned_text, remove_spaces
 from .models import is_antispam_enabled
 
 
@@ -45,3 +45,12 @@ def in_delete_list(message: types.Message) -> bool:
 
 def is_white_id(message: types.Message) -> bool:
     return message.from_user.id in WHITEIDS
+
+
+def is_hello_text(message: types.Message) -> bool:
+    text = remove_spaces(cleaned_text(message.text))
+    return any(hello == text for hello in HELLO_EXAMPLES)
+
+
+def is_empty_name(message: types.Message) -> bool:
+    return message.from_user.full_name.strip() == ''

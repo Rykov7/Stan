@@ -78,9 +78,7 @@ async def enable_stan(message: types.Message):
         add_chat(message.chat.id, message.chat.title)
         await bot.send_message(
             message.chat.id,
-            f"""Группа "{message.chat.title}" добавлена в БД.
-/get_group_info - узнать текущие настройки""",
-        )
+            f'Группа "{message.chat.title}" добавлена в БД.\n/get_group_info - узнать текущие настройки')
     else:
         await bot.send_message(message.chat.id, "Отказ. Группа уже включена")
 
@@ -119,7 +117,7 @@ async def get_quotes(message: types.Message):
     logging.info(f"[{message.chat.id}] {message.from_user.first_name} {message.text}.")
     quotes = all_chat_quotes(message.chat.id)
     if quotes:
-        text = f"Количество цитат: {len(quotes)}\n\Последние добавленные\n\n"
+        text = f"Количество цитат: {len(quotes)}\n\nПоследние добавленные:\n\n"
         text += "\n".join(f"· {quote}" for quote in quotes[-10:])
         await bot.send_message(message.chat.id, f"{text}")
     else:
@@ -132,17 +130,9 @@ async def get_group_info(message: types.Message):
     if group:
         await bot.send_message(
             message.chat.id,
-            f"""Группа: {group.title}
-ID группы: {group.chat_id} 
-
-Количество цитат:  {len(group.quotes)}
-Последние добавленные: /get_quotes
-
-Текущие настройки:
-  Антиспам: {group.antispam}
-  Ежедневные отчёты: {group.report}
-  Праздники: {group.reminder}""",
-        )
+            f"Группа: {group.title}\nID группы: {group.chat_id}\n\nКоличество цитат:  {len(group.quotes)}\n"
+            f"Последние добавленные: /get_quotes\n\nТекущие настройки:\n  Антиспам: {group.antispam}\n  "
+            f"Ежедневные отчёты: {group.report}\n  Праздники: {group.reminder}")
     else:
         await bot.send_message(message.chat.id, "Группа не включена. Включить: /enable_stan")
 
