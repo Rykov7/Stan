@@ -497,7 +497,7 @@ class TestBot(IsolatedAsyncioTestCase):
         await self.bot.process_new_updates([get_update('новый текст', first_name=None)])
         self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
         self.assertEqual(RESULTS[1][1], 'sendMessage')
-        self.assertEqual(RESULTS[1][0]['text'], 'Правило 6\nИмя должно быть читаемым и понятным')
+        self.assertEqual(RESULTS[1][0]['text'], '<b>Правило 6</b>\n<i>Имя должно быть читаемым и понятным</i>')
 
 
 if __name__ == '__main__':
