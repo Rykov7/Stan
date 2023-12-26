@@ -30,14 +30,21 @@ def is_mixed(text: str) -> bool:
     Разбивает текст на слова и проверяет на смешанный алфавит, спамеры используют его. Слово допускается только
     полностью на русском или русский + знаки пунктуации
     """
-    cleaned_text = ''.join(letter if letter not in SYMBOLS else ' ' for letter in text)
-    for word in cleaned_text.split():
-        word = word.strip().lower()
+    for word in cleaned_text(text).split():
+        word = word.strip()
         if not word:
             continue
         if any(e in ONLY_RUS_LETTERS for e in word) and any(e in ONLY_ENG_LETTERS for e in word):
             return True
     return False
+
+
+def cleaned_text(text: str) -> str:
+    return ''.join(letter.lower() if letter not in SYMBOLS else ' ' for letter in text)
+
+
+def remove_spaces(text: str) -> str:
+    return ' '.join(word.strip() for word in text.split() if word.strip())
 
 
 def is_in_not_allowed(word_list: list, msg: str) -> bool:

@@ -17,7 +17,7 @@ from src import helpers
 # нужно не дать делать реальные запросы в тестах, конкретно тут -за Правилами чата
 helpers.is_url_reachable = lambda a: True
 from src.commands import bot
-from src.constants import BDMTSS_ID, LUTZ_ID, ADMIN_ID
+from src.constants import BDMTSS_ID, LUTZ_ID, ADMIN_ID, HELLO_EXAMPLES
 from src.filters import is_white_id
 
 # отключаем логи бота, в тестах они не нужны
@@ -45,11 +45,11 @@ def _all_nones():
             shipping_query, pre_checkout_query, poll, poll_answer, my_chat_member, chat_member, chat_join_request)
 
 
-def get_update(text, reply_to=None, user_id=10):
+def get_update(text, reply_to=None, user_id=10, first_name='Some User'):
     """Хелпер, генерирующий событие обновления для бота"""
     params = {'text': text}
     chat = types.Chat(id=11, type='group')
-    user = types.User(id=user_id, is_bot=False, first_name='Some User')
+    user = types.User(id=user_id, is_bot=False, first_name=first_name, full_name=first_name)
     if reply_to:
         params["reply_to_message"] = types.Message(message_id=2, from_user=user, date=None, chat=chat,
                                                    content_type='text', options={'text': reply_to}, json_string="")
@@ -155,6 +155,15 @@ class TestBot(IsolatedAsyncioTestCase):
         await self.bot.process_new_updates([get_update('/neprivet', reply_to="привет всем")])
         self.assertEqual(RESULTS[0][0]['text'], "Пожалуйста, не пишите просто «Привет» в чате.")
         self.assertTrue("https://neprivet.com/" in RESULTS[0][0]['reply_markup'])
+        self.assertEqual(RESULTS[1][1], "deleteMessage")
+
+    async def test_neprivet_auto(self):
+        for hello in HELLO_EXAMPLES:
+            with self.subTest(f"neprivet auto {hello}"):
+                await self.bot.process_new_updates([get_update(hello)])
+                self.assertEqual(RESULTS[0][0]['text'], "Пожалуйста, не пишите просто «Привет» в чате.")
+                self.assertTrue("https://neprivet.com/" in RESULTS[0][0]['reply_markup'])
+                RESULTS.clear()
 
     async def test_lutz(self):
         await self.bot.process_new_updates([get_update('/lutz', reply_to="привет всем")])
@@ -441,8 +450,8 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_get_quotes(self):
         params = (
             ("Цитаты отсутствуют. Подробнее: /get_group_info", []),
-            ("Количество цитат: 1\n\\Последние добавленные\n\n· one", ['one']),
-            ("Количество цитат: 2\n\\Последние добавленные\n\n· one\n· two", ['one', 'two']),
+            ("Количество цитат: 1\n\nПоследние добавленные:\n\n· one", ['one']),
+            ("Количество цитат: 2\n\nПоследние добавленные:\n\n· one\n· two", ['one', 'two']),
         )
         for expected, quotes in params:
             with self.subTest(f"get_quotes {quotes}"):
@@ -453,7 +462,7 @@ class TestBot(IsolatedAsyncioTestCase):
                     RESULTS.clear()
 
     async def test_get_group_info(self):
-        exp = f"Группа: Title\nID группы: 11 \n\nКоличество цитат:  0\nПоследние добавленные: /get_quotes\n\n" \
+        exp = f"Группа: Title\nID группы: 11\n\nКоличество цитат:  0\nПоследние добавленные: /get_quotes\n\n" \
               f"Текущие настройки:\n  Антиспам: 1\n  Ежедневные отчёты: 1\n  Праздники: 1"
         params = (
             ("Группа не включена. Включить: /enable_stan", None),
@@ -466,6 +475,12 @@ class TestBot(IsolatedAsyncioTestCase):
                     await self.bot.process_new_updates([get_update('/get_group_info', user_id=100)])
                     self.assertEqual(expected, RESULTS[0][0]['text'])
                     RESULTS.clear()
+
+    async def test_empty_name_user(self):
+        await self.bot.process_new_updates([get_update('новый текст', first_name='')])
+        self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
+        self.assertEqual(RESULTS[1][1], 'sendMessage')
+        self.assertEqual(RESULTS[1][0]['text'], '@None\nНапоминаем правило: Твой ник должен быть читаемым и понятным')
 
 
 if __name__ == '__main__':
