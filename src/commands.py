@@ -6,7 +6,7 @@ from telebot import types
 from .admin_commands import bot
 from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
                         BDMTSS_ID)
-from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_hello_text, is_empty_name
+from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_hello_text, is_invalid_name
 from .helpers import represent_as_get, detect_args, is_admin, fetch_rule
 from .report import update_stats, increment
 from .stan import act, speak
@@ -352,7 +352,7 @@ async def default_query(inline_query):
     await bot.answer_inline_query(inline_query.id, zen, cache_time=1200)
 
 
-@bot.message_handler(func=is_empty_name, chat_types=["supergroup", "group"])
+@bot.message_handler(func=is_invalid_name, chat_types=["supergroup", "group"])
 async def handle_hello(message: types.Message):
     await bot.delete_message(message.chat.id, message.id)
     nick_rule = 6
