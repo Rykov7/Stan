@@ -69,6 +69,12 @@ def is_admin(message: types.Message) -> bool:
     return message.from_user.id == ADMIN_ID
 
 
+def has_no_letters(text: str) -> bool:
+    text = text.lower()
+    letters = f'{ONLY_RUS_LETTERS}{ONLY_ENG_LETTERS}'
+    return not any(letter in text for letter in letters)
+
+
 def my_ip():
     ip_service = "https://icanhazip.com"
     ip = urlopen(ip_service)

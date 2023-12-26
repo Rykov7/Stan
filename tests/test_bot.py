@@ -18,7 +18,7 @@ from src import helpers
 helpers.is_url_reachable = lambda a: True
 from src.commands import bot
 from src.constants import BDMTSS_ID, LUTZ_ID, ADMIN_ID, HELLO_EXAMPLES
-from src.filters import is_white_id
+from src.filters import is_white_id, is_invalid_name
 
 # отключаем логи бота, в тестах они не нужны
 logger.setLevel(logging.ERROR)
@@ -98,6 +98,23 @@ class TestOther(TestCase):
             with self.subTest(f"check non-is_white_id({text})"):
                 m = MagicMock(from_user=MagicMock(id=text))
                 self.assertEqual(is_white_id(m), expected)
+
+    def test_is_invalid_name(self):
+        params = (
+            (True, None),
+            (True, ''),
+            (True, ' '),
+            (True, '.'),
+            (True, '#!%%@$#@'),
+            (True, '⛔️ '),
+            (True, '212434343'),
+            (False, 'a212434343'),
+            (False, '212434343я'),
+        )
+        for expected, text in params:
+            with self.subTest(f"check non-is_invalid_name({text})"):
+                m = MagicMock(from_user=MagicMock(full_name=text))
+                self.assertEqual(is_invalid_name(m), expected)
 
 
 class TestBot(IsolatedAsyncioTestCase):
@@ -476,8 +493,8 @@ class TestBot(IsolatedAsyncioTestCase):
                     self.assertEqual(expected, RESULTS[0][0]['text'])
                     RESULTS.clear()
 
-    async def test_empty_name_user(self):
-        await self.bot.process_new_updates([get_update('новый текст', first_name='')])
+    async def test_invalid_name_user(self):
+        await self.bot.process_new_updates([get_update('новый текст', first_name=None)])
         self.assertEqual(RESULTS[0], ({'chat_id': 11, 'message_id': 1}, 'deleteMessage'))
         self.assertEqual(RESULTS[1][1], 'sendMessage')
         self.assertEqual(RESULTS[1][0]['text'], '@None\nНапоминаем правило: Твой ник должен быть читаемым и понятным')

@@ -2,7 +2,7 @@ from unittest import TestCase, main
 from unittest.mock import MagicMock
 from src.constants import SPAM, BAN_WORDS, ADMIN_ID, RULES_TEXT
 from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, \
-    fetch_rule, cleaned_text, remove_spaces
+    fetch_rule, cleaned_text, remove_spaces, has_no_letters
 
 CASES = (
     "Оформим резидeнтствo ОАЭ без предoплаты за 5000 дирхам. Пoдробнoсти в лc",
@@ -114,6 +114,21 @@ class TestOthers(TestCase):
         for expected, text in params:
             with self.subTest(f"remove_spaces {text}"):
                 self.assertEqual(expected, remove_spaces(text))
+
+    def test_has_no_letters(self):
+        params = (
+            (False, 'f1   b2  print  text  '),
+            (True, ''),
+            (True, ' '),
+            (True, '12 @# &*'),
+            (False, '12 @# &* f'),
+            (False, '12 @# &* Z'),
+            (False, '12 @# &* я'),
+            (False, '12 @# &* Я'),
+        )
+        for expected, text in params:
+            with self.subTest(f"has_no_letters {text}"):
+                self.assertEqual(expected, has_no_letters(text))
 
 
 if __name__ == '__main__':

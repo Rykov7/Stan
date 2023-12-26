@@ -4,7 +4,7 @@ from telebot import types
 
 from .config import WHITEIDS
 from .constants import LOG_COMM, ALLOWED_WORDS, URL_RX, HELLO_EXAMPLES
-from .helpers import is_spam, is_in_not_allowed, is_ban_words_in_caption, cleaned_text, remove_spaces
+from .helpers import is_spam, is_in_not_allowed, is_ban_words_in_caption, cleaned_text, remove_spaces, has_no_letters
 from .models import is_antispam_enabled
 
 
@@ -52,5 +52,8 @@ def is_hello_text(message: types.Message) -> bool:
     return any(hello == text for hello in HELLO_EXAMPLES)
 
 
-def is_empty_name(message: types.Message) -> bool:
-    return message.from_user.full_name.strip() == ''
+def is_invalid_name(message: types.Message) -> bool:
+    name = message.from_user.full_name
+    if name is None or name.strip() == '':
+        return True
+    return has_no_letters(name)
