@@ -353,15 +353,15 @@ async def default_query(inline_query):
 
 
 @bot.message_handler(func=is_invalid_name, chat_types=["supergroup", "group"])
-async def handle_hello(message: types.Message):
-    await bot.delete_message(message.chat.id, message.id)
-    nick_rule = 6
-    await bot.send_message(message.chat.id, f"@{message.from_user.username}\n"
-                                            f"Напоминаем правило: {fetch_rule(nick_rule)}")
+async def handle_invalid_name(message: types.Message):
+    """Send the rule if member name is invalid."""
+    message.text = '\правило 6'
+    await send_rules(message)
 
 
 @bot.message_handler(func=is_hello_text, chat_types=["supergroup", "group"])
 async def handle_hello(message: types.Message):
+    """Send the rule if member name is message is just Hello."""
     await _neprivet(message, forced_reply=True)
 
 
