@@ -77,9 +77,9 @@ async def check_new_members(message: types.Message):
         info['bio'] = more_data.bio
         if more_data.photo:
             info['photo'] = more_data.photo.big_file_id
-        logging.info("[JOIN] User join chat: %s", info)
+        logging.info(f"[JOINED] {info['full_name']}")
     if message.content_type == "left_chat_member":
         from_user = message.from_user
         info = short_user_data(from_user)
-        logging.debug("[LEAVE] User left chat: %s", info)
+        logging.info(f"[LEFT] {info['full_name']}")
         await bot.delete_message(message.chat.id, message.id)
