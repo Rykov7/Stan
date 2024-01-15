@@ -7,9 +7,9 @@ from .admin_commands import bot
 from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
                         BDMTSS_ID)
 from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_hello_text, is_invalid_name
-from .helpers import represent_as_get, detect_args, is_admin, fetch_rule
+from .helpers import represent_as_get, detect_args, is_admin, fetch_rule, has_warnings, warn_user, warnings_count
 from .report import update_stats, increment
-from .stan import act, speak
+from .stan import act, speak, mute_for_one_day
 
 
 async def send_or_reply(message: types.Message, answer, **kwargs):
@@ -358,7 +358,15 @@ async def handle_invalid_name(message: types.Message):
     rule_num = 6
     markup = types.InlineKeyboardMarkup([[RULES]], 1)
     logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
-    await send_or_reply(message, f'<b><a href="tg:user?id={message.from_user.id}">{message.from_user.full_name}</a>, правило {rule_num}</b>\n<i>{fetch_rule(rule_num)}</i>', reply_markup=markup)
+    user_id = message.from_user.id
+    if not has_warnings(user_id):
+        await send_or_reply(message, f'<b><a href="tg:user?id={user_id}">{message.from_user.full_name}'
+                                     f'</a>, правило {rule_num}</b>\n<i>{fetch_rule(rule_num)}</i>',
+                            reply_markup=markup)
+    warn_user(user_id)
+    if warnings_count(user_id) >= 3:
+        logging.info(f"[MUTED] User {user_id} has been muted for violating 6 rule")
+        await mute_for_one_day(message.chat.id, user_id)
     await bot.delete_message(message.chat.id, message.id)
 
 

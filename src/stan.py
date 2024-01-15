@@ -3,6 +3,7 @@ import asyncio
 import html
 import logging
 import random
+from time import time
 
 from telebot import types
 
@@ -12,6 +13,9 @@ from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_i
 from .robot import bot
 
 TYPING_TIMEOUT = 0.13 / 4  # Reading time is quarter of the same text writing time
+FOR_EVER_TIMEOUT = 0
+ONE_DAY_TIMEOUT = 86400
+ONE_WEEK_TIMEOUT = 86400 * 7
 
 
 def speak(chance_of: int, chat_id: int) -> None | str:
@@ -34,6 +38,23 @@ async def act(message: types.Message):
     quote = speak(50, message.chat.id)
     if quote:
         await send_quote(len(quote) * 0.13, message, quote)
+
+
+async def mute_forever(chat_id: int, user_id: int):
+    await mute(chat_id, user_id, FOR_EVER_TIMEOUT)
+
+
+async def mute_for_one_day(chat_id: int, user_id: int):
+    await mute(chat_id, user_id, ONE_DAY_TIMEOUT)
+
+
+async def mute_for_one_week(chat_id: int, user_id: int):
+    await mute(chat_id, user_id, ONE_WEEK_TIMEOUT)
+
+
+async def mute(chat_id, user_id, period):
+    logging.info(f"[MUTED] User {user_id} has been muted for: {period} seconds")
+    await bot.restrict_chat_member(chat_id, user_id, until_date=time() + period)
 
 
 @bot.message_handler(func=is_white_id, commands=["add"])
