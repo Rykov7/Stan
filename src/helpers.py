@@ -126,3 +126,7 @@ def fetch_rule(index: int) -> str:
         return RULES_TEXT[index - 1]
     else:
         return "Пока не придумали"
+
+
+def has_links(body: str) -> bool:
+    return "https://" in body or "http://" in body

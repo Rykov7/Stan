@@ -25,6 +25,25 @@ logger.setLevel(logging.ERROR)
 
 # сюда будут складываться результаты, перед началом теста очищается
 RESULTS = []
+USER_ID = 555
+SPAMMER_ID = 666
+
+
+async def custom_sender(_token, url, _method='get', params=None, _files=None, **_kwargs):
+    """Замена для тестов, чтобы не слать запросы в телегу"""
+    RESULTS.append((params, url))
+    bio = "bio" if params["chat_id"] == USER_ID else "My bot here https://t.me/stupid.bot"
+    chat = {"id": 1000, "type": "group", "bio": bio,
+            "photo": {"big_file_id": "file_id", "small_file_id": "file_id", "small_file_unique_id": "file_id",
+                      "big_file_unique_id": "file_id"}}
+    result = {"message_id": 1000, "date": 1, "chat": chat}
+    if url == "getChat":
+        result = chat
+    return result
+
+
+# Чтобы перехватить запросы к телеге
+asyncio_helper._process_request = custom_sender
 
 
 def _all_nones():
@@ -58,31 +77,16 @@ def get_update(text, reply_to=None, user_id=10, first_name='Some User'):
     return types.Update(1001234038283, mess, *_all_nones())
 
 
-def member(leave: bool = False):
+def member(leave: bool = False, url_in_bio: bool = False):
     """Хелпер, генерирующий событие входа и выхода юзера"""
     type_ = 'left_chat_member' if leave else 'new_chat_members'
     chat = types.Chat(id=11, type='group')
     params = {'content_type': type_}
-    user = types.User(id=555, is_bot=False, first_name='Some User')
+    id_ = SPAMMER_ID if url_in_bio else USER_ID
+    user = types.User(id=id_, is_bot=False, first_name='Some User')
     mess = types.Message(message_id=1, from_user=user, date=None, chat=chat, content_type=type_,
                          options=params, json_string='')
     return types.Update(100100, mess, *_all_nones())
-
-
-async def custom_sender(token, url, method='get', params=None, files=None, **kwargs):
-    """Замена для тестов, чтобы не слать запросы в телегу"""
-    RESULTS.append((params, url))
-    chat = {"id": 1000, "type": "group", "bio": "bio",
-            "photo": {"big_file_id": "file_id", "small_file_id": "file_id", "small_file_unique_id": "file_id",
-                      "big_file_unique_id": "file_id"}}
-    result = {"message_id": 1000, "date": 1, "chat": chat}
-    if url == "getChat":
-        result = chat
-    return result
-
-
-# Чтобы перехватить запросы к телеге
-asyncio_helper._process_request = custom_sender
 
 
 class TestOther(TestCase):
@@ -345,7 +349,13 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_new_user_in_chat(self):
         await self.bot.process_new_updates([member()])
         self.assertEqual(RESULTS[0][1], 'deleteMessage')
-        self.assertEqual(RESULTS[1], ({'chat_id': 555}, 'getChat'))
+        self.assertEqual(RESULTS[1], ({'chat_id': USER_ID}, 'getChat'))
+
+    async def test_new_user_in_chat_ban_for_bio(self):
+        await self.bot.process_new_updates([member(url_in_bio=True)])
+        self.assertEqual(RESULTS[0][1], 'deleteMessage')
+        self.assertEqual(RESULTS[1], ({'chat_id': SPAMMER_ID}, 'getChat'))
+        self.assertEqual(RESULTS[2][1], 'banChatMember')
 
     async def test_user_leave_chat(self):
         await self.bot.process_new_updates([member(leave=True)])
@@ -496,7 +506,8 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_invalid_name_user(self):
         await self.bot.process_new_updates([get_update('новый текст', first_name=None)])
         self.assertEqual(RESULTS[0][0]['chat_id'], '11')
-        self.assertEqual(RESULTS[0][0]['text'], '<b><a href="tg:user?id=10">None</a>, правило 6</b>\n<i>Имя должно быть читаемым и понятным.</i>')
+        self.assertEqual(RESULTS[0][0]['text'],
+                         '<b><a href="tg:user?id=10">None</a>, правило 6</b>\n<i>Имя должно быть читаемым и понятным.</i>')
         self.assertEqual(RESULTS[0][1], 'sendMessage')
         self.assertEqual(RESULTS[1][1], 'deleteMessage')
 

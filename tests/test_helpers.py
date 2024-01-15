@@ -1,8 +1,10 @@
 from unittest import TestCase, main
 from unittest.mock import MagicMock
 from src.constants import SPAM, BAN_WORDS, ADMIN_ID, RULES_TEXT
-from src.helpers import is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, \
-    fetch_rule, cleaned_text, remove_spaces, has_no_letters
+from src.helpers import (
+    is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, fetch_rule, cleaned_text,
+    remove_spaces, has_no_letters, has_links
+)
 
 REAL_CASES = (
     "Оформим резидeнтствo ОАЭ без предoплаты за 5000 дирхам. Пoдробнoсти в лc",
@@ -179,6 +181,17 @@ class TestOthers(TestCase):
         for expected, text in params:
             with self.subTest(f"has_no_letters {text}"):
                 self.assertEqual(expected, has_no_letters(text))
+
+    def test_has_links(self):
+        params = (
+            (True, 'My bot https://t.me/bot.some'),
+            (True, 'My bot http://t.me/bot.some'),
+            (False, 'My bot here'),
+            (False, 'I can use http'),
+        )
+        for expected, text in params:
+            with self.subTest(f"has_links {text}"):
+                self.assertEqual(expected, has_links(text))
 
 
 if __name__ == '__main__':

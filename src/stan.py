@@ -4,10 +4,10 @@ import html
 import logging
 import random
 
-from telebot import types, util
+from telebot import types
 
 from .filters import is_white_id
-from .helpers import is_nongrata, short_user_data
+from .helpers import is_nongrata, short_user_data, has_links
 from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat
 from .robot import bot
 
@@ -73,11 +73,15 @@ async def check_new_members(message: types.Message):
         info = short_user_data(from_user)
         await bot.delete_message(message.chat.id, message.id)
         # мы не знаем как быстро получим инфу о био, потому сначала удаляем сообщение, потом запрашиваем био/логируем
-        more_data = await bot.get_chat(from_user.id)
+        more_data = await bot.get_chat(info['id'])
         info['bio'] = more_data.bio
         if more_data.photo:
             info['photo'] = more_data.photo.big_file_id
-        logging.info(f"[JOINED] {info['full_name']}")
+        if has_links(info['bio']):
+            await bot.ban_chat_member(message.chat.id, info['id'])
+            logging.info(f"[BANNED] User {info['full_name']} has url in bio: {info['bio']}")
+        else:
+            logging.info(f"[JOINED] {info['full_name']}")
     if message.content_type == "left_chat_member":
         from_user = message.from_user
         info = short_user_data(from_user)
