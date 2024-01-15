@@ -511,6 +511,15 @@ class TestBot(IsolatedAsyncioTestCase):
         self.assertEqual(RESULTS[0][1], 'sendMessage')
         self.assertEqual(RESULTS[1][1], 'deleteMessage')
 
+    async def test_invalid_name_user_muted(self):
+        await self.bot.process_new_updates([get_update('новый текст', user_id=111, first_name=None)])
+        await self.bot.process_new_updates([get_update('новый текст', user_id=111, first_name=None)])
+        await self.bot.process_new_updates([get_update('новый текст', user_id=111, first_name=None)])
+        self.assertEqual(RESULTS[1][1], 'deleteMessage')
+        self.assertEqual(RESULTS[2][1], 'deleteMessage')
+        self.assertEqual(RESULTS[4][1], 'deleteMessage')
+        self.assertEqual(RESULTS[3][1], 'restrictChatMember')
+
 
 if __name__ == '__main__':
     main()

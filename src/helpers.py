@@ -8,6 +8,22 @@ from telebot import types
 
 from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS
 
+WARNS: dict[int, int] = {}
+
+
+def has_warnings(user_id: int) -> bool:
+    return user_id in WARNS
+
+
+def warn_user(user_id: int):
+    if user_id not in WARNS:
+        WARNS[user_id] = 0
+    WARNS[user_id] += 1
+
+
+def warnings_count(user_id: int) -> int:
+    return WARNS.get(user_id, 0)
+
 
 def is_url_reachable(url: str) -> bool:
     try:
