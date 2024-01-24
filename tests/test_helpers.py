@@ -186,6 +186,8 @@ class TestOthers(TestCase):
         params = (
             (True, 'My bot https://t.me/bot.some'),
             (True, 'My bot http://t.me/bot.some'),
+            (True, 'My bot here https://t.me/bot.some '),
+            (True, 'My bot here t.me/+hENFI22TCQdkN2E'),
             (False, 'My bot here'),
             (False, 'I can use http'),
         )
