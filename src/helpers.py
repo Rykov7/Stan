@@ -6,7 +6,9 @@ from urllib.request import urlopen
 
 from telebot import types
 
-from .constants import SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS
+from .constants import (
+    SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS, URL_RX
+)
 
 WARNS: dict[int, int] = {}
 
@@ -145,4 +147,4 @@ def fetch_rule(index: int) -> str:
 
 
 def has_links(body: str) -> bool:
-    return "https://" in body or "http://" in body
+    return "https://" in body or "http://" in body or "t.me/" in body
