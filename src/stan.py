@@ -98,7 +98,7 @@ async def check_new_members(message: types.Message):
         info['bio'] = more_data.bio
         if more_data.photo:
             info['photo'] = more_data.photo.big_file_id
-        if has_links(info['bio']):
+        if info['bio'] and has_links(info['bio']):
             await bot.ban_chat_member(message.chat.id, info['id'])
             logging.info(f"[BANNED] User {info['full_name']} has url in bio: {info['bio']}")
         else:

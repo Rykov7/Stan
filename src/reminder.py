@@ -13,7 +13,7 @@ from .constants import PYTHONCHATRU
 from .report import create_report_text, reset_report_stats
 
 if USE_REMINDER:
-    logging.debug("Starts reminder!!!")
+    logging.debug("[START] Reminder")
     # We need synchronous instance of bot here as we use synchronous library 'schedule' in a separate thread.
     bot = TeleBot(TOKEN, "HTML", disable_web_page_preview=True, allow_sending_without_reply=True)
 else:
