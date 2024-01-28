@@ -130,11 +130,13 @@ def represent_as_get(message: types.Message):
 def detect_args(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         if len(message.text.split()) == 1:
-            return message.reply_to_message.text
-        else:
+            # Есть цитата, нет аргументов: ищем текст из цитаты.
+            return (message.quote and message.quote.text) or message.reply_to_message.text
+        elif len(message.text.split()) > 1:
+            # Есть цитата, есть аргументы: ищем текст из аргументов.
             return " ".join(message.text.split()[1:])
-    else:
-        if len(message.text.split()) > 1:
+    elif len(message.text.split()) > 1:
+            # Нет цитаты, есть аргументы: ищем текст из аргументов.
             return " ".join(message.text.split()[1:])
 
 
