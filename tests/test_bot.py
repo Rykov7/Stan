@@ -318,7 +318,7 @@ class TestBot(IsolatedAsyncioTestCase):
                 aq.side_effect = lambda *a: None
                 await self.bot.process_new_updates([get_update('/add', reply_to="good text", user_id=100)])
                 self.assertEqual(RESULTS[0][1], 'sendMessage')
-                self.assertEqual(RESULTS[0][0]['text'], '➕\n  └ good text')
+                self.assertEqual(RESULTS[0][0]['text'], '⭐️ Добавил: good text')
                 self.assertEqual(RESULTS[1][1], 'deleteMessage')
 
     async def test_white_id_cant_add_existing_quote(self):
@@ -332,25 +332,25 @@ class TestBot(IsolatedAsyncioTestCase):
                     add_qoute.side_effect = lambda x, y: None
                     await self.bot.process_new_updates([get_update('/add', reply_to="good text", user_id=100)])
                     self.assertEqual(RESULTS[0][1], 'sendMessage')
-                    self.assertEqual(RESULTS[0][0]['text'], '⛔️ Не добавил, есть токое\n  └ good text')
+                    self.assertEqual(RESULTS[0][0]['text'], '⛔️ Не добавил, есть токое: good text')
 
     async def test_white_id_cant_remove_non_existing_quote(self):
         await self.bot.process_new_updates([get_update('/remove', reply_to="good text", user_id=100)])
         self.assertEqual(RESULTS[0][1], 'sendMessage')
-        self.assertEqual(RESULTS[0][0]['text'], '⛔️ Нет такого\n  └ good text')
+        self.assertEqual(RESULTS[0][0]['text'], '⛔️ Нет такого: good text')
 
     async def test_white_id_can_remove_existing_quote(self):
         # Нужно вернуть запрос о наличии цитаты
         with patch("src.stan.is_quote_in_chat") as mocked:
             # Подменяем удаление цитаты, нам важно что оно просто было вызвано
-            with patch("src.stan.delete_quote_in_chat") as delete_qoute:
+            with patch("src.stan.delete_quote_in_chat") as delete_quote:
                 mocked.return_value = [["good text"]]
-                delete_qoute.side_effect = lambda x, y: None
+                delete_quote.side_effect = lambda x, y: None
                 mocked.return_value = True
                 await self.bot.process_new_updates([get_update('/remove', reply_to="good text", user_id=100)])
                 self.assertEqual(RESULTS[0][1], 'sendMessage')
                 self.assertEqual(RESULTS[1][1], 'deleteMessage')
-                self.assertEqual(RESULTS[0][0]['text'], '➖ \n  └ good text')
+                self.assertEqual(RESULTS[0][0]['text'], '🗑 Удалил: good text')
 
     async def test_new_user_in_chat(self):
         await self.bot.process_new_updates([member()])
