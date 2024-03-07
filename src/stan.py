@@ -7,6 +7,7 @@ from time import time
 
 from telebot import types
 
+from .constants import LOG_COMM
 from .filters import is_white_id
 from .helpers import is_nongrata, short_user_data, has_links
 from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat
@@ -53,7 +54,7 @@ async def mute_for_one_week(chat_id: int, user_id: int):
 
 
 async def mute(chat_id, user_id, period):
-    logging.info(f"[MUTED] User {user_id} has been muted for: {period} seconds")
+    logging.info(f"[MUTED] {user_id} заглушен на: {period} секунд.")
     await bot.restrict_chat_member(chat_id, user_id, until_date=time() + period)
 
 
@@ -63,10 +64,13 @@ async def add_stan_quote(message: types.Message):
         quote = message.reply_to_message.text
         if not is_quote_in_chat(quote, message.chat.id):
             add_quote(message.chat.id, quote.replace("\n", " "))
-            await bot.send_message(message.chat.id, "➕\n  └ " + quote.replace("\n", " "), parse_mode='Markdown')
+            ok_message = await bot.send_message(message.chat.id, "⭐️ Добавил: " + quote, parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
+            await asyncio.sleep(3)
+            await bot.delete_message(message.chat.id, ok_message.id)
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое\n  └ {quote}", parse_mode='Markdown')
+            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
+        logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, message.text))
 
 
 @bot.message_handler(func=is_white_id, commands=["remove"])
@@ -75,10 +79,13 @@ async def remove_stan_quote(message: types.Message):
         quote = message.reply_to_message.text
         if is_quote_in_chat(quote, message.chat.id):
             delete_quote_in_chat(quote, message.chat.id)
-            await bot.send_message(message.chat.id, f"➖ \n  └ {quote}", parse_mode='Markdown')
+            remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
+            await asyncio.sleep(3)
+            await bot.delete_message(message.chat.id, remove_message.id)
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Нет такого\n  └ {quote}", parse_mode='Markdown')
+            await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode='Markdown')
+        logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, message.text))
 
 
 @bot.message_handler(func=is_nongrata)
@@ -100,7 +107,7 @@ async def check_new_members(message: types.Message):
             info['photo'] = more_data.photo.big_file_id
         if info['bio'] and has_links(info['bio']):
             await bot.ban_chat_member(message.chat.id, info['id'])
-            logging.info(f"[BANNED] User {info['full_name']} has url in bio: {info['bio']}")
+            logging.info(f"[BANNED] У {info['full_name']} ссылка в био: {info['bio']}")
         else:
             logging.info(f"[JOINED] {info['full_name']}")
     if message.content_type == "left_chat_member":

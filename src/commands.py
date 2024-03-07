@@ -365,7 +365,7 @@ async def handle_invalid_name(message: types.Message):
                             reply_markup=markup)
     warn_user(user_id)
     if warnings_count(user_id) >= 3:
-        logging.info(f"[MUTED] User {user_id} has been muted for violating 6 rule")
+        logging.info(f"[MUTED] {user_id} заглушен за нарушение правила 6.")
         await mute_for_one_day(message.chat.id, user_id)
     await bot.delete_message(message.chat.id, message.id)
 
