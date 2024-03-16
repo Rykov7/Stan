@@ -1,6 +1,5 @@
 """ Stan's commands and reactions. """
 import asyncio
-import html
 import logging
 import random
 from time import time
@@ -32,7 +31,7 @@ async def send_quote(after_sec, message, quote):
         await asyncio.sleep(len(message.text) * TYPING_TIMEOUT)
     await bot.send_chat_action(message.chat.id, action="typing")
     await asyncio.sleep(after_sec)  # Typing time
-    await bot.send_message(message.chat.id, html.escape(quote))
+    await bot.send_message(message.chat.id, quote, parse_mode=None)
 
 
 async def act(message: types.Message):
@@ -64,13 +63,13 @@ async def add_stan_quote(message: types.Message):
         quote = message.reply_to_message.text
         if not is_quote_in_chat(quote, message.chat.id):
             add_quote(message.chat.id, quote.replace("\n", " "))
-            ok_message = await bot.send_message(message.chat.id, "⭐️ Добавил: " + quote, parse_mode='Markdown')
+            ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил: {quote}", parse_mode=None)
             await bot.delete_message(message.chat.id, message.id)
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, ok_message.id)
+            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[ADD] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
-        logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, message.text))
+            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode=None)
 
 
 @bot.message_handler(func=is_white_id, commands=["remove"])
@@ -79,13 +78,13 @@ async def remove_stan_quote(message: types.Message):
         quote = message.reply_to_message.text
         if is_quote_in_chat(quote, message.chat.id):
             delete_quote_in_chat(quote, message.chat.id)
-            remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode='Markdown')
+            remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode=None)
             await bot.delete_message(message.chat.id, message.id)
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, remove_message.id)
+            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[RMV] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode='Markdown')
-        logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, message.text))
+            await bot.send_message(message.chat.id, f"⛔️ Не удалил, нет такого: {quote}", parse_mode=None)
 
 
 @bot.message_handler(func=is_nongrata)

@@ -57,7 +57,7 @@ def create_report_text(chat_id):
                 )
                 top_users += f'\n{i + 1}. {html.escape(name)} [{flooder["Count"]}]'
 
-            if len(flooders) >= 3 or s["Banned"] or s["Deleted"]:
+            if len(flooders) >= 3 or s["Banned"]:
                 report = f"<b>H</b>ello, <b>W</b>orld!\n"
             if len(flooders) >= 3:
                 report += f"{top_users}\n"

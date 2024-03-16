@@ -173,7 +173,7 @@ async def stan_speak(message: types.Message):
             message.text,
         )
     )
-    await bot.send_message(message.chat.id, speak(0, message.chat.id), parse_mode='Markdown')
+    await bot.send_message(message.chat.id, speak(0, message.chat.id), parse_mode=None)
     await bot.delete_message(message.chat.id, message.id)
 
 
