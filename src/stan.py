@@ -84,7 +84,7 @@ async def remove_stan_quote(message: types.Message):
             await bot.delete_message(message.chat.id, remove_message.id)
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[RMV] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Не удалил, нет такого: {quote}", parse_mode=None)
+            await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode=None)
 
 
 @bot.message_handler(func=is_nongrata)
