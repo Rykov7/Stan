@@ -60,7 +60,7 @@ async def mute(chat_id, user_id, period):
 @bot.message_handler(func=is_white_id, commands=["add"])
 async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        quote = message.reply_to_message.text
+        quote = (message.quote and message.quote.text) or message.reply_to_message.text
         if not is_quote_in_chat(quote, message.chat.id):
             add_quote(message.chat.id, quote)
             ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил: {quote}", parse_mode='Markdown')
@@ -75,7 +75,7 @@ async def add_stan_quote(message: types.Message):
 @bot.message_handler(func=is_white_id, commands=["remove"])
 async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
-        quote = message.reply_to_message.text
+        quote = (message.quote and message.quote.text) or message.reply_to_message.text
         if is_quote_in_chat(quote, message.chat.id):
             delete_quote_in_chat(quote, message.chat.id)
             remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode='Markdown')
