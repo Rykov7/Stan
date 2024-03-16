@@ -4,12 +4,12 @@ import logging
 import random
 from time import time
 
-from telebot import types
+from telebot import types, util
 
 from .constants import LOG_COMM
 from .filters import is_white_id
 from .helpers import is_nongrata, short_user_data, has_links
-from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat
+from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat, CACHE
 from .robot import bot
 
 TYPING_TIMEOUT = 0.13 / 4  # Reading time is quarter of the same text writing time
@@ -62,14 +62,14 @@ async def add_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = message.reply_to_message.text
         if not is_quote_in_chat(quote, message.chat.id):
-            add_quote(message.chat.id, quote.replace("\n", " "))
-            ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил: {quote}", parse_mode=None)
+            add_quote(message.chat.id, quote)
+            ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил: {quote}", parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, ok_message.id)
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[ADD] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode=None)
+            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
 
 
 @bot.message_handler(func=is_white_id, commands=["remove"])
@@ -78,13 +78,29 @@ async def remove_stan_quote(message: types.Message):
         quote = message.reply_to_message.text
         if is_quote_in_chat(quote, message.chat.id):
             delete_quote_in_chat(quote, message.chat.id)
-            remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode=None)
+            remove_message = await bot.send_message(message.chat.id, f"🗑 Удалил: {quote}", parse_mode='Markdown')
             await bot.delete_message(message.chat.id, message.id)
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, remove_message.id)
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[RMV] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode=None)
+            await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode='Markdown')
+
+
+@bot.message_handler(func=is_white_id, commands=[ "last", "quotes", "last_quotes"])
+async def send_last_quotes(message: types.Message):
+    """The last added quotes for the current chat."""
+    argument = util.extract_arguments(message.text)
+    num = 5
+    if argument:
+        try:
+            num = int(argument)
+        except ValueError:
+            pass
+
+    last_quotes = [f' • {quote.text}' for quote in CACHE[message.chat.id].quotes[-num:]]
+    text = f'💬 Последние цитаты\n*{message.chat.title}*\n\n' + '\n'.join(last_quotes)
+    await bot.send_message(message.chat.id, text, parse_mode='Markdown')
 
 
 @bot.message_handler(func=is_nongrata)
