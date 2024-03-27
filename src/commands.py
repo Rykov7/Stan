@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import logging.handlers
 
@@ -374,6 +375,19 @@ async def handle_invalid_name(message: types.Message):
 async def handle_hello(message: types.Message):
     """Send the rule if member name is message is just Hello."""
     await _neprivet(message, forced_reply=True)
+
+test_var = 0
+
+
+@bot.message_handler(func=is_admin, commands=["check_asyncio"])
+async def check_asyncio(message: types.Message):
+    global test_var
+    test_var += 1
+    coroutine_no = test_var
+
+    await bot.send_message(message.chat.id, f'⬜️ Начало корутиночки {coroutine_no}.')
+    await asyncio.sleep(15)
+    await bot.send_message(message.chat.id, f'🟩 Конец корутиночки {coroutine_no}.')
 
 
 """                [ COUNTER ]              """
