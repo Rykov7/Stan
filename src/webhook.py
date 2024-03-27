@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import telebot
@@ -15,6 +16,6 @@ async def webhook(update: dict):
     """Parse POST requests from Telegram."""
     if update:
         update = telebot.types.Update.de_json(update)
-        await bot.process_new_updates([update])
+        asyncio.ensure_future(bot.process_new_updates([update]))
     else:
         return None

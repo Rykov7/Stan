@@ -385,3 +385,10 @@ async def handle_msg(message: types.Message):
     """Count messages, Stan."""
     update_stats(message)
     await act(message)
+
+
+@bot.message_handler(content_types=["text", "sticker", "photo", "animation", "video", "audio", "document"],
+                     chat_types=["private"])
+async def handle_all_msg(message: types.Message):
+    """Личка выводится в лог."""
+    logging.info(LOG_COMM % ('PM', message.from_user.id, message.from_user.full_name, message.text))
