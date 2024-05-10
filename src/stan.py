@@ -86,6 +86,11 @@ async def remove_stan_quote(message: types.Message):
         else:
             await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode='Markdown')
 
+@bot.message_handler(func=is_white_id, commands=["info"])
+async def get_user_info(message: types.Message):
+    if replied_message := message.reply_to_message:
+        await bot.send_message(message.chat.id, f'{replied_message.from_user.full_name}\nTelegram ID: {replied_message.from_user.id}')
+
 
 @bot.message_handler(func=is_white_id, commands=[ "last", "quotes", "last_quotes"])
 async def send_last_quotes(message: types.Message):
