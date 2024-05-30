@@ -54,6 +54,15 @@ class Chat(Base):
         return f'Chat({self.chat_id=}, {self.title=})'
 
 
+class BadWord(Base):
+    __tablename__ = 'bad_words'
+    id = Column(Integer, primary_key=True)
+    word = Column(String)
+
+    def __repr__(self):
+        return f'BadWord({self.id}: {self.word=})'
+
+
 CACHE: dict[int, Type[Chat]] = {}
 
 
@@ -91,6 +100,12 @@ def is_chat_exists(chat_id: int) -> bool:
 
 def add_quote(chat_id: int, text: str):
     session.add(Quote(chat_id=chat_id, text=text))
+    session.commit()
+    _reload_chat(chat_id)
+
+
+def add_spam(chat_id: int, text: str):
+    session.add(BadWord(word=text))
     session.commit()
     _reload_chat(chat_id)
 

@@ -1,1 +1,1 @@
-from . import set_commands
+# from . import set_commands  # Временное решение. Не коммитить раскомментированным - упадут тесты.

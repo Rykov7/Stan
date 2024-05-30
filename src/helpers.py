@@ -1,5 +1,4 @@
 """ Send User's info. """
-
 from urllib import parse
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -7,8 +6,9 @@ from urllib.request import urlopen
 from telebot import types
 
 from .constants import (
-    SPAM, BAN_WORDS, NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS, URL_RX
+    NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS, BAN_WORDS
 )
+from .models import session, BadWord
 
 WARNS: dict[int, int] = {}
 
@@ -40,7 +40,7 @@ def is_spam(message_text: str) -> bool:
     """
     if is_mixed(message_text):
         return True
-    return any(text.casefold() in message_text.casefold() for text in SPAM)
+    return any(bad_word.word.casefold() in message_text.casefold() for bad_word in session.query(BadWord).all())
 
 
 def is_mixed(text: str) -> bool:

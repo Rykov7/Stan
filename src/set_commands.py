@@ -26,6 +26,7 @@ for white_id in WHITEIDS:
             telebot.types.BotCommand("links", "/ссылки на правила, чзв и библиотеку"),
             telebot.types.BotCommand("tsya", "/тся и /ться"),
             telebot.types.BotCommand("add", "добавить цитату [Whitelist]"),
+            telebot.types.BotCommand("add_spam", "добавить в спам [Whitelist]"),
             telebot.types.BotCommand("remove", "удалить цитату [Whitelist]"),
         ],
         scope=telebot.types.BotCommandScopeChatMember(PYTHONCHATRU, white_id)

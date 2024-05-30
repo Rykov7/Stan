@@ -1,10 +1,11 @@
 from unittest import TestCase, main
 from unittest.mock import MagicMock
-from src.constants import SPAM, BAN_WORDS, ADMIN_ID, RULES_TEXT
+from src.constants import BAN_WORDS, ADMIN_ID, RULES_TEXT
 from src.helpers import (
     is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, fetch_rule, cleaned_text,
     remove_spaces, has_no_letters, has_links
 )
+from src.models import BadWord, session
 
 REAL_CASES = (
     "Оформим резидeнтствo ОАЭ без предoплаты за 5000 дирхам. Пoдробнoсти в лc",
@@ -48,9 +49,9 @@ TEST_CASES = ('here it me.sv/122', "My site is tg.sv/home", "look here goo.by/ho
 
 class TestSpam(TestCase):
     def test_simple(self):
-        for spam_word in SPAM:
-            with self.subTest(f"check spam word({spam_word})"):
-                self.assertTrue(is_spam(spam_word))
+        for spam_word in session.query(BadWord).all():
+            with self.subTest(f"check spam word({spam_word.word})"):
+                self.assertTrue(is_spam(spam_word.word))
 
     def test_case_first(self):
         for text in REAL_CASES:

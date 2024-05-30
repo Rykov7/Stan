@@ -9,7 +9,8 @@ from telebot import types, util
 from .constants import LOG_COMM
 from .filters import is_white_id
 from .helpers import is_nongrata, short_user_data, has_links
-from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat, CACHE
+from .models import all_chat_quotes, add_quote, is_quote_in_chat, delete_quote_in_chat, CACHE, add_spam, session, \
+    BadWord
 from .robot import bot
 
 TYPING_TIMEOUT = 0.13 / 4  # Reading time is quarter of the same text writing time
@@ -68,6 +69,22 @@ async def add_stan_quote(message: types.Message):
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, ok_message.id)
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[ADD] {message.reply_to_message.text}'))
+        else:
+            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
+
+
+@bot.message_handler(func=is_white_id, commands=["add_spam"])
+async def add_spam_handler(message: types.Message):
+    if message.reply_to_message and message.reply_to_message.text:
+        quote = (message.quote and message.quote.text) or message.reply_to_message.text
+        logging.error(f'{session.query(BadWord).filter_by(word=quote).first()}')
+        if not session.query(BadWord).filter_by(word=quote).first():
+            add_spam(message.chat.id, quote)
+            ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил в спам: {quote}", parse_mode='Markdown')
+            await bot.delete_message(message.chat.id, message.id)
+            await asyncio.sleep(3)
+            await bot.delete_message(message.chat.id, ok_message.id)
+            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[SPAM] {message.reply_to_message.text}'))
         else:
             await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
 
