@@ -1,5 +1,5 @@
 # Stan
-Multipurpose Asynchronous Telegram Bot for Python group
+Admin Bot for Python Telegram group
 
 ### What does this project do?
  * Send links on command (chat rules, FAQs, libraries etc.)
@@ -16,12 +16,11 @@ You can use this project as a pre-coded customizable bot.
 Original (and currently working example) bot's Telegram username: @LutzPyBot
 
 ### How to deploy it?
- 1. Clone repository on your linux server into `Stan` user's home directory.
- 2. Create virtual environment, activate virtual environment, install required packages from `requirements.txt`.
- 3. Create `.env` file in `Stan` directory with 3 variables: `LUTZPYBOT` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
- 4. Install `gunicorn` and `uvicorn` package with `pip install gunicorn uvicorn`
- 5. Set webhook using Python interactive shell with `bot.set_webhook()` or manually according [Telegram Bot API Documentation](https://core.telegram.org/bots/api#setwebhook).
- 6. Configure nginx as a reverse proxy. Example of Nginx config:
+ 1. Clone repository to your linux server into `/home/username/Stan/` directory.
+ 2. Create virtual environment, activate virtual environment, install required packages from `/requirements/common.txt` and `/requirements/prod.txt`.
+ 3. Create `.env` file in `Stan` directory with 3 variables: `STAN` (Bot Token), `whitelist` (White usernames, comma separated), `whiteids` (White IDs, comma separated)
+ 4. Set webhook using Python interactive shell with `bot.set_webhook()` or manually according [Telegram Bot API Documentation](https://core.telegram.org/bots/api#setwebhook).
+ 5. Configure nginx as a reverse proxy. Example of Nginx config:
     ```
     server {
             server_name rykov7.ru;
@@ -44,7 +43,7 @@ Original (and currently working example) bot's Telegram username: @LutzPyBot
     ```
 Then install certbot SSL certificate for this config.
 
- 7. Configure the bot as a daemon:
+ 6. Configure the bot as a daemon:
  * Create daemon unit file in `/etc/systemd/system/stan.service` with the next content (replace `inferno` with your username):
 ```
 [Unit]
@@ -89,3 +88,5 @@ Standard command pack for bot father includes:
 * faq - FAQ
 * books - Pythonista's Library
 * lutz - Send Lutz book
+* add - Add quote to Stan's dictionary
+* add_spam - Add spam phrase to Stan's dictionary

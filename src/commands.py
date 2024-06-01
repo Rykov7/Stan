@@ -5,8 +5,8 @@ import logging.handlers
 from telebot import types
 
 from .admin_commands import bot
-from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_ID,
-                        BDMTSS_ID)
+from .constants import (LOG_COMM, FAQ, LIB, RULES, RUS, RUS_ENG_TABLE, ENG_RUS_TABLE, PYTHONCHATRU, ZEN, LUTZ_BOOK_ID,
+                        BDMTSS_VOICE_ID)
 from .filters import in_spam_list, in_caption_spam_list, in_delete_list, is_hello_text, is_invalid_name
 from .helpers import represent_as_get, detect_args, is_admin, fetch_rule, has_warnings, warn_user, warnings_count
 from .report import update_stats, increment
@@ -126,7 +126,7 @@ async def send_lutz(message: types.Message):
             message.text,
         )
     )
-    await bot.send_document(message.chat.id, document=LUTZ_ID, caption="вот, не позорься")
+    await bot.send_document(message.chat.id, document=LUTZ_BOOK_ID, caption="вот, не позорься")
     await bot.delete_message(message.chat.id, message.id)
 
 
@@ -141,7 +141,7 @@ async def send_bdmtss_audio(message: types.Message):
             message.text,
         )
     )
-    await bot.send_voice(message.chat.id, BDMTSS_ID)
+    await bot.send_voice(message.chat.id, BDMTSS_VOICE_ID)
     await bot.delete_message(message.chat.id, message.id)
 
 

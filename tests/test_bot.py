@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 from telebot import asyncio_helper, types, logger
 
 # Надо сделать до импорта бота, иначе упадет, так как нет енва в тестах
-os.environ["LUTZPYBOT"] = "00000:AAAAAAAAAAAA"
+os.environ["STAN"] = "00000:AAAAAAAAAAAA"
 os.environ["whiteids"] = "100,200,300"
 os.environ["rollback"] = "1,2,3"
 os.environ["use_reminder"] = "FALSE"
@@ -17,7 +17,7 @@ from src import helpers
 # нужно не дать делать реальные запросы в тестах, конкретно тут -за Правилами чата
 helpers.is_url_reachable = lambda a: True
 from src.commands import bot
-from src.constants import BDMTSS_ID, LUTZ_ID, ADMIN_ID, HELLO_EXAMPLES
+from src.constants import BDMTSS_VOICE_ID, LUTZ_BOOK_ID, ADMIN_ID, HELLO_EXAMPLES
 from src.filters import is_white_id, is_invalid_name
 
 # отключаем логи бота, в тестах они не нужны
@@ -195,13 +195,13 @@ class TestBot(IsolatedAsyncioTestCase):
     async def test_lutz(self):
         await self.bot.process_new_updates([get_update('/lutz', reply_to="привет всем")])
         self.assertEqual(RESULTS[0][0]['caption'], "вот, не позорься")
-        self.assertEqual(RESULTS[0][0]['document'], LUTZ_ID)
+        self.assertEqual(RESULTS[0][0]['document'], LUTZ_BOOK_ID)
         self.assertEqual(RESULTS[0][1], "sendDocument")
         self.assertEqual(RESULTS[1][1], "deleteMessage")
 
     async def test_bdmtss(self):
         await self.bot.process_new_updates([get_update('/bdmtss', reply_to="привет всем")])
-        self.assertEqual(RESULTS[0][0]['voice'], BDMTSS_ID)
+        self.assertEqual(RESULTS[0][0]['voice'], BDMTSS_VOICE_ID)
         self.assertEqual(RESULTS[0][1], "sendVoice")
         self.assertEqual(RESULTS[1][1], "deleteMessage")
 

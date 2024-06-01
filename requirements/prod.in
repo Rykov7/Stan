@@ -1,0 +1,4 @@
+-c common.txt
+fastapi
+gunicorn
+uvicorn
