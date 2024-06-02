@@ -163,7 +163,7 @@ async def translate_layout(message: types.Message):
             await bot.send_message(message.chat.id, message.reply_to_message.text.translate(ENG_RUS_TABLE))
 
 
-@bot.message_handler(commands=["quote", "цитата"])
+@bot.message_handler(commands=["q", "quote", "цитата"])
 async def stan_speak(message: types.Message):
     logging.info(
         LOG_COMM

@@ -73,22 +73,6 @@ async def add_stan_quote(message: types.Message):
             await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
 
 
-@bot.message_handler(func=is_white_id, commands=["add_spam"])
-async def add_spam_handler(message: types.Message):
-    if message.reply_to_message and message.reply_to_message.text:
-        quote = (message.quote and message.quote.text) or message.reply_to_message.text
-        logging.error(f'{session.query(BadWord).filter_by(word=quote).first()}')
-        if not session.query(BadWord).filter_by(word=quote).first():
-            add_spam(message.chat.id, quote)
-            ok_message = await bot.send_message(message.chat.id, f"⭐️ Добавил в спам: {quote}", parse_mode='Markdown')
-            await bot.delete_message(message.chat.id, message.id)
-            await asyncio.sleep(3)
-            await bot.delete_message(message.chat.id, ok_message.id)
-            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[SPAM] {message.reply_to_message.text}'))
-        else:
-            await bot.send_message(message.chat.id, f"⛔️ Не добавил, есть токое: {quote}", parse_mode='Markdown')
-
-
 @bot.message_handler(func=is_white_id, commands=["remove"])
 async def remove_stan_quote(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
@@ -102,6 +86,23 @@ async def remove_stan_quote(message: types.Message):
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[RMV] {message.reply_to_message.text}'))
         else:
             await bot.send_message(message.chat.id, f"⛔️ Нет такого: {quote}", parse_mode='Markdown')
+
+
+@bot.message_handler(func=is_white_id, commands=["add_spam"])
+async def add_spam_handler(message: types.Message):
+    if message.reply_to_message and message.reply_to_message.text:
+        quote = (message.quote and message.quote.text) or message.reply_to_message.text
+        logging.error(f'{session.query(BadWord).filter_by(word=quote).first()}')
+        if not session.query(BadWord).filter_by(word=quote).first():
+            add_spam(message.chat.id, quote)
+            ok_message = await bot.send_message(message.chat.id, f"⭐️🤬 Добавил в спам: {quote}", parse_mode='Markdown')
+            await bot.delete_message(message.chat.id, message.id)
+            await asyncio.sleep(3)
+            await bot.delete_message(message.chat.id, ok_message.id)
+            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[SPAM] {message.reply_to_message.text}'))
+        else:
+            await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть такое в спаме: {quote}", parse_mode='Markdown')
+
 
 @bot.message_handler(func=is_white_id, commands=["info"])
 async def get_user_info(message: types.Message):

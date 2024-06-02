@@ -3,7 +3,6 @@ import logging
 import os
 import random
 import shelve
-from pathlib import Path
 
 from .config import ROLLBACK
 from .constants import DATA, types
@@ -29,9 +28,9 @@ def create_report_text(chat_id):
     report = ""
     top_users = ""
     flooders = []
-    spammer_icons = ('🐷', '🐒', '🐔')
+    spammer_icons = ('🐷', '🐒', '🐔', '👽')
     current_spammer_face = random.choice(spammer_icons)
-    if os.path.exists(f"{DATA}{chat_id}.db"):
+    if os.path.exists(f"{DATA}{chat_id}"):
         with shelve.open(f"{DATA}{chat_id}", writeback=True) as s:
             for user_id in ROLLBACK:
                 if user_id in s["Messages"] and s["Messages"][user_id]["Count"] > 10:
@@ -68,7 +67,7 @@ def create_report_text(chat_id):
 """
         return report
     else:
-        return f"Невозможно получить статистику.\n{DATA}{chat_id}.db не существует, возможно запрос в приватном чате. "
+        return f"Невозможно получить статистику.\n{DATA}{chat_id} не существует, возможно запрос в приватном чате. "
 
 
 def reset_report_stats(chat_id):
@@ -84,7 +83,7 @@ def reset_report_stats(chat_id):
 
 
 def update_stats(message: types.Message):
-    if not Path(f"{DATA}{message.chat.id}.db").exists():
+    if not os.path.exists(f"{DATA}{message.chat.id}"):
         reset_report_stats(message.chat.id)
     with shelve.open(f"{DATA}{message.chat.id}", writeback=True) as shelve_db:
         if "Messages" not in shelve_db:
