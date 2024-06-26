@@ -361,9 +361,9 @@ async def handle_invalid_name(message: types.Message):
     logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.first_name, message.text))
     user_id = message.from_user.id
     if not has_warnings(user_id):
-        await send_or_reply(message, f'<b><a href="tg:user?id={user_id}">{message.from_user.full_name}'
-                                     f'</a>, правило {rule_num}</b>\n<i>{fetch_rule(rule_num)}</i>',
-                            reply_markup=markup)
+        await bot.reply_to(message, f'<b><a href="tg:user?id={user_id}">{message.from_user.full_name}'
+                                    f'</a>, правило {rule_num}</b>\n<i>{fetch_rule(rule_num)}</i>',
+                           reply_markup=markup)
     warn_user(user_id)
     if warnings_count(user_id) >= 3:
         logging.info(f"[MUTED] {user_id} заглушен за нарушение правила 6.")
