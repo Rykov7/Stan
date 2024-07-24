@@ -51,7 +51,6 @@ LIB = types.InlineKeyboardButton("📚 Книги", url="https://telegra.ph/what
 
 
 NON_GRATA = {"дудар", "хауди", "dudar"}
-BAN_WORDS = {"GREEN", "TONCOIN", "казино", "🍋", "Выплаты", "🎰"}
 
 ZEN = [
     "Beautiful is better than ugly.",

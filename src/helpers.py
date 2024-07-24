@@ -6,7 +6,7 @@ from urllib.request import urlopen
 from telebot import types
 
 from .constants import (
-    NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS, BAN_WORDS
+    NON_GRATA, ADMIN_ID, ONLY_RUS_LETTERS, ONLY_ENG_LETTERS, RULES_TEXT, SYMBOLS
 )
 from .models import session, BadWord
 
@@ -73,7 +73,7 @@ def is_in_not_allowed(word_list: list, msg: str) -> bool:
 
 
 def is_ban_words_in_caption(caption: str) -> bool:
-    return any(ban_word in caption for ban_word in BAN_WORDS)
+    return is_spam(caption)
 
 
 def is_nongrata(type_message: types.Message) -> bool:

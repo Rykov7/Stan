@@ -1,6 +1,6 @@
 from unittest import TestCase, main
 from unittest.mock import MagicMock
-from src.constants import BAN_WORDS, ADMIN_ID, RULES_TEXT
+from src.constants import ADMIN_ID, RULES_TEXT
 from src.helpers import (
     is_spam, is_mixed, is_ban_words_in_caption, is_in_not_allowed, is_nongrata, is_admin, fetch_rule, cleaned_text,
     remove_spaces, has_no_letters, has_links
@@ -100,10 +100,6 @@ class TestSpam(TestCase):
 
 
 class TestOthers(TestCase):
-    def test_ban(self):
-        for word in BAN_WORDS:
-            with self.subTest(f"check ban word({word})"):
-                self.assertTrue(is_ban_words_in_caption(word))
 
     def test_allowed(self):
         params = (
