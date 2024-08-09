@@ -42,9 +42,10 @@ async def moderate_messages(message: types.Message):
     increment(message.chat.id, banned=True)
 
 
-@bot.message_handler(func=in_caption_spam_list, content_types=["video"], chat_types=["supergroup", "group"])
+@bot.edited_message_handler(func=in_caption_spam_list, content_types=["video", "photo", "animation"], chat_types=["supergroup", "group"])
+@bot.message_handler(func=in_caption_spam_list, content_types=["video", "photo", "animation"], chat_types=["supergroup", "group"])
 async def catch_videos(message: types.Message):
-    """Catch offensive videos"""
+    """Catch offensive media"""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)
     increment(message.chat.id, banned=True)
