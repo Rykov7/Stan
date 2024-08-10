@@ -22,7 +22,7 @@ def in_caption_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted words in caption."""
     if message.caption and is_ban_words_in_caption(message.caption):
         from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
-        logging.info("!BAN CAPTION!" + LOG_COMM % (title, from_user_id, from_user_name, message.video.file_name))
+        logging.info("!BAN CAPTION!" + LOG_COMM % (title, from_user_id, from_user_name, message.caption))
         return True
     return False
 

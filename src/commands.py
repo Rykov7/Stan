@@ -44,7 +44,7 @@ async def moderate_messages(message: types.Message):
 
 @bot.edited_message_handler(func=in_caption_spam_list, content_types=["video", "photo", "animation"], chat_types=["supergroup", "group"])
 @bot.message_handler(func=in_caption_spam_list, content_types=["video", "photo", "animation"], chat_types=["supergroup", "group"])
-async def catch_videos(message: types.Message):
+async def catch_media(message: types.Message):
     """Catch offensive media"""
     await bot.delete_message(message.chat.id, message.id)
     await bot.ban_chat_member(message.chat.id, message.from_user.id)

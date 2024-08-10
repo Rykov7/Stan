@@ -101,7 +101,8 @@ async def add_spam_handler(message: types.Message):
             await bot.delete_message(message.chat.id, ok_message.id)
             logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[SPAM] {message.reply_to_message.text}'))
         else:
-            await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть такое в спаме: {quote}", parse_mode='Markdown')
+            no_message = await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть такое в спаме: {quote}", parse_mode='Markdown')
+            await bot.delete_message(message.chat.id, no_message.id)
 
 
 @bot.message_handler(func=is_white_id, commands=["info"])
