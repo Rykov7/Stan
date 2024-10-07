@@ -13,19 +13,23 @@ def in_spam_list(message: types.Message) -> bool:
     from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
     if from_user_id not in WHITEIDS and antispam_is_enabled:
         if is_spam(message.text):
-            logging.info("!BAN!" + LOG_COMM % (title, from_user_id, from_user_name, message.text))
-            return True
-        if message.forward_from:  # Запрет репостов из других групп.
+            logging.info("[BAN]" + LOG_COMM % (title, from_user_id, from_user_name, message.text))
             return True
     return False
 
 
 def in_caption_spam_list(message: types.Message) -> bool:
     """Check for mentioning unwanted words in caption."""
-    if message.caption and is_ban_words_in_caption(message.caption):
-        from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
-        logging.info("!BAN CAPTION!" + LOG_COMM % (title, from_user_id, from_user_name, message.caption))
-        return True
+    antispam_is_enabled = is_antispam_enabled(message.chat.id)
+    from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
+    if from_user_id not in WHITEIDS and antispam_is_enabled:
+        if message.caption and is_ban_words_in_caption(message.caption):
+            from_user_id, title, from_user_name = message.from_user.id, message.chat.title, message.from_user.first_name
+            logging.info("[BAN CAPTION]" + LOG_COMM % (title, from_user_id, from_user_name, message.caption))
+            return True
+        if message.forward_from:  # Запрет репостов для Медиа.
+            logging.info("[BAN REPOST]" + LOG_COMM % (title, from_user_id, from_user_name))
+            return True
     return False
 
 
