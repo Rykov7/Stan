@@ -15,6 +15,8 @@ def in_spam_list(message: types.Message) -> bool:
         if is_spam(message.text):
             logging.info("!BAN!" + LOG_COMM % (title, from_user_id, from_user_name, message.text))
             return True
+        if message.forward_from:  # Запрет репостов из других групп.
+            return True
     return False
 
 
