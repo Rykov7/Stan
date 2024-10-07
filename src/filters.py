@@ -28,7 +28,7 @@ def in_caption_spam_list(message: types.Message) -> bool:
             logging.info("[BAN CAPTION]" + LOG_COMM % (title, from_user_id, from_user_name, message.caption))
             return True
         if message.forward_from:  # Запрет репостов для Медиа.
-            logging.info("[BAN REPOST]" + LOG_COMM % (title, from_user_id, from_user_name))
+            logging.info(f"[BAN REPOST] [{title}] {from_user_id}: {from_user_name}")
             return True
     return False
 
