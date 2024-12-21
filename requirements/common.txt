@@ -4,19 +4,21 @@
 #
 #    pip-compile requirements/common.in
 #
-aiohappyeyeballs==2.4.3
+aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.10.9
+aiohttp==3.11.11
     # via -r requirements/common.in
-aiosignal==1.3.1
+aiosignal==1.3.2
     # via aiohttp
-attrs==24.2.0
+attrs==24.3.0
     # via aiohttp
-certifi==2024.8.30
+certifi==2024.12.14
     # via requests
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via requests
-frozenlist==1.4.1
+emoji==2.14.0
+    # via -r requirements/common.in
+frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
@@ -30,7 +32,11 @@ multidict==6.1.0
     # via
     #   aiohttp
     #   yarl
-pytelegrambotapi==4.23.0
+propcache==0.2.1
+    # via
+    #   aiohttp
+    #   yarl
+pytelegrambotapi==4.25.0
     # via -r requirements/common.in
 python-dotenv==1.0.1
     # via -r requirements/common.in
@@ -38,11 +44,11 @@ requests==2.32.3
     # via pytelegrambotapi
 schedule==1.2.2
     # via -r requirements/common.in
-sqlalchemy==2.0.35
+sqlalchemy==2.0.36
     # via -r requirements/common.in
 typing-extensions==4.12.2
     # via sqlalchemy
 urllib3==2.2.3
     # via requests
-yarl==1.13.1
+yarl==1.18.3
     # via aiohttp
