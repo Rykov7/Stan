@@ -3,6 +3,7 @@ from urllib import parse
 from urllib.error import URLError
 from urllib.request import urlopen
 
+from emoji import is_emoji
 from telebot import types
 
 from .constants import (
@@ -34,11 +35,22 @@ def is_url_reachable(url: str) -> bool:
         return False
 
 
+def is_too_much_emojis(text: str) -> bool:
+    """
+    Проверяет, что первые 15 символов текста содержат много (5) эмодзи, или текст длиннее 8 символов и половина - это
+    эмодзи
+    """
+    if len(text) < 8:
+        return False
+    limit = 5 if len(text) > 15 else len(text) // 2
+    return len([1 for e in text[:15] if is_emoji(e)]) >= limit
+
+
 def is_spam(message_text: str) -> bool:
     """
     Проверяет текст на спам - сначала проверка смешанного алфавита, потом на константный набор спам-слов
     """
-    if is_mixed(message_text):
+    if is_mixed(message_text) or is_too_much_emojis(message_text):
         return True
     return any(bad_word.word.casefold() in message_text.casefold() for bad_word in session.query(BadWord).all())
 
@@ -136,8 +148,8 @@ def detect_args(message: types.Message):
             # Есть цитата, есть аргументы: ищем текст из аргументов.
             return " ".join(message.text.split()[1:])
     elif len(message.text.split()) > 1:
-            # Нет цитаты, есть аргументы: ищем текст из аргументов.
-            return " ".join(message.text.split()[1:])
+        # Нет цитаты, есть аргументы: ищем текст из аргументов.
+        return " ".join(message.text.split()[1:])
 
 
 def fetch_rule(index: int) -> str:
