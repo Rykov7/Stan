@@ -43,7 +43,7 @@ def is_too_much_emojis(text: str) -> bool:
     if len(text) < 8:
         return False
     limit = 5 if len(text) > 15 else len(text) // 2
-    return len([1 for e in text[:15] if is_emoji(e)]) >= limit
+    return len([1 for e in text[:15] if is_emoji(e) or e == '️']) >= limit
 
 
 def is_spam(message_text: str) -> bool:
@@ -64,8 +64,17 @@ def is_mixed(text: str) -> bool:
         word = word.strip()
         if not word:
             continue
-        if any(e in ONLY_RUS_LETTERS for e in word) and any(e in ONLY_ENG_LETTERS for e in word):
-            return True
+        rus_counts = eng_counts = any_counts = 0
+        for letter in word:
+            if letter in ONLY_RUS_LETTERS:
+                rus_counts += 1
+            elif letter in ONLY_ENG_LETTERS:
+                eng_counts += 1
+            elif letter not in SYMBOLS:
+                any_counts += 1
+            if (rus_counts > 0 and eng_counts > 0) or (rus_counts > 0 and any_counts > 0) or (
+                    eng_counts > 0 and any_counts > 0):
+                return True
     return False
 
 
