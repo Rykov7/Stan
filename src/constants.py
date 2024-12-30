@@ -39,7 +39,7 @@ HELLO_EXAMPLES = ('привет', 'привет всем', 'ку', 'здравс
 
 ONLY_RUS_LETTERS = "ёйцукенгшщзхъфывапролджэячсмитьбю"
 ONLY_ENG_LETTERS = string.ascii_lowercase
-SYMBOLS = """`[];',./~!@#$%^{}|:"<>?«»-+*/№=()&"""
+SYMBOLS = """`[];',./~!@#$%^{}|:"<>?«»-_\+*/№=()&"""
 RUS = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё!"№;%:?ЙЦУКЕНГШЩЗХЪ/ФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,"""
 ENG = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~!@#$%^&QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?"""
 RUS_ENG_TABLE = str.maketrans(RUS, ENG)
