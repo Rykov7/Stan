@@ -92,17 +92,17 @@ async def remove_stan_quote(message: types.Message):
 async def add_spam_handler(message: types.Message):
     if message.reply_to_message and message.reply_to_message.text:
         quote = (message.quote and message.quote.text) or message.reply_to_message.text
-        logging.error(f'{session.query(BadWord).filter_by(word=quote).first()}')
+        await bot.delete_message(message.chat.id, message.id)  # Удаляет сообщение с командой /add_spam
         if not session.query(BadWord).filter_by(word=quote).first():
             add_spam(message.chat.id, quote)
-            ok_message = await bot.send_message(message.chat.id, f"⭐️🤬 Добавил в спам: {quote}", parse_mode='Markdown')
-            await bot.delete_message(message.chat.id, message.id)
-            await asyncio.sleep(3)
-            await bot.delete_message(message.chat.id, ok_message.id)
-            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[SPAM] {message.reply_to_message.text}'))
+            status_message = await bot.send_message(message.chat.id, f"⭐️🤬 Добавил в спам: {quote}")
+            logging.info(LOG_COMM % (message.chat.title, message.from_user.id, message.from_user.full_name, f'[ADD_SPAM] {quote}'))
         else:
-            no_message = await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть такое в спаме: {quote}", parse_mode='Markdown')
-            await bot.delete_message(message.chat.id, no_message.id)
+            status_message = await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть уже в спаме: {quote}")
+
+        if message.chat.id == message.from_user.id:
+            await asyncio.sleep(3)
+            await bot.delete_message(message.chat.id, status_message.id)
 
 
 @bot.message_handler(func=is_white_id, commands=["info"])
