@@ -100,7 +100,7 @@ async def add_spam_handler(message: types.Message):
         else:
             status_message = await bot.send_message(message.chat.id, f"⛔️🤬 Не добавил, есть уже в спаме: {quote}")
 
-        if message.chat.id == message.from_user.id:
+        if message.chat.id != message.from_user.id:
             await asyncio.sleep(3)
             await bot.delete_message(message.chat.id, status_message.id)
 
