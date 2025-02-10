@@ -34,6 +34,7 @@ ALLOWED_WORDS = [
     "#rtfm",
     "support",
     "jetbrains",
+    "leetcode",
 ]
 HELLO_EXAMPLES = ('привет', 'привет всем', 'ку', 'здравствуйте', 'прив', 'всем прив', 'ребята всем привет', 'прива')
 
