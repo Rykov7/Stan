@@ -4,7 +4,7 @@ services:
     volumes:
       - stan_data:/code/data
     ports:
-      - "127.0.0.1:8813:8813"
+      - "8813:8813"
     restart: unless-stopped
     environment:
       STAN: ${STAN}
