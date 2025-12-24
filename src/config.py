@@ -1,5 +1,6 @@
 import logging
 import os
+from collections import deque
 
 from telebot import logger
 
@@ -21,4 +22,20 @@ if not is_url_reachable(RULES_URL):
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S", force=True)
 logger.setLevel(logging.ERROR)
 
-logging.critical(f'LOGGER {logging.getLogger()}: ')
+
+# Лог в буфер для HTML:
+log_buffer = deque(maxlen=1500)
+
+class BufferHandler(logging.Handler):
+    def emit(self, record):
+        log_buffer.append(self.format(record))
+
+
+buffer_handler = BufferHandler()
+buffer_handler.setLevel(logging.ERROR)
+buffer_handler.setFormatter(logging.Formatter(
+    "%(asctime)s %(levelname)s %(name)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+))
+
+logging.getLogger().addHandler(buffer_handler)

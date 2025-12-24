@@ -1,12 +1,14 @@
 import asyncio
+import html
 import logging
 
 import requests
 import telebot
 from fastapi import FastAPI
+from starlette.responses import HTMLResponse
 
 from .commands import bot
-from .config import TOKEN
+from .config import TOKEN, log_buffer
 
 logging.warning("[START] Webhook server")
 app = FastAPI(docs=None, redoc_url=None)
@@ -20,6 +22,27 @@ async def webhook(update: dict):
         asyncio.ensure_future(bot.process_new_updates([update]))
     else:
         return None
+
+
+@app.get("/stan-logs", response_class=HTMLResponse)
+def logs():
+    body = "<br>".join(html.escape(line) for line in log_buffer)
+    return f"""
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Stan Logs</title>
+        <style>
+          body {{
+            font-family: monospace;
+            background: #111;
+            color: #0f0;
+          }}
+        </style>
+      </head>
+      <body>{body}</body>
+    </html>
+    """
 
 
 @app.get("/healthz")
