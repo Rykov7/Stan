@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements/ ./requirements/
-RUN ["pip", "install", "-r", "requirements/requirements.txt", "--no-cache-dir", "--disable-pip-version-check"]
+RUN ["pip", "install", "-r", "requirements/common.txt", "-r", "requirements/prod.txt", "--no-cache-dir", "--disable-pip-version-check"]
 
 COPY . .
 
