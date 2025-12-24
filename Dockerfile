@@ -1,4 +1,6 @@
-FROM python:3.13-slim
+FROM python:3.13-slim-trixie
+
+LABEL title="Stan"
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
