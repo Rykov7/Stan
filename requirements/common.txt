@@ -38,8 +38,6 @@ propcache==0.2.1
     #   yarl
 pytelegrambotapi==4.25.0
     # via -r requirements/common.in
-python-dotenv==1.0.1
-    # via -r requirements/common.in
 requests==2.32.3
     # via pytelegrambotapi
 schedule==1.2.2

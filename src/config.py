@@ -1,12 +1,10 @@
 import logging
 import os
 
-from dotenv import load_dotenv
 from telebot import logger
 
 from .helpers import is_url_reachable
 
-load_dotenv()
 
 TOKEN = os.environ.get("STAN")
 if not TOKEN:

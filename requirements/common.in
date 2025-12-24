@@ -1,5 +1,4 @@
 aiohttp
-python-dotenv
 pyTelegramBotAPI
 schedule
 SQLAlchemy
