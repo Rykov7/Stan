@@ -32,7 +32,7 @@ class BufferHandler(logging.Handler):
 
 
 buffer_handler = BufferHandler()
-buffer_handler.setLevel(logging.ERROR)
+buffer_handler.setLevel(logging.INFO)
 buffer_handler.setFormatter(logging.Formatter(
     "%(asctime)s %(levelname)s %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
