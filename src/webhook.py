@@ -31,6 +31,9 @@ def logs():
     <html>
       <head>
         <meta charset="utf-8">
+        <script>
+          setInterval(() => location.reload(), 5000);
+        </script>
         <title>Stan Logs</title>
         <style>
           body {{
