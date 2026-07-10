@@ -1,0 +1,176 @@
+- name: Развертывание бота Stan
+  hosts: servers
+  become: true
+
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Установка базовых утилит
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+          - htop
+          - ufw
+        state: present
+        update_cache: true
+
+    - name: Создаем директорию для GPG-ключа Docker
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Скачивание официального GPG-ключа Docker
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: 'a+r'
+
+    - name: Добавление репозитория Docker
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+        filename: docker
+
+    - name: Установка Docker, Nginx и Certbot
+      apt:
+        name:
+          - nginx
+          - docker-ce
+          - docker-ce-cli
+          - docker-buildx-plugin
+          - docker-compose-plugin
+          - python3-docker
+          - certbot
+        state: present
+        update_cache: true
+
+    - name: Клонируем репозиторий бота
+      git:
+        repo: 'https://github.com/LeoR156/Stan-Ansible'
+        dest: "{{ bot_dir }}"
+        force: yes
+
+    - name: Создаем директорию для базы данных на сервере
+      file:
+        path: "{{ bot_dir }}/data"
+        state: directory
+        mode: '0755'
+
+    - name: Собираем Docker-образ локально
+      community.docker.docker_image:
+        name: stan
+        tag: latest
+        source: build
+        build:
+          path: "{{ bot_dir }}"
+          nocache: true
+
+    - name: Копируем файл .env на сервер
+      copy:
+        src: .env
+        dest: "{{ bot_dir }}/.env"
+
+    - name: Запускаем контейнер бота
+      community.docker.docker_container:
+        name: "tg_bot_stan"
+        image: stan:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "127.0.0.1:8813:8813"
+        env_file: "{{ bot_dir }}/.env"
+        volumes:
+          - "{{ bot_dir }}/data:/app/data"
+
+    - name: Настройка UFW - Запрещаем все входящие
+      ufw:
+        policy: deny
+        direction: incoming
+
+    - name: Настройка UFW - Разрешаем все исходящие
+      ufw:
+        policy: allow
+        direction: outgoing
+
+    - name: Настройка UFW - Разрешаем порты 22, 80, 443
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - '22'
+        - '80'
+        - '443'
+
+    - name: Включаем UFW
+      ufw:
+        state: enabled
+
+    - name: Проверяем, есть ли SSL сертификат
+      stat:
+        path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+      register: cert_file
+
+    - name: Останавливаем Nginx перед получением сертификата
+      service:
+        name: nginx
+        state: stopped
+      when: not cert_file.stat.exists
+
+    - name: Получаем SSL сертификат (Standalone режим)
+      command: >
+        certbot certonly --standalone
+        --non-interactive
+        --agree-tos
+        --email {{ certbot_email }}
+        -d {{ domain_name }}
+      when: not cert_file.stat.exists
+
+    - name: Удаляем дефолтный конфиг Nginx
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Копируем шаблон конфигурации Nginx
+      template:
+        src: templates/bot.conf.j2
+        dest: "/etc/nginx/sites-available/{{ domain_name }}.conf"
+      notify: Reload Nginx
+
+    - name: Активируем конфиг Nginx (симлинк)
+      file:
+        src: "/etc/nginx/sites-available/{{ domain_name }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ domain_name }}.conf"
+        state: link
+      notify: Reload Nginx
+
+    - name: Запускаем и включаем Nginx в автозагрузку
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+
+    - name: Активируем Telegram Webhook
+      shell: >
+        source {{ bot_dir }}/.env &&
+        curl -s "https://api.telegram.org/bot${STAN}/setWebhook?url=https://{{ domain_name }}/bot${STAN}/"
+      args:
+        executable: /bin/bash
+      register: webhook_result
+      changed_when: false
+
+    - name: Выводим результат активации Webhook в консоль
+      debug:
+        msg: "Ответ от Telegram: {{ webhook_result.stdout }}"
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded

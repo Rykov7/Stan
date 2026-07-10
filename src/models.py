@@ -15,7 +15,7 @@ data_folder = root / "data"
 db_path = data_folder / "db.sqlite"
 engine = create_engine(f'sqlite:///{db_path}')
 
-Base.metadata.create_all(engine)
+
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -141,6 +141,7 @@ def _reload_chat(chat_id: int):
     chat = session.query(Chat).filter(Chat.chat_id == chat_id).first()
     CACHE[chat_id] = chat
 
+Base.metadata.create_all(engine)
 
 _fill_cache()
 logging.warning("[START] Load data from db to cache")

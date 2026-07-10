@@ -11,8 +11,12 @@ TOKEN = os.environ.get("STAN")
 if not TOKEN:
     raise LookupError("STAN (token) has not been found in .env")
 
-WHITEIDS = {int(i) for i in os.environ.get("whiteids").split(",")}
-ROLLBACK = {int(i) for i in os.environ.get("rollback").split(",")}
+whiteids_env = os.environ.get("whiteids")
+WHITEIDS = {int(i) for i in whiteids_env.split(",")} if whiteids_env else set()
+
+rollback_env = os.environ.get("rollback")
+ROLLBACK = {int(i) for i in rollback_env.split(",")} if rollback_env else set()
+
 USE_REMINDER = os.environ.get("use_reminder", "TRUE") == "TRUE"
 
 RULES_URL = os.environ.get("rules_url", "https://telegra.ph/pythonchatru-07-07")

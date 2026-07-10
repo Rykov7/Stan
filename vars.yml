@@ -1,0 +1,4 @@
+domain_name: ваш_домен.ру   # Замените на ваш реальный домен!
+certbot_email: aaa@gmail.com
+bot_dir: /apt/tg_bot
+bot_internal_port: "8813"
